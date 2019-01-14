@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gofunct/common/utils"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -17,9 +18,11 @@ var (
 	rootCmd = &cobra.Command{
 		Use:   "mamba",
 		Short: "A generator for Mamba based Applications",
-		Long: `Mamba is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Mamba application.`,
+		Long: utils.Red(`oooo     oooo                          oooo                   
+ 8888o   888   ooooooo   oo ooo oooo    888ooooo     ooooooo  
+ 88 888o8 88   ooooo888   888 888 888   888    888   ooooo888 
+ 88  888  88 888    888   888 888 888   888    888 888    888 
+o88o  8  o88o 88ooo88 8o o888o888o888o o888ooo88    88ooo88 8o`),
 	}
 )
 
@@ -39,8 +42,13 @@ func init() {
 	rootCmd.PersistentFlags().StringP("author", "a", "YOUR NAME", "author name for copyright attribution")
 	rootCmd.PersistentFlags().StringVarP(&userLicense, "license", "l", "", "name of license for the project")
 	rootCmd.PersistentFlags().Bool("viper", true, "use Viper for configuration")
-	viper.BindPFlag("author", rootCmd.PersistentFlags().Lookup("author"))
-	viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
+	if err := viper.BindPFlag("author", rootCmd.PersistentFlags().Lookup("author")); err != nil {
+		log.Print("failed to bind to flag", err)
+	}
+	if err := viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper")); err != nil {
+		log.Print("failed to bind to flag", err)
+	}
+
 	viper.SetDefault("author", "NAME HERE <EMAIL ADDRESS>")
 	viper.SetDefault("license", "apache")
 

@@ -19,9 +19,9 @@ var packageName, parentName string
 var addCmd = &cobra.Command{
 	Use:     "add [command name]",
 	Aliases: []string{"command"},
-	Short:   "Add a command to a Cobra Application",
+	Short:   "Add a command to a Mamba Application",
 	Long: `Add (cobra add) will create a new command, with a license and
-the appropriate structure for a Cobra-based CLI application,
+the appropriate structure for a Mamba-based CLI application,
 and register it to its parent (default rootCmd).
 
 If you want your command to be public, pass in the command name
@@ -47,7 +47,7 @@ Example: cobra add server -> resulting in a new cmd/server.go`,
 
 		cmdName := validateCmdName(args[0])
 		cmdPath := filepath.Join(project.CmdPath(), cmdName+".go")
-		createCmdFile(project.License(), cmdPath, cmdName)
+		createCmdFile(cmdPath, cmdName)
 
 		fmt.Fprintln(cmd.OutOrStdout(), cmdName, "created at", cmdPath)
 	},
@@ -106,7 +106,7 @@ func validateCmdName(source string) string {
 	return output
 }
 
-func createCmdFile(license License, path, cmdName string) {
+func createCmdFile(path, cmdName string) {
 	template := `{{comment .copyright}}
 {{if .license}}{{comment .license}}{{end}}
 
@@ -125,9 +125,9 @@ var {{.cmdName}}Cmd = &cobra.Command{
 	Long: ` + "`" + `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
-Cobra is a CLI library for Go that empowers applications.
+Mamba is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
-to quickly create a Cobra application.` + "`" + `,
+to quickly create a Mamba application.` + "`" + `,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("{{.cmdName}} called")
 	},
@@ -138,19 +138,17 @@ func init() {
 
 	// Here you will define your flags and configuration settings.
 
-	// Cobra supports Persistent Flags which will work for this command
+	// Mamba supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	// {{.cmdName}}Cmd.PersistentFlags().String("foo", "", "A help for foo")
 
-	// Cobra supports local flags which will only run when this command
+	// Mamba supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// {{.cmdName}}Cmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 `
 
 	data := make(map[string]interface{})
-	data["copyright"] = copyrightLine()
-	data["license"] = license.Header
 	data["cmdPackage"] = filepath.Base(filepath.Dir(path)) // last dir of path
 	data["parentName"] = parentName
 	data["cmdName"] = cmdName

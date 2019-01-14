@@ -12,7 +12,6 @@ type Project struct {
 	absPath string
 	cmdPath string
 	srcPath string
-	license License
 	name    string
 }
 
@@ -104,14 +103,6 @@ func trimSrcPath(absPath, srcPath string) string {
 		er(err)
 	}
 	return relPath
-}
-
-// License returns the License object of project.
-func (p *Project) License() License {
-	if p.license.Text == "" && p.license.Name != "None" {
-		p.license = getLicense()
-	}
-	return p.license
 }
 
 // Name returns the name of project, e.g. "github.com/spf13/cobra"

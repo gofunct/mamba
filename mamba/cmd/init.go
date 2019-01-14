@@ -13,9 +13,9 @@ import (
 var initCmd = &cobra.Command{
 	Use:     "init [name]",
 	Aliases: []string{"initialize", "initialise", "create"},
-	Short:   "Initialize a Cobra Application",
+	Short:   "Initialize a Mamba Application",
 	Long: `Initialize (cobra init) will create a new application, with a license
-and the appropriate structure for a Cobra-based CLI application.
+and the appropriate structure for a Mamba-based CLI application.
 
   * If a name is provided, it will be created in the current directory;
   * If no name is provided, the current directory will be assumed;
@@ -51,7 +51,7 @@ Init will not use an existing directory with contents.`,
 
 		initializeProject(project)
 
-		fmt.Fprintln(cmd.OutOrStdout(), `Your Cobra application is ready at
+		fmt.Fprintln(cmd.OutOrStdout(), `Your Mamba application is ready at
 `+project.AbsPath()+`
 
 Give it a try by going there and running `+"`go run main.go`."+`
@@ -66,30 +66,12 @@ func initializeProject(project *Project) {
 			er(err)
 		}
 	} else if !isEmpty(project.AbsPath()) { // If path exists and is not empty don't use it
-		er("Cobra will not create a new project in a non empty directory: " + project.AbsPath())
+		er("Mamba will not create a new project in a non empty directory: " + project.AbsPath())
 	}
 
 	// We have a directory and it's empty. Time to initialize it.
-	createLicenseFile(project.License(), project.AbsPath())
 	createMainFile(project)
 	createRootCmdFile(project)
-}
-
-func createLicenseFile(license License, path string) {
-	data := make(map[string]interface{})
-	data["copyright"] = copyrightLine()
-
-	// Generate license template from text and data.
-	text, err := executeTemplate(license.Text, data)
-	if err != nil {
-		er(err)
-	}
-
-	// Write license text to LICENSE file.
-	err = writeStringToFile(filepath.Join(path, "LICENSE"), text)
-	if err != nil {
-		er(err)
-	}
 }
 
 func createMainFile(project *Project) {
@@ -105,8 +87,6 @@ func main() {
 }
 `
 	data := make(map[string]interface{})
-	data["copyright"] = copyrightLine()
-	data["license"] = project.License().Header
 	data["importpath"] = path.Join(project.Name(), filepath.Base(project.CmdPath()))
 
 	mainScript, err := executeTemplate(mainTemplate, data)
@@ -144,9 +124,9 @@ var rootCmd = &cobra.Command{
 	Long: ` + "`" + `A longer description that spans multiple lines and likely contains
 examples and usage of using your application. For example:
 
-Cobra is a CLI library for Go that empowers applications.
+Mamba is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
-to quickly create a Cobra application.` + "`" + `,
+to quickly create a Mamba application.` + "`" + `,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },
@@ -165,12 +145,12 @@ func init() { {{- if .viper}}
 	cobra.OnInitialize(initConfig)
 {{end}}
 	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
+	// Mamba supports persistent flags, which, if defined here,
 	// will be global for your application.{{ if .viper }}
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.{{ .appName }}.yaml)"){{ else }}
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.{{ .appName }}.yaml)"){{ end }}
 
-	// Cobra also supports local flags, which will only run
+	// Mamba also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }{{ if .viper }}
@@ -203,9 +183,7 @@ func initConfig() {
 `
 
 	data := make(map[string]interface{})
-	data["copyright"] = copyrightLine()
 	data["viper"] = viper.GetBool("useViper")
-	data["license"] = project.License().Header
 	data["appName"] = path.Base(project.Name())
 
 	rootCmdScript, err := executeTemplate(template, data)

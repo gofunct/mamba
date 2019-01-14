@@ -1,6 +1,6 @@
 package main
 
-import "github.com/gofunct/mamba/cmd"
+import "github.com/gofunct/mamba/mamba/cmd"
 
 func main() {
 	cmd.Execute()
