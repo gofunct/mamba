@@ -5,6 +5,7 @@ import (
 	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/ratelimit"
 	"github.com/gofunct/mamba/app"
+	"github.com/gofunct/mamba/service"
 	"golang.org/x/time/rate"
 	kitlog"github.com/go-kit/kit/log"
 	"log"
@@ -12,7 +13,23 @@ import (
 	"time"
 )
 
+
+var (
+	application *app.Application
+	closer func()
+)
+
+func init() {
+	var err error
+	application, closer, err = app.Gcp(context.Background(), "demo")
+	if err != nil {
+		log.Fatalf("failed to initialize application", err)
+	}
+}
+
 func main() {
+	defer log.Fatal(application.Execute())
+	defer closer()
 	// Create a single logger, which we'll use and give to other components.
 	var logger kitlog.Logger
 	{
@@ -27,11 +44,7 @@ func main() {
 		sumEndpoint = ratelimit.NewErroringLimiter(rate.NewLimiter(rate.Every(time.Second), 1))(sumEndpoint)
 		sumEndpoint = LoggingMiddleware(kitlog.With(logger, "method", "Sum"))(sumEndpoint)
 	}
+	svc := service.NewService("sum", sumEndpoint, nil)
+	application.AddService(svc)
 
-	a, c, err := app.Gcp(context.TODO(), "demo", sumEndpoint, nil)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer c()
-	log.Fatal(a.Execute())
 }
