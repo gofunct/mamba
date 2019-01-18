@@ -22,7 +22,7 @@ func init() {
 	var err error
 	application, closer, err = app.Gcp(context.Background(), "demo")
 	if err != nil {
-		log.Fatalf("failed to initialize application", err)
+		log.Fatalf("failed to initialize application %s\n", err)
 	}
 }
 
