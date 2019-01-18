@@ -22,16 +22,29 @@ package cmd
 
 import (
 	"fmt"
+	kitlog "github.com/go-kit/kit/log"
 	"github.com/gofunct/mamba/cmd/gcloud"
 	"github.com/gofunct/mamba/cmd/local"
-	"github.com/gofunct/mamba/cmd/protoc"
 	"github.com/spf13/cobra"
+	"log"
 	"os"
 )
 
-var (
-	cfgFile string
-)
+func init() {
+	{
+		logger := kitlog.NewJSONLogger(kitlog.NewSyncWriter(os.Stdout))
+		logger = kitlog.With(logger, "time", kitlog.DefaultTimestampUTC, "origin")
+		log.SetOutput(kitlog.NewStdlibAdapter(logger))
+	}
+
+	{
+		rootCmd.AddCommand(gcloud.RootCmd)
+		rootCmd.AddCommand(local.RootCmd)
+		rootCmd.AddCommand(protocCmd)
+		rootCmd.AddCommand(htmlCmd)
+		rootCmd.AddCommand(testCmd)
+	}
+}
 
 var rootCmd = &cobra.Command{
 	Use:   "mamba",
@@ -43,12 +56,4 @@ func Execute() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-}
-
-func init() {
-	rootCmd.AddCommand(protoc.ProtocCmd)
-	rootCmd.AddCommand(gcloud.RootCmd)
-	rootCmd.AddCommand(local.RootCmd)
-
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.chronic.yaml)")
 }

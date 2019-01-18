@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option go_package = "github.com/gofunct/mamba/api/tf_service";
+import "google/protobuf/empty.proto";
+import "github.com/gofunct/mamba/common/common.proto";
+
+package provisioner;
+
+service Provisioner {
+    rpc GetSchema(common.GetProvisionerSchema.Request) returns (common.GetProvisionerSchema.Response);
+    rpc ValidateProvisionerConfig(common.ValidateProvisionerConfig.Request) returns (common.ValidateProvisionerConfig.Response);
+    rpc ProvisionResource(common.ProvisionResource.Request) returns (stream common.ProvisionResource.Response);
+    rpc Stop(common.Stop.Request) returns (common.Stop.Response);
+}

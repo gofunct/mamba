@@ -20,7 +20,7 @@ var ApplicationSet = wire.NewSet(
 type Application struct {
 	Name    string
 	Version string
-	Info   string
+	Info    string
 	*runtime.Service
 }
 

@@ -5,8 +5,8 @@ import (
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
 	"github.com/google/wire"
 	"github.com/hashicorp/terraform/terraform"
-	"google.golang.org/grpc"
 	"github.com/terraform-providers/terraform-provider-kubernetes/kubernetes"
+	"google.golang.org/grpc"
 	"strings"
 )
 
@@ -16,9 +16,9 @@ var Set = wire.NewSet(
 )
 
 type Service struct {
-	Pattern    string
-	Version    string
-	Endpoint   endpoint.Endpoint
+	Pattern  string
+	Version  string
+	Endpoint endpoint.Endpoint
 	*grpc.Server
 	terraform.ResourceProvider
 }

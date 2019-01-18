@@ -3,20 +3,19 @@ package main
 import (
 	"context"
 	"github.com/go-kit/kit/endpoint"
+	kitlog "github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/ratelimit"
 	"github.com/gofunct/mamba/app"
 	"github.com/gofunct/mamba/service"
 	"golang.org/x/time/rate"
-	kitlog"github.com/go-kit/kit/log"
 	"log"
 	"os"
 	"time"
 )
 
-
 var (
 	application *app.Application
-	closer func()
+	closer      func()
 )
 
 func init() {

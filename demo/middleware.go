@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/go-kit/kit/endpoint"
-	"time"
-	"github.com/go-kit/kit/log"
 	"context"
+	"github.com/go-kit/kit/endpoint"
+	"github.com/go-kit/kit/log"
+	"time"
 )
 
 // LoggingMiddleware returns an endpoint middleware that logs the

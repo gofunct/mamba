@@ -21,38 +21,15 @@
 package cmd
 
 import (
-	"fmt"
-	"github.com/gofunct/mamba/api/script"
-	"google.golang.org/grpc"
-	"log"
-	"net"
-
+	"github.com/gofunct/mamba/tmpl"
 	"github.com/spf13/cobra"
 )
 
-var (
-	port string
-)
-
-func init() {
-	rootCmd.AddCommand(serveCmd)
-	serveCmd.Flags().StringVarP(&port, "port", "p", "8080", "port  to listen on")
-}
-
-// serveCmd represents the serve command
-var serveCmd = &cobra.Command{
-	Use:   "serve",
-	Short: "start a grpc server to handle remote script requests",
-
-	RunE: func(cmd *cobra.Command, args []string) error {
-		lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", port))
-		if err != nil {
-			log.Fatalf("failed to listen: %v", err)
-		}
-		var opts []grpc.ServerOption
-
-		grpcServer := grpc.NewServer(opts...)
-		script.RegisterScriptServiceServer(grpcServer, script.NewScriptHandler())
-		return grpcServer.Serve(lis)
+// htmlCmd represents the html command
+var htmlCmd = &cobra.Command{
+	Use:   "html",
+	Short: "Generate html files",
+	Run: func(cmd *cobra.Command, args []string) {
+		tmpl.GenerateHtml()
 	},
 }

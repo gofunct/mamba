@@ -1,6 +1,39 @@
 syntax = "proto3";
 
-package tf;
+option go_package = "github.com/gofunct/mamba/common";
+import "google/protobuf/empty.proto";
+import "github.com/gofunct/mamba/common/common.proto";
+
+package common;
+
+message ConnInfo {
+    uint32 service_id = 1;
+    string network = 2;
+    string address = 3;
+}
+
+message Raw {
+    repeated bytes out = 1;
+}
+
+// RawState holds the stored state for a resource to be upgraded by the
+// provider. It can be in one of two formats, the current json encoded format
+// in bytes, or the legacy flatmap format as a map of strings.
+message RawState {
+    bytes json = 1;
+    map<string, string> flatmap = 2;
+}
+
+message Args {
+    repeated string args = 1;
+}
+
+message Command {
+    string name =1;
+    string dir = 2;
+    repeated string args = 3;
+    repeated string env = 4;
+}
 
 // DynamicValue is an opaque encoding of terraform data, with the field name
 // indicating the encoding scheme used.
@@ -20,7 +53,6 @@ message Diagnostic {
     string detail = 3;
     AttributePath attribute = 4;
 }
-
 message AttributePath {
     message Step {
         oneof selector {
@@ -42,14 +74,6 @@ message Stop {
     message Response {
         string Error = 1;
     }
-}
-
-// RawState holds the stored state for a resource to be upgraded by the
-// provider. It can be in one of two formats, the current json encoded format
-// in bytes, or the legacy flatmap format as a map of strings.
-message RawState {
-    bytes json = 1;
-    map<string, string> flatmap = 2;
 }
 
 // Schema is the configuration schema for a Resource, Provider, or Provisioner.
@@ -95,28 +119,6 @@ message Schema {
     Block block = 2;
 }
 
-service Provider {
-    //////// Information about what a provider supports/expects
-    rpc GetSchema(GetProviderSchema.Request) returns (GetProviderSchema.Response);
-    rpc PrepareProviderConfig(PrepareProviderConfig.Request) returns (PrepareProviderConfig.Response);
-    rpc ValidateResourceTypeConfig(ValidateResourceTypeConfig.Request) returns (ValidateResourceTypeConfig.Response);
-    rpc ValidateDataSourceConfig(ValidateDataSourceConfig.Request) returns (ValidateDataSourceConfig.Response);
-    rpc UpgradeResourceState(UpgradeResourceState.Request) returns (UpgradeResourceState.Response);
-
-    //////// One-time initialization, called before other functions below
-    rpc Configure(Configure.Request) returns (Configure.Response);
-
-    //////// Managed Resource Lifecycle
-    rpc ReadResource(ReadResource.Request) returns (ReadResource.Response);
-    rpc PlanResourceChange(PlanResourceChange.Request) returns (PlanResourceChange.Response);
-    rpc ApplyResourceChange(ApplyResourceChange.Request) returns (ApplyResourceChange.Response);
-    rpc ImportResourceState(ImportResourceState.Request) returns (ImportResourceState.Response);
-
-    rpc ReadDataSource(ReadDataSource.Request) returns (ReadDataSource.Response);
-
-    //////// Graceful Shutdown
-    rpc Stop(Stop.Request) returns (Stop.Response);
-}
 
 message GetProviderSchema {
     message Request {
@@ -126,16 +128,6 @@ message GetProviderSchema {
         map<string, Schema> resource_schemas = 2;
         map<string, Schema> data_source_schemas = 3;
         repeated Diagnostic diagnostics = 4;
-    }
-}
-
-message PrepareProviderConfig {
-    message Request {
-        DynamicValue config = 1;
-    }
-    message Response {
-        DynamicValue prepared_config = 1;
-        repeated Diagnostic diagnostics = 2;
     }
 }
 
@@ -166,7 +158,7 @@ message UpgradeResourceState {
     }
 }
 
-message ValidateResourceTypeConfig {
+message ValidateDataSourceConfig {
     message Request {
         string type_name = 1;
         DynamicValue config = 2;
@@ -176,7 +168,63 @@ message ValidateResourceTypeConfig {
     }
 }
 
-message ValidateDataSourceConfig {
+message ReadResource {
+    message Request {
+        string type_name = 1;
+        DynamicValue current_state = 2;
+    }
+    message Response {
+        DynamicValue new_state = 1;
+        repeated Diagnostic diagnostics = 2;
+    }
+}
+
+message ApplyResourceChange {
+    message Request {
+        string type_name = 1;
+        DynamicValue prior_state = 2;
+        DynamicValue planned_state = 3;
+        DynamicValue config = 4;
+        bytes planned_private = 5;
+    }
+    message Response {
+        DynamicValue new_state = 1;
+        bytes private = 2;
+        repeated Diagnostic diagnostics = 3;
+    }
+}
+
+message ReadDataSource {
+    message Request {
+        string type_name = 1;
+        DynamicValue config = 2;
+    }
+    message Response {
+        DynamicValue state = 1;
+        repeated Diagnostic diagnostics = 2;
+    }
+}
+
+message ValidateProvisionerConfig {
+    message Request {
+        DynamicValue config = 1;
+    }
+    message Response {
+        repeated Diagnostic diagnostics = 1;
+    }
+}
+
+message PrepareProviderConfig {
+    message Request {
+        DynamicValue config = 1;
+    }
+    message Response {
+        DynamicValue prepared_config = 1;
+        repeated Diagnostic diagnostics = 2;
+    }
+}
+
+message ValidateResourceTypeConfig {
     message Request {
         string type_name = 1;
         DynamicValue config = 2;
@@ -196,17 +244,6 @@ message Configure {
     }
 }
 
-message ReadResource {
-    message Request {
-        string type_name = 1;
-        DynamicValue current_state = 2;
-    }
-    message Response {
-        DynamicValue new_state = 1;
-        repeated Diagnostic diagnostics = 2;
-    }
-}
-
 message PlanResourceChange {
     message Request {
         string type_name = 1;
@@ -221,21 +258,6 @@ message PlanResourceChange {
         repeated AttributePath requires_replace = 2;
         bytes planned_private = 3;
         repeated Diagnostic diagnostics = 4;
-    }
-}
-
-message ApplyResourceChange {
-    message Request {
-        string type_name = 1;
-        DynamicValue prior_state = 2;
-        DynamicValue planned_state = 3;
-        DynamicValue config = 4;
-        bytes planned_private = 5;
-    }
-    message Response {
-        DynamicValue new_state = 1;
-        bytes private = 2;
-        repeated Diagnostic diagnostics = 3;
     }
 }
 
@@ -257,24 +279,6 @@ message ImportResourceState {
     }
 }
 
-message ReadDataSource {
-    message Request {
-        string type_name = 1;
-        DynamicValue config = 2;
-    }
-    message Response {
-        DynamicValue state = 1;
-        repeated Diagnostic diagnostics = 2;
-    }
-}
-
-service Provisioner {
-    rpc GetSchema(GetProvisionerSchema.Request) returns (GetProvisionerSchema.Response);
-    rpc ValidateProvisionerConfig(ValidateProvisionerConfig.Request) returns (ValidateProvisionerConfig.Response);
-    rpc ProvisionResource(ProvisionResource.Request) returns (stream ProvisionResource.Response);
-    rpc Stop(Stop.Request) returns (Stop.Response);
-}
-
 message GetProvisionerSchema {
     message Request {
     }
@@ -284,14 +288,6 @@ message GetProvisionerSchema {
     }
 }
 
-message ValidateProvisionerConfig {
-    message Request {
-        DynamicValue config = 1;
-    }
-    message Response {
-        repeated Diagnostic diagnostics = 1;
-    }
-}
 
 message ProvisionResource {
     message Request {

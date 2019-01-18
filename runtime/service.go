@@ -28,7 +28,7 @@ func init() {
 	viper.SetConfigName("variables.hcl")
 	viper.AllowEmptyEnv(true)
 	viper.AutomaticEnv()
-	viper.AddConfigPath(os.Getenv("PWD")+"/deploy")
+	viper.AddConfigPath(os.Getenv("PWD") + "/deploy")
 	viper.AddConfigPath(os.Getenv("HOME"))
 	viper.AddConfigPath(os.Getenv("."))
 	if err := viper.ReadInConfig(); err != nil {
@@ -66,7 +66,7 @@ func NewService(db *sql.DB, bucket *blob.Bucket, srv *server.Server, l requestlo
 	m.Handle("/debug/pprof/trace", http.HandlerFunc(pprof.Trace))
 	m.Handle("/metrics", promhttp.HandlerFor(prometheus.DefaultGatherer, promhttp.HandlerOpts{}))
 	handl = requestlog.NewHandler(l, m)
-	return 	 &Service{db: db, bucket: bucket, Server: srv, Handler: handl, Group: RunGroup}
+	return &Service{db: db, bucket: bucket, Server: srv, Handler: handl, Group: RunGroup}
 }
 
 func (s *Service) Services() []*service.Service {

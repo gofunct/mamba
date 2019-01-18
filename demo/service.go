@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/go-kit/kit/endpoint"
-	"github.com/go-kit/kit/examples/addsvc/pkg/addservice"
 	"context"
 	"errors"
+	"github.com/go-kit/kit/endpoint"
+	"github.com/go-kit/kit/examples/addsvc/pkg/addservice"
 )
 
 // MakeSumEndpoint constructs a Sum endpoint wrapping the service.
@@ -76,8 +76,7 @@ const (
 
 var (
 	// ErrTwoZeroes is an arbitrary business rule for the Add method.
-	ErrTwoZeroes = errors.New("can't sum two zeroes")
-	ErrIntOverflow = errors.New("integer overflow")
+	ErrTwoZeroes       = errors.New("can't sum two zeroes")
+	ErrIntOverflow     = errors.New("integer overflow")
 	ErrMaxSizeExceeded = errors.New("result exceeds maximum size")
 )
-

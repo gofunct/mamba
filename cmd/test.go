@@ -38,7 +38,3 @@ var testCmd = &cobra.Command{
 		return c.Run()
 	},
 }
-
-func init() {
-	rootCmd.AddCommand(testCmd)
-}

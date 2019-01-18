@@ -18,38 +18,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package protoc
+package cmd
 
 import (
-	kitlog "github.com/go-kit/kit/log"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
-
-	"github.com/spf13/cobra"
 )
 
 // protocCmd represents the protoc command
-var ProtocCmd = &cobra.Command{
+var protocCmd = &cobra.Command{
 	Use:   "protoc",
-	Short: "A brief description of your command",
+	Short: "generate protobuf files",
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := Grpc(dir); err != nil {
+		if err := WalkGrpc(viper.GetString("proto.dir")); err != nil {
 			log.Fatalln("failed to execute command", err)
 		}
 	},
 }
 
-func init() {
-	ProtocCmd.Flags().StringVar(&dir, "dir", ".", "path to directory containing protobuf files")
-	logger := kitlog.NewJSONLogger(kitlog.NewSyncWriter(os.Stdout))
-	logger = kitlog.With(logger, "time", kitlog.DefaultTimestampUTC, "exec", kitlog.DefaultCaller, "dir", dir)
-	log.SetOutput(kitlog.NewStdlibAdapter(logger))
-
-}
-
-func Grpc(d string) error {
+func WalkGrpc(d string) error {
 
 	return filepath.Walk(d, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
