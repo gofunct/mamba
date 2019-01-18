@@ -21,40 +21,16 @@
 package cmd
 
 import (
-	"fmt"
-	kitlog "github.com/go-kit/kit/log"
-	"github.com/gofunct/mamba/cmd/gcloud"
-	"github.com/gofunct/mamba/cmd/local"
+	"github.com/gofunct/mamba/tmpl"
+
 	"github.com/spf13/cobra"
-	"log"
-	"os"
 )
 
-func init() {
-	{
-		logger := kitlog.NewJSONLogger(kitlog.NewSyncWriter(os.Stdout))
-		logger = kitlog.With(logger, "time", kitlog.DefaultTimestampUTC, "origin")
-		log.SetOutput(kitlog.NewStdlibAdapter(logger))
-	}
-
-	{
-		rootCmd.AddCommand(gcloud.RootCmd)
-		rootCmd.AddCommand(local.RootCmd)
-		rootCmd.AddCommand(protocCmd)
-		rootCmd.AddCommand(htmlCmd)
-		rootCmd.AddCommand(testCmd)
-		rootCmd.AddCommand(protocGenCmd)
-	}
-}
-
-var rootCmd = &cobra.Command{
-	Use:   "mamba",
-	Short: "A general purpose scripting utility for developers and administrators",
-}
-
-func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+// protocGenCmd represents the protocGen command
+var protocGenCmd = &cobra.Command{
+	Use:   "protocGen",
+	Short: "A brief description of your command",
+	Run: func(cmd *cobra.Command, args []string) {
+		tmpl.Service()
+	},
 }
