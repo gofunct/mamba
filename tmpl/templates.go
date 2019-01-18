@@ -1,4 +1,4 @@
-package render
+package tmpl
 
 import (
 	"github.com/Masterminds/sprig"

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/spf13/pflag"
 	"strings"
+	"github.com/fatih/color"
 )
 
 // FlagValueSet is an interface that users can implement
@@ -79,7 +80,7 @@ func (v *config) BindFlagValues(flags FlagValueSet) (err error) {
 
 func (v *config) BindFlagValue(key string, flag FlagValue) error {
 	if flag == nil {
-		return fmt.Errorf(redstring("flag for %q is nil", key))
+		return fmt.Errorf(color.RedString("flag for %q is nil", key))
 	}
 	v.pflags[strings.ToLower(key)] = flag
 	return nil

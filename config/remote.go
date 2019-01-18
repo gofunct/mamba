@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"reflect"
+	"github.com/prometheus/common/log"
 )
 
 type defaultRemoteProvider struct {
@@ -45,7 +46,6 @@ func (v *config) AddRemoteProvider(provider, endpoint, path string) error {
 		return UnsupportedRemoteProviderError(provider)
 	}
 	if provider != "" && endpoint != "" {
-		green("adding %s:%s to remote provider list", provider, endpoint)
 		rp := &defaultRemoteProvider{
 			endpoint: endpoint,
 			provider: provider,
@@ -63,7 +63,6 @@ func (v *config) AddSecureRemoteProvider(provider, endpoint, path, secretkeyring
 		return UnsupportedRemoteProviderError(provider)
 	}
 	if provider != "" && endpoint != "" {
-		green("adding %s:%s to remote provider list", provider, endpoint)
 		rp := &defaultRemoteProvider{
 			endpoint:      endpoint,
 			provider:      provider,
@@ -101,7 +100,7 @@ type RemoteResponse struct {
 }
 
 func (v *config) watchRemoteconfig(provider RemoteProvider) (map[string]interface{}, error) {
-	logkv(v, "event", "watching remote config...")
+	log.Debug( "event", "watching remote config...")
 
 	reader, err := Remoteconfig.Watch(provider)
 	if err != nil {
@@ -112,7 +111,7 @@ func (v *config) watchRemoteconfig(provider RemoteProvider) (map[string]interfac
 }
 
 func (v *config) getRemoteconfig(provider RemoteProvider) (map[string]interface{}, error) {
-	logkv(v, "event", "getting remote config...")
+	log.Debug( "event", "getting remote config...")
 
 	reader, err := Remoteconfig.Get(provider)
 	if err != nil {
@@ -124,7 +123,7 @@ func (v *config) getRemoteconfig(provider RemoteProvider) (map[string]interface{
 
 // Retrieve the first found remote configuration.
 func (v *config) watchKeyValueconfigOnChannel() error {
-	logkv(v, "event", "watching kv config on channel...")
+	log.Debug( "event", "watching kv config on channel...")
 
 	for _, rp := range v.remoteProviders {
 		respc, _ := Remoteconfig.WatchChannel(rp)
@@ -143,7 +142,7 @@ func (v *config) watchKeyValueconfigOnChannel() error {
 
 // Retrieve the first found remote configuration.
 func (v *config) watchKeyValueconfig() error {
-	logkv(v, "event", "watching kv config...")
+	log.Debug( "event", "watching kv config...")
 	for _, rp := range v.remoteProviders {
 		val, err := v.watchRemoteconfig(rp)
 		if err != nil {

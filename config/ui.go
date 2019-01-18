@@ -3,48 +3,42 @@ package config
 import (
 	"fmt"
 	"github.com/fatih/color"
-	"github.com/go-kit/kit/log"
-	"os"
+	"github.com/prometheus/common/log"
 	"strings"
 )
 
-var (
-	red         = color.New(color.FgRed).Add(color.Underline).PrintfFunc()
-	redstring   = color.New(color.FgRed).Add(color.Underline).SprintfFunc()
-	green       = color.New(color.FgGreen).PrintfFunc()
-	greenstring = color.New(color.FgGreen).SprintfFunc()
-)
-
-var logger log.Logger
-
-var logkv = func(c *config, k, v string) {
-	log.With(logger, "config", c.Name, "path", c.Path)
-	if err := logger.Log(greenstring(k), greenstring(v)); err != nil {
-		red("global logger failure")
-	}
-}
-
-func init() {
-	{
-		logger = log.NewJSONLogger(log.NewSyncWriter(os.Stdout))
-		logger = log.With(logger, "time", log.DefaultTimestampUTC)
-	}
-}
-
 func (v *config) Debug() {
-	green("Aliases:\n%#v\n", v.aliases)
-	green("Override:\n%#v\n", v.override)
-	green("PFlags:\n%#v\n", v.pflags)
-	green("Env:\n%#v\n", v.env)
-	green("Key/Value Store:\n%#v\n", v.kvstore)
-	green("config:\n%#v\n", v.config)
-	green("Defaults:\n%#v\n", v.defaults)
+	color.Red("Overriden Variables:\n")
+	for k, v := range v.override {
+		color.Blue(indentcol, k)
+		color.Black(indent,v)
+	}
+	color.Red("Flag Variables:\n")
+	for k, v := range v.pflags {
+		color.Blue(indentcol, k)
+		color.Black(indent,v)
+	}
+	color.Red("Environmental Variables:\n")
+	for k, v := range v.env {
+		color.Blue(indentcol, k)
+		color.Black(indent,v)
+	}
+	color.Red("Config Variables:\n")
+	for k, v := range v.config {
+		color.Blue(indentcol, k)
+		color.Black(indent,v)
+	}
+	color.Red("Default Variables:\n")
+	for k, v := range v.defaults {
+		color.Blue(indentcol, k)
+		color.Black(indent,v)
+	}
 }
 
 // Search all configPaths for any config file.
 // Returns the first path that exists (and is a config file).
 func (v *config) findconfigFile() (string, error) {
-	logkv(v, "event", "finding config file...")
+	log.Debug("event", "finding config file...")
 
 	file := v.searchInPath(v.Path)
 	if file != "" {
@@ -72,3 +66,6 @@ func (v *config) AllSettings() map[string]interface{} {
 	}
 	return m
 }
+
+var indent = "%s"
+var indentcol = "%s:"

@@ -1,5 +1,4 @@
-//go:generate wire ./...
 //go:generate go fmt ./...
-//go:generate mamba protoc --dir api
+//go:generate mamba protoc
 
 package main

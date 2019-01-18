@@ -6,6 +6,8 @@ require (
 	github.com/Masterminds/semver v1.4.2 // indirect
 	github.com/Masterminds/sprig v2.17.1+incompatible
 	github.com/VividCortex/gohistogram v1.0.0 // indirect
+	github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc // indirect
+	github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf // indirect
 	github.com/aokoli/goutils v1.1.0 // indirect
 	github.com/aws/aws-sdk-go v1.16.12
 	github.com/fatih/color v1.7.0
@@ -32,6 +34,7 @@ require (
 	github.com/pelletier/go-toml v1.2.0
 	github.com/pkg/errors v0.8.1
 	github.com/prometheus/client_golang v0.9.0
+	github.com/prometheus/common v0.0.0-20181015124227-bcb74de08d37
 	github.com/shiyanhui/hero v0.0.1
 	github.com/smartystreets/goconvey v0.0.0-20180222194500-ef6db91d284a
 	github.com/spf13/afero v1.1.2
@@ -44,11 +47,12 @@ require (
 	github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77
 	go.opencensus.io v0.18.1-0.20181204023538-aab39bd6a98b
 	gocloud.dev v0.9.0
-	golang.org/x/net v0.0.0-20190110200230-915654e7eabc // indirect
+	golang.org/x/net v0.0.0-20190110200230-915654e7eabc
 	golang.org/x/sys v0.0.0-20190107173414-20be8e55dc7b // indirect
 	golang.org/x/time v0.0.0-20181108054448-85acf8d2951c
-	google.golang.org/genproto v0.0.0-20181202183823-bd91e49a0898
+	google.golang.org/genproto v0.0.0-20190111180523-db91494dd46c
 	google.golang.org/grpc v1.17.0
+	gopkg.in/alecthomas/kingpin.v2 v2.2.6 // indirect
 	gopkg.in/pipe.v2 v2.0.0-20140414041502-3c2ca4d52544
 	gopkg.in/yaml.v2 v2.2.2
 )

@@ -22,52 +22,26 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"log"
-	"os"
-	"os/exec"
-	"path/filepath"
 )
 
-// protocCmd represents the protoc command
-var protocCmd = &cobra.Command{
-	Use:   "protoc",
-	Short: "generate protobuf files",
+// debugCmd represents the debug command
+var debugCmd = &cobra.Command{
+	Use:   "debug",
+	Short: "A brief description of your command",
 	Run: func(cmd *cobra.Command, args []string) {
-		s := viper.GetString("proto.dir")
-		if s == "" {
-			s = "."
-		}
-		if err := WalkGrpc(s); err != nil {
-			log.Fatalln("failed to execute command", err)
-		}
+		Cache.Debug()
 	},
 }
 
-func WalkGrpc(d string) error {
+func init() {
 
-	return filepath.Walk(d, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			log.Fatalln(err)
-		}
-		// skip vendor directory
-		if info.IsDir() && info.Name() == "vendor" {
-			return filepath.SkipDir
-		}
-		// find all protobuf files
-		if filepath.Ext(path) == ".proto" {
-			// args
-			args := []string{
-				"--go_out=plugins=grpc:.",
-				path,
-			}
-			cmd := exec.Command("protoc", args...)
-			log.Print("starting command")
-			cmd.Env = os.Environ()
-			if err := cmd.Run(); err != nil {
-				return err
-			}
-		}
-		return nil
-	})
+	// Here you will define your flags and configuration settings.
+
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// debugCmd.PersistentFlags().String("foo", "", "A help for foo")
+
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// debugCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

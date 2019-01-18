@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/afero"
 	yaml "gopkg.in/yaml.v2"
 	"io"
+	"github.com/prometheus/common/log"
 	"strings"
 )
 
@@ -87,7 +88,7 @@ func (v *config) Unmarshal(rawVal interface{}, opts ...DecoderconfigOption) erro
 }
 
 func (v *config) unmarshalReader(in io.Reader, c map[string]interface{}) error {
-	logkv(v, "event", "unmarshaling reader...")
+	log.Debug("event", "unmarshaling reader...")
 
 	buf := new(bytes.Buffer)
 	_, err := buf.ReadFrom(in)
@@ -148,7 +149,7 @@ func (v *config) unmarshalReader(in io.Reader, c map[string]interface{}) error {
 }
 
 func (v *config) marshalWriter(f afero.File, configType string) error {
-	logkv(v, "event", "marshaling writer...")
+	log.Debug("event", "marshaling writer...")
 
 	c := v.AllSettings()
 	switch configType {

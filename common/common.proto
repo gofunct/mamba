@@ -35,8 +35,6 @@ message Command {
     repeated string env = 4;
 }
 
-// DynamicValue is an opaque encoding of terraform data, with the field name
-// indicating the encoding scheme used.
 message DynamicValue {
     bytes msgpack = 1;
     bytes json = 2;

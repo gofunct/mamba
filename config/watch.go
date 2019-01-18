@@ -2,8 +2,8 @@ package config
 
 import (
 	"github.com/fsnotify/fsnotify"
-	"log"
 	"path/filepath"
+	"github.com/prometheus/common/log"
 	"sync"
 )
 
@@ -23,7 +23,7 @@ func (v *config) Watchconfig() {
 		// we have to watch the entire directory to pick up renames/atomic saves in a cross-platform way
 		filename, err := v.getconfigFile()
 		if err != nil {
-			log.Printf("error: %v\n", err)
+			log.Debug("error: %v\n", err.Error())
 			return
 		}
 
@@ -52,7 +52,7 @@ func (v *config) Watchconfig() {
 						realconfigFile = currentconfigFile
 						err := v.ReadInconfig()
 						if err != nil {
-							log.Printf("error reading config file: %v\n", err)
+							log.Debug("error reading config file: %v\n", err)
 						}
 						if v.onconfigChange != nil {
 							v.onconfigChange(event)
@@ -65,7 +65,7 @@ func (v *config) Watchconfig() {
 
 				case err, ok := <-watcher.Errors:
 					if ok { // 'Errors' channel is not closed
-						log.Printf("watcher error: %v\n", err)
+						log.Debug("watcher error: %v\n", err)
 					}
 					eventsWG.Done()
 					return

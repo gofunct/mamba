@@ -5,12 +5,12 @@ import (
 	"encoding/csv"
 	"github.com/Masterminds/sprig"
 	"github.com/fsnotify/fsnotify"
-	"github.com/huandu/xstrings"
 	"github.com/magiconair/properties"
 	"github.com/spf13/afero"
 	"io"
 	"os"
 	"strings"
+	"github.com/prometheus/common/log"
 )
 
 // SupportedExts are universally supported extensions.
@@ -19,7 +19,7 @@ var SupportedExts = []string{"json", "toml", "yaml", "yml", "properties", "props
 // SupportedRemoteProviders are universally supported remote providers.
 var SupportedRemoteProviders = []string{"etcd", "consul"}
 
-var c *config
+var Cache = new(config)
 
 type config struct {
 	// Name of file to look for inside the path
@@ -52,32 +52,25 @@ type config struct {
 
 // New returns an initialized config instance.
 func New(name, file, pth string) *config {
-	c.keyDelim = "."
-	c.Name = name
-	c.File = file
-	c.Path = pth
-	c.fs = afero.NewOsFs()
-	c.config = make(map[string]interface{})
-	c.override = make(map[string]interface{})
-	c.defaults = make(map[string]interface{})
-	c.kvstore = make(map[string]interface{})
-	c.pflags = make(map[string]FlagValue)
-	c.aliases = make(map[string]string)
-	c.typeByDefValue = true
-	c.env = make(map[string]string)
+	Cache.keyDelim = "."
+	Cache.Name = name
+	Cache.File = file
+	Cache.Path = pth
+	Cache.fs = afero.NewOsFs()
+	Cache.config = make(map[string]interface{})
+	Cache.override = make(map[string]interface{})
+	Cache.defaults = make(map[string]interface{})
+	Cache.kvstore = make(map[string]interface{})
+	Cache.pflags = make(map[string]FlagValue)
+	Cache.aliases = make(map[string]string)
+	Cache.typeByDefValue = true
+	Cache.env = make(map[string]string)
 	for _, val := range os.Environ() {
 		slice := strings.Split(val, "=")
-		c.env[strings.ToLower(slice[0])] = strings.ToLower(slice[1])
+		Cache.env[strings.ToLower(slice[0])] = strings.ToLower(slice[1])
 	}
 
-	for _, val := range c.AllKeys() {
-		c.regAlias(strings.ToUpper(val), val)
-		c.regAlias(strings.ToTitle(val), val)
-		c.regAlias(xstrings.ToCamelCase(val), val)
-		c.regAlias(xstrings.ToSnakeCase(val), val)
-		c.regAlias(xstrings.ToKebabCase(val), val)
-	}
-	return c
+	return Cache
 }
 
 func (v *config) setEnvPrefix(in string) {
@@ -179,7 +172,7 @@ func (v *config) Set(key string, value interface{}) {
 }
 
 func (v *config) ReadInconfig() error {
-	green("%s\n", "Attempting to read in config file...")
+	log.Debug("%s\n", "Attempting to read in config file...")
 	filename, err := v.getconfigFile()
 	if err != nil {
 		return err
@@ -189,7 +182,7 @@ func (v *config) ReadInconfig() error {
 		return UnsupportedconfigError(v.getconfigType())
 	}
 
-	green("%s\n", "Reading file:"+filename+"...")
+	log.Debug("%s\n", "Reading file:"+filename+"...")
 	file, err := afero.ReadFile(v.fs, filename)
 	if err != nil {
 		return err
@@ -207,7 +200,7 @@ func (v *config) ReadInconfig() error {
 }
 
 func (v *config) MergeInconfig() error {
-	green("%s\n", "Attempting to merge in config file...")
+	log.Debug("%s\n", "Attempting to merge in config file...")
 	filename, err := v.getconfigFile()
 	if err != nil {
 		return err

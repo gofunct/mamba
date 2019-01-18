@@ -25,15 +25,31 @@ import (
 	kitlog "github.com/go-kit/kit/log"
 	"github.com/gofunct/mamba/cmd/gcloud"
 	"github.com/gofunct/mamba/cmd/local"
+	"github.com/gofunct/mamba/config"
 	"github.com/spf13/cobra"
 	"log"
 	"os"
 )
 
+var (
+	cfgName string
+	cfgFile string
+	cfgPath string
+)
+
+var Cache = config.New(cfgName, cfgFile, cfgPath)
+
 func init() {
 	{
+		rootCmd.PersistentFlags().StringVarP(&cfgName, "name", "n", "mamba", "name of config file")
+		rootCmd.PersistentFlags().StringVarP(&cfgFile, "file", "f", "mamba.json", "config file with extension")
+		rootCmd.PersistentFlags().StringVarP(&cfgPath, "path", "p", ".", "path to config file")
+
+
+	}
+	{
 		logger := kitlog.NewJSONLogger(kitlog.NewSyncWriter(os.Stdout))
-		logger = kitlog.With(logger, "time", kitlog.DefaultTimestampUTC, "origin")
+		logger = kitlog.With(logger, "origin", kitlog.DefaultCaller)
 		log.SetOutput(kitlog.NewStdlibAdapter(logger))
 	}
 
@@ -44,6 +60,7 @@ func init() {
 		rootCmd.AddCommand(htmlCmd)
 		rootCmd.AddCommand(testCmd)
 		rootCmd.AddCommand(protocGenCmd)
+		rootCmd.AddCommand(debugCmd)
 	}
 }
 

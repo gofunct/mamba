@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/prometheus/common/log"
 	"github.com/spf13/cast"
 	"strings"
 	"time"
@@ -55,7 +56,7 @@ func (v *config) GetStringMapStringSlice(key string) map[string][]string {
 }
 
 func (v *config) Get(key string) interface{} {
-	logkv(v, "event", "searching for key value...")
+	log.Debug( "event", "searching for key value...")
 
 	lcaseKey := strings.ToLower(key)
 	val := v.find(lcaseKey)

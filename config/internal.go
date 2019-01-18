@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"github.com/spf13/afero"
 	"github.com/spf13/cast"
+	"github.com/prometheus/common/log"
 	"os"
 	"path/filepath"
+	"github.com/fatih/color"
 	"reflect"
 	"runtime"
 	"strings"
@@ -94,7 +96,7 @@ func (v *config) searchMap(source map[string]interface{}, path []string) interfa
 }
 
 func (v *config) searchMapWithPathPrefixes(source map[string]interface{}, path []string) interface{} {
-	logkv(v, "event", "searching path with prefix...")
+	log.Debug("event", "searching path with prefix...")
 
 	if len(path) == 0 {
 		return source
@@ -283,21 +285,21 @@ func (v *config) registerAlias(alias string, key string) {
 			v.aliases[alias] = key
 		}
 	} else {
-		red("Creating circular reference alias", alias, key, v.realKey(key))
+		color.Red("Creating circular reference alias", alias, key, v.realKey(key))
 	}
 }
 
 func (v *config) realKey(key string) string {
 	newkey, exists := v.aliases[key]
 	if exists {
-		green("Alias", key, "to", newkey)
+		log.Debug("Alias", key, "to", newkey)
 		return v.realKey(newkey)
 	}
 	return key
 }
 
 func (v *config) writeconfig(filename string, force bool) error {
-	logkv(v, "event", "Attempting to write configuration to file.")
+	log.Debug("event", "Attempting to write configuration to file.")
 	ext := filepath.Ext(filename)
 	if len(ext) <= 1 {
 		return fmt.Errorf("Filename: %s requires valid extension.", filename)
@@ -316,7 +318,7 @@ func (v *config) writeconfig(filename string, force bool) error {
 		if _, err := os.Stat(filename); os.IsNotExist(err) {
 			flags = os.O_WRONLY
 		} else {
-			return fmt.Errorf("File: %s exists. Use Writeconfig to overwrite.", filename)
+			return fmt.Errorf(color.RedString("File: %s exists. Use Writeconfig to overwrite."), filename)
 		}
 	}
 	f, err := v.fs.OpenFile(filename, flags, os.FileMode(0644))
@@ -344,7 +346,7 @@ func mergeMaps(
 	for sk, sv := range src {
 		tk := keyExists(sk, tgt)
 		if tk == "" {
-			green("tk=\"\", tgt[%s]=%v", sk, sv)
+			log.Debug("tk=\"\", tgt[%s]=%v", sk, sv)
 			tgt[sk] = sv
 			if itgt != nil {
 				itgt[sk] = sv
@@ -354,7 +356,7 @@ func mergeMaps(
 
 		tv, ok := tgt[tk]
 		if !ok {
-			green("tgt[%s] != ok, tgt[%s]=%v", tk, sk, sv)
+			log.Debug("tgt[%s] != ok, tgt[%s]=%v", tk, sk, sv)
 			tgt[sk] = sv
 			if itgt != nil {
 				itgt[sk] = sv
@@ -365,27 +367,27 @@ func mergeMaps(
 		svType := reflect.TypeOf(sv)
 		tvType := reflect.TypeOf(tv)
 		if svType != tvType {
-			red(
+			color.Red(
 				"svType != tvType; key=%s, st=%v, tt=%v, sv=%v, tv=%v",
 				sk, svType, tvType, sv, tv)
 			continue
 		}
 
-		red("processing key=%s, st=%v, tt=%v, sv=%v, tv=%v",
+		color.Red("processing key=%s, st=%v, tt=%v, sv=%v, tv=%v",
 			sk, svType, tvType, sv, tv)
 
 		switch ttv := tv.(type) {
 		case map[interface{}]interface{}:
-			green("merging maps (must convert)")
+			log.Debug("merging maps (must convert)")
 			tsv := sv.(map[interface{}]interface{})
 			ssv := castToMapStringInterface(tsv)
 			stv := castToMapStringInterface(ttv)
 			mergeMaps(ssv, stv, ttv)
 		case map[string]interface{}:
-			green("merging maps")
+			log.Debug("merging maps")
 			mergeMaps(sv.(map[string]interface{}), ttv, nil)
 		default:
-			green("setting value")
+			log.Debug("setting value")
 			tgt[tk] = sv
 			if itgt != nil {
 				itgt[tk] = sv
@@ -401,7 +403,7 @@ func mergeMaps(
 //   it is skipped.
 // The resulting set of paths is merged to the given shadow set at the same time.
 func (v *config) flattenAndMergeMap(shadow map[string]bool, m map[string]interface{}, prefix string) map[string]bool {
-	logkv(v, "event", "flattening and merging map...")
+	log.Debug("event", "flattening and merging map...")
 
 	if shadow != nil && prefix != "" && shadow[prefix] {
 		// prefix is shadowed => nothing more to flatten
@@ -436,7 +438,7 @@ func (v *config) flattenAndMergeMap(shadow map[string]bool, m map[string]interfa
 // mergeFlatMap merges the given maps, excluding values of the second map
 // shadowed by values from the first map.
 func (v *config) mergeFlatMap(shadow map[string]bool, m map[string]interface{}) map[string]bool {
-	logkv(v, "event", "merging flat map...")
+	log.Debug("event", "merging flat map...")
 
 	// scan keys
 outer:
@@ -486,7 +488,7 @@ func castMapStringToMapInterface(src map[string]string) map[string]interface{} {
 }
 
 func (v *config) getconfigType() string {
-	logkv(v, "event", "getting config type...")
+	log.Debug( "event", "getting config type...")
 
 	if v.configType != "" {
 		return v.configType
@@ -507,7 +509,7 @@ func (v *config) getconfigType() string {
 }
 
 func (v *config) getconfigFile() (string, error) {
-	logkv(v, "event", "getting config file...")
+	log.Debug( "event", "getting config file...")
 
 	if v.File == "" {
 		cf, err := v.findconfigFile()
@@ -520,11 +522,11 @@ func (v *config) getconfigFile() (string, error) {
 }
 
 func (v *config) searchInPath(in string) (filename string) {
-	logkv(v, "event", "searchingfor config file...")
+	log.Debug( "event", "searchingfor config file...")
 	for _, ext := range SupportedExts {
-		green("Checking for%s\n", filepath.Join(in, v.Name+"."+ext))
+		log.Debug("check",(filepath.Join(in, v.Name+"."+ext)))
 		if b, _ := exists(v.fs, filepath.Join(in, v.Name+"."+ext)); b {
-			green("Found: %s\n", filepath.Join(in, v.Name+"."+ext))
+			log.Debug("check",(filepath.Join(in, v.Name+"."+ext)))
 			return filepath.Join(in, v.Name+"."+ext)
 		}
 	}
@@ -546,7 +548,7 @@ type configParseError struct {
 
 // Error returns the formatted configuration error.
 func (pe configParseError) Error() string {
-	return redstring("While parsing config: %s", pe.err.Error())
+	return color.RedString("While parsing config: %s", pe.err.Error())
 }
 
 // toCaseInsensitiveValue checks if the value is a  map;
@@ -605,7 +607,7 @@ func insensitiviseMap(m map[string]interface{}) {
 }
 
 func absPathify(inPath string) string {
-	green("Trying to resolve absolute path to", inPath)
+	log.Debug("resolve", inPath)
 
 	if strings.HasPrefix(inPath, "$HOME") {
 		inPath = userHomeDir() + inPath[5:]
@@ -625,8 +627,8 @@ func absPathify(inPath string) string {
 		return filepath.Clean(p)
 	}
 
-	red("Couldn't discover absolute path")
-	red(err.Error())
+	color.Red("Couldn't discover absolute path")
+	color.Red(err.Error())
 	return ""
 }
 
