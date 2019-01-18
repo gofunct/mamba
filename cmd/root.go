@@ -57,7 +57,7 @@ func init() {
 		rootCmd.AddCommand(debugCmd)
 	}
 	{
-		if err := cache.Bind(rootCmd, local.RootCmd, protocGenCmd, protocCmd, htmlCmd, testCmd, debugCmd); err != nil {
+		if err := cache.Bind(rootCmd); err != nil {
 			log.Println("failed to bind config to commands\n", err.Error())
 		}
 	}

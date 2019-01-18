@@ -14,7 +14,7 @@ var (
 	OSFS = afero.NewOsFs()
 )
 
-func Bind(c ...*cobra.Command) error {
+func Bind(c *cobra.Command) error {
 	{
 		viper.SetFs(OSFS)
 		viper.SetConfigName("."+filepath.Base(os.Getenv("PWD")))
@@ -39,8 +39,15 @@ func Bind(c ...*cobra.Command) error {
 		viper.SetDefault("env.host", host)
 	}
 
+	if err := viper.BindPFlags(c.Flags()); err != nil {
+		return err
+	}
+	if err := viper.BindPFlags(c.PersistentFlags()); err != nil {
+		return err
+	}
+	viper.SetDefault(c.Name()+".meta", c.Annotations)
 
-	for _, cmd := range c {
+	for _, cmd := range c.Commands() {
 		if err := viper.BindPFlags(cmd.Flags()); err != nil {
 			return err
 		}
