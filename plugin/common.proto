@@ -2,7 +2,7 @@ syntax = "proto3";
 
 option go_package = "github.com/gofunct/mamba/common";
 import "google/protobuf/empty.proto";
-import "github.com/gofunct/mamba/common/common.proto";
+import "github.com/gofunct/mamba/plugin/common.proto";
 
 package common;
 

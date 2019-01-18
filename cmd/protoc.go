@@ -22,7 +22,6 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"log"
 	"os"
 	"os/exec"
@@ -34,11 +33,7 @@ var protocCmd = &cobra.Command{
 	Use:   "protoc",
 	Short: "generate protobuf files",
 	Run: func(cmd *cobra.Command, args []string) {
-		s := viper.GetString("proto.dir")
-		if s == "" {
-			s = "."
-		}
-		if err := WalkGrpc(s); err != nil {
+		if err := WalkGrpc(in); err != nil {
 			log.Fatalln("failed to execute command", err)
 		}
 	},
