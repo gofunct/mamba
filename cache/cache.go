@@ -10,86 +10,94 @@ import (
 	"path/filepath"
 )
 
+func init() {
+	Cache.v = viper.GetViper()
+}
+
 var (
-	OSFS = afero.NewOsFs()
+	OSFS  = afero.NewOsFs()
+	Cache *cache
 )
 
-func Bind(c *cobra.Command) error {
+type cache struct {
+	v *viper.Viper
+}
+
+func (c *cache) Bind(cmd *cobra.Command) error {
 	{
-		viper.SetFs(OSFS)
-		viper.SetConfigName("."+filepath.Base(os.Getenv("PWD")))
-		viper.AddConfigPath(os.Getenv("HOME"))
-		viper.AutomaticEnv()
-		viper.AllowEmptyEnv(true)
-		viper.SetTypeByDefaultValue(true)
-		viper.SetDefault("env.base", filepath.Base(os.Getenv("PWD")))
+		c.v.SetFs(OSFS)
+		c.v.SetConfigName("." + filepath.Base(os.Getenv("PWD")))
+		c.v.AddConfigPath(os.Getenv("HOME"))
+		c.v.AutomaticEnv()
+		c.v.AllowEmptyEnv(true)
+		c.v.SetTypeByDefaultValue(true)
+		c.v.SetDefault("env.base", filepath.Base(os.Getenv("PWD")))
 		home, _ := os.LookupEnv("HOME")
-		viper.SetDefault("env.home", home)
+		c.v.SetDefault("env.home", home)
 		gopath, _ := os.LookupEnv("GOPATH")
-		viper.SetDefault("env.gopath", gopath)
+		c.v.SetDefault("env.gopath", gopath)
 		user, _ := os.LookupEnv("USER")
-		viper.SetDefault("env.user", user)
+		c.v.SetDefault("env.user", user)
 		modules, _ := os.LookupEnv("GO111MODULES")
-		viper.SetDefault("env.modules", modules)
+		c.v.SetDefault("env.modules", modules)
 		creds, _ := os.LookupEnv("GOOGLE_APPLICATION_CREDENTIALS")
-		viper.SetDefault("env.creds", creds)
+		c.v.SetDefault("env.creds", creds)
 		pwd, _ := os.LookupEnv("PWD")
-		viper.SetDefault("env.absolute", pwd)
+		c.v.SetDefault("env.absolute", pwd)
 		host, _ := os.Hostname()
-		viper.SetDefault("env.host", host)
+		c.v.SetDefault("env.host", host)
 	}
 
-	if err := viper.BindPFlags(c.Flags()); err != nil {
+	if err := c.v.BindPFlags(cmd.Flags()); err != nil {
 		return err
 	}
-	if err := viper.BindPFlags(c.PersistentFlags()); err != nil {
+	if err := c.v.BindPFlags(cmd.PersistentFlags()); err != nil {
 		return err
 	}
-	viper.SetDefault(c.Name()+".meta", c.Annotations)
+	c.v.SetDefault(cmd.Name()+".meta", cmd.Annotations)
 
-	for _, cmd := range c.Commands() {
-		if err := viper.BindPFlags(cmd.Flags()); err != nil {
+	for _, cmds := range cmd.Commands() {
+		if err := c.v.BindPFlags(cmds.Flags()); err != nil {
 			return err
 		}
-		if err := viper.BindPFlags(cmd.PersistentFlags()); err != nil {
+		if err := c.v.BindPFlags(cmds.PersistentFlags()); err != nil {
 			return err
 		}
-		viper.SetDefault(cmd.Name()+".meta", cmd.Annotations)
+		c.v.SetDefault(cmds.Name()+".meta", cmd.Annotations)
 	}
-	if err := write(); err != nil {
+	if err := c.Write(); err != nil {
 		return err
 	}
-	WithDebugCmd(c)
+	cmd.AddCommand(c.DebugCmd())
 	return nil
 }
 
-
-func write() error {
+func (c *cache) Write() error {
 	// If a config file is found, read it in.
 	b, err := afero.Exists(OSFS, os.Getenv("HOME")+"/."+filepath.Base(os.Getenv("PWD")+".json"))
 	if err != nil {
 		return errors.WithStack(err)
 	}
 	if !b {
-		f, err := os.Create(os.Getenv("HOME")+"/."+filepath.Base(os.Getenv("PWD")+".json"))
+		f, err := os.Create(os.Getenv("HOME") + "/." + filepath.Base(os.Getenv("PWD")+".json"))
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		viper.SetConfigFile(f.Name())
+		c.v.SetConfigFile(f.Name())
 	}
-	if err := viper.ReadInConfig(); err != nil {
+	if err := c.v.ReadInConfig(); err != nil {
 		log.Println("failed to read config file, writing defaults...")
-		if err := viper.WriteConfig(); err != nil {
+		if err := c.v.WriteConfig(); err != nil {
 			return errors.Wrap(err, "failed to write config")
 		}
-		log.Println("Using config file:", viper.ConfigFileUsed())
-		if err := viper.WriteConfig(); err != nil {
+		log.Println("Using config file:", c.v.ConfigFileUsed())
+		if err := c.v.WriteConfig(); err != nil {
 			return errors.WithStack(err)
 		}
 
 	} else {
-		log.Println("Using config file:", viper.ConfigFileUsed())
-		if err := viper.WriteConfig(); err != nil {
+		log.Println("Using config file:", c.v.ConfigFileUsed())
+		if err := c.v.WriteConfig(); err != nil {
 			return errors.WithStack(err)
 		}
 	}
@@ -97,15 +105,14 @@ func write() error {
 	return nil
 }
 
-func WithDebugCmd(c *cobra.Command) {
-	c.AddCommand(debugCmd)
-}
-
-// debugCmd represents the debug command
-var debugCmd = &cobra.Command{
-	Use:   "debug",
-	Short: "Debug your current configuration settings",
-	Run: func(cmd *cobra.Command, args []string) {
-		viper.Debug()
-	},
+func (c *cache) DebugCmd() *cobra.Command {
+	// debugCmd represents the debug command
+	var debugCmd = &cobra.Command{
+		Use:   "debug",
+		Short: "Debug your current configuration settings",
+		Run: func(cmd *cobra.Command, args []string) {
+			c.v.Debug()
+		},
+	}
+	return debugCmd
 }

@@ -32,10 +32,9 @@ import (
 )
 
 var (
-	in 	string
-	out		string
+	in  string
+	out string
 )
-
 
 func init() {
 	{
@@ -56,7 +55,7 @@ func init() {
 		rootCmd.AddCommand(protocGenCmd)
 	}
 	{
-		if err := cache.Bind(rootCmd); err != nil {
+		if err := cache.Cache.Bind(rootCmd); err != nil {
 			log.Println("failed to bind config to commands\n", err.Error())
 		}
 	}

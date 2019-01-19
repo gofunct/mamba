@@ -1,27 +1,27 @@
-package tmpl
+package cache
 
 import (
 	"github.com/Masterminds/sprig"
-	"github.com/spf13/viper"
 	"io"
 	"text/template"
 )
 
-var TemplateFuncs = funcMap()
-
-// tmpl executes the given template text on data, writing the result to w.
-func Compile(w io.Writer, text string, data interface{}) error {
-	t := template.New("top")
-	t.Funcs(TemplateFuncs)
-	template.Must(t.Parse(text))
-	return t.Execute(w, data)
+func init() {
+	TemplateFuncs = Cache.funcMap()
 }
 
-func funcMap() template.FuncMap {
+var TemplateFuncs template.FuncMap
+
+// tmpl executes the given template text on data, writing the result to w.
+func (c *cache) Compile(w io.Writer, text string) error {
+	t := template.New("")
+	t.Funcs(TemplateFuncs)
+	template.Must(t.Parse(text))
+	return t.Execute(w, c.v.AllSettings())
+}
+
+func (c *cache) funcMap() template.FuncMap {
 	newMap := sprig.GenericFuncMap()
-	for k, v := range viper.AllSettings() {
-		newMap[k] = v
-	}
 	return newMap
 }
 
