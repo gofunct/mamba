@@ -59,6 +59,7 @@ func Bind(c *cobra.Command) error {
 	if err := write(); err != nil {
 		return err
 	}
+	WithDebugCmd(c)
 	return nil
 }
 
@@ -94,4 +95,17 @@ func write() error {
 	}
 
 	return nil
+}
+
+func WithDebugCmd(c *cobra.Command) {
+	c.AddCommand(debugCmd)
+}
+
+// debugCmd represents the debug command
+var debugCmd = &cobra.Command{
+	Use:   "debug",
+	Short: "Debug your current configuration settings",
+	Run: func(cmd *cobra.Command, args []string) {
+		viper.Debug()
+	},
 }

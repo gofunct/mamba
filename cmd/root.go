@@ -54,7 +54,6 @@ func init() {
 		rootCmd.AddCommand(htmlCmd)
 		rootCmd.AddCommand(testCmd)
 		rootCmd.AddCommand(protocGenCmd)
-		rootCmd.AddCommand(debugCmd)
 	}
 	{
 		if err := cache.Bind(rootCmd); err != nil {
