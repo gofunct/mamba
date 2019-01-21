@@ -21,7 +21,7 @@
 package cmd
 
 import (
-	"github.com/gofunct/mamba/tmpl"
+	"github.com/gofunct/mamba/static"
 	"github.com/spf13/cobra"
 )
 
@@ -30,6 +30,6 @@ var htmlCmd = &cobra.Command{
 	Use:   "html",
 	Short: "Generate html files",
 	Run: func(cmd *cobra.Command, args []string) {
-		tmpl.GenerateHtml()
+		static.Generate(in, out, pkg)
 	},
 }

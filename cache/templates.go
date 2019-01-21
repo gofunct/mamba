@@ -1,37 +1,34 @@
 package cache
 
 import (
-	"github.com/Masterminds/sprig"
 	"io"
 	"text/template"
 )
 
-func init() {
-	TemplateFuncs = Cache.funcMap()
+func (c *cache) AddTmplConfig(src, dest, pkg string) {
+	c.v.SetDefault("template.dir", src)
+	c.v.SetDefault("template.dest", dest)
+	c.v.SetDefault("template.debug", true)
+	c.v.SetDefault("template.single_pkg", false)
+	c.v.SetDefault("template.all", false)
+	c.v.SetDefault("template.pkg", pkg)
 }
-
-var TemplateFuncs template.FuncMap
 
 // tmpl executes the given template text on data, writing the result to w.
 func (c *cache) Compile(w io.Writer, text string) error {
 	t := template.New("")
-	t.Funcs(TemplateFuncs)
+	t.Funcs(c.fmap)
 	template.Must(t.Parse(text))
 	return t.Execute(w, c.v.AllSettings())
 }
 
-func (c *cache) funcMap() template.FuncMap {
-	newMap := sprig.GenericFuncMap()
-	return newMap
+func (c *cache) AddTmplFunc(name string, tmplFunc interface{}) {
+	c.fmap[name] = tmplFunc
 }
 
-func addTemplateFunc(name string, tmplFunc interface{}) {
-	TemplateFuncs[name] = tmplFunc
-}
-
-func addTemplateFuncs(tmplFuncs template.FuncMap) {
+func (c *cache) AddTmplFuncs(tmplFuncs template.FuncMap) {
 	for k, v := range tmplFuncs {
-		TemplateFuncs[k] = v
+		c.fmap[k] = v
 	}
 }
 

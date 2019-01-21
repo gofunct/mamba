@@ -2,8 +2,6 @@ package tmpl
 
 import (
 	"github.com/gofunct/mamba/tmpl/encoders"
-	"github.com/shiyanhui/hero"
-	"github.com/spf13/viper"
 	"io/ioutil"
 	"log"
 	"os"
@@ -14,7 +12,6 @@ import (
 	"github.com/golang/protobuf/protoc-gen-go/generator"
 	"github.com/golang/protobuf/protoc-gen-go/plugin"
 	ggdescriptor "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway/descriptor"
-	"path/filepath"
 )
 
 var (
@@ -26,26 +23,14 @@ const (
 	boolFalse = "false"
 )
 
-func init() {
-	viper.SetDefault("tmpl.dir", "./source")
-	viper.SetDefault("tmpl.dest", "./gen")
-	viper.SetDefault("tmpl.debug", true)
-	viper.SetDefault("tmpl.single_pkg", false)
-	viper.SetDefault("tmpl.all", false)
-	viper.SetDefault("tmpl.pkg", filepath.Base(os.Getenv("PWD")))
-}
-
 // Parse parameters
 var (
-	templateDir       = viper.GetString("tmpl.dir")
-	destinationDir    = viper.GetString("tmpl.dest")
-	debug             = viper.GetBool("tmpl.debig")
-	all               = viper.GetBool("tmpl.all")
-	singlePackageMode = viper.GetBool("tmpl.single_pkg")
-	pkg               = viper.GetString("tmpl.pkg")
+	debug             = true
+	all               = true
+	singlePackageMode = false
 )
 
-func Service() {
+func Service(in, out string) {
 	g := generator.New()
 
 	data, err := ioutil.ReadAll(os.Stdin)
@@ -72,9 +57,9 @@ func Service() {
 			}
 			switch parts[0] {
 			case "template_dir":
-				templateDir = parts[1]
+				in = parts[1]
 			case "destination_dir":
-				destinationDir = parts[1]
+				out = parts[1]
 			case "single-package-mode":
 				switch strings.ToLower(parts[1]) {
 				case boolTrue, "t":
@@ -131,7 +116,7 @@ func Service() {
 					g.Error(err, "registry: failed to lookup file %q", file.GetName())
 				}
 			}
-			encoder := encoders.NewGenericTemplateBasedEncoder(templateDir, file, debug, destinationDir)
+			encoder := encoders.NewGenericTemplateBasedEncoder(in, file, debug, out)
 			for _, tmpl := range encoder.Files() {
 				concatOrAppend(tmpl)
 			}
@@ -140,7 +125,7 @@ func Service() {
 		}
 
 		for _, service := range file.GetService() {
-			encoder := encoders.NewGenericServiceTemplateBasedEncoder(templateDir, service, file, debug, destinationDir)
+			encoder := encoders.NewGenericServiceTemplateBasedEncoder(in, service, file, debug, out)
 			for _, tmpl := range encoder.Files() {
 				concatOrAppend(tmpl)
 			}
@@ -159,8 +144,4 @@ func Service() {
 	if err != nil {
 		g.Error(err, "failed to write output proto")
 	}
-}
-
-func GenerateHtml() {
-	hero.Generate(templateDir, destinationDir, pkg)
 }

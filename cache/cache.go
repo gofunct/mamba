@@ -1,6 +1,8 @@
 package cache
 
 import (
+	"fmt"
+	"github.com/Masterminds/sprig"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -8,73 +10,74 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"text/template"
 )
 
 func init() {
-	Cache.v = viper.GetViper()
+	fmt.Println("setting up cache...")
+	{
+		Cache.fmap = sprig.GenericFuncMap()
+	}
+	{
+		Cache.v = viper.GetViper()
+		Cache.v.SetFs(osFs)
+		Cache.v.SetConfigName("." + filepath.Base(os.Getenv("PWD")))
+		Cache.v.AddConfigPath(os.Getenv("HOME"))
+		Cache.v.AutomaticEnv()
+		Cache.v.AllowEmptyEnv(true)
+		Cache.v.SetTypeByDefaultValue(true)
+	}
+
+	{
+		Cache.v.SetDefault("env.base", filepath.Base(os.Getenv("PWD")))
+		home, _ := os.LookupEnv("HOME")
+		Cache.v.SetDefault("env.home", home)
+		gopath, _ := os.LookupEnv("GOPATH")
+		Cache.v.SetDefault("env.gopath", gopath)
+		user, _ := os.LookupEnv("USER")
+		Cache.v.SetDefault("env.user", user)
+		modules, _ := os.LookupEnv("GO111MODULES")
+		Cache.v.SetDefault("env.modules", modules)
+		creds, _ := os.LookupEnv("GOOGLE_APPLICATION_CREDENTIALS")
+		Cache.v.SetDefault("env.creds", creds)
+		pwd, _ := os.LookupEnv("PWD")
+		Cache.v.SetDefault("env.absolute", pwd)
+		host, _ := os.Hostname()
+		Cache.v.SetDefault("env.host", host)
+		Cache.v.SetDefault("env.base", filepath.Base(os.Getenv("PWD")))
+		home, _ = os.LookupEnv("HOME")
+		Cache.v.SetDefault("env.home", home)
+		gopath, _ = os.LookupEnv("GOPATH")
+		Cache.v.SetDefault("env.gopath", gopath)
+		user, _ = os.LookupEnv("USER")
+		Cache.v.SetDefault("env.user", user)
+		modules, _ = os.LookupEnv("GO111MODULES")
+		Cache.v.SetDefault("env.modules", modules)
+		creds, _ = os.LookupEnv("GOOGLE_APPLICATION_CREDENTIALS")
+		Cache.v.SetDefault("env.creds", creds)
+		pwd, _ = os.LookupEnv("PWD")
+		Cache.v.SetDefault("env.absolute", pwd)
+		host, _ = os.Hostname()
+		Cache.v.SetDefault("env.host", host)
+	}
+	if err := Cache.Write(); err != nil {
+		fmt.Printf("failed to write config from cache %s\n", err.Error())
+	}
 }
 
 var (
-	OSFS  = afero.NewOsFs()
-	Cache *cache
+	osFs  = afero.NewOsFs()
+	Cache = new(cache)
 )
 
 type cache struct {
-	v *viper.Viper
-}
-
-func (c *cache) Bind(cmd *cobra.Command) error {
-	{
-		c.v.SetFs(OSFS)
-		c.v.SetConfigName("." + filepath.Base(os.Getenv("PWD")))
-		c.v.AddConfigPath(os.Getenv("HOME"))
-		c.v.AutomaticEnv()
-		c.v.AllowEmptyEnv(true)
-		c.v.SetTypeByDefaultValue(true)
-		c.v.SetDefault("env.base", filepath.Base(os.Getenv("PWD")))
-		home, _ := os.LookupEnv("HOME")
-		c.v.SetDefault("env.home", home)
-		gopath, _ := os.LookupEnv("GOPATH")
-		c.v.SetDefault("env.gopath", gopath)
-		user, _ := os.LookupEnv("USER")
-		c.v.SetDefault("env.user", user)
-		modules, _ := os.LookupEnv("GO111MODULES")
-		c.v.SetDefault("env.modules", modules)
-		creds, _ := os.LookupEnv("GOOGLE_APPLICATION_CREDENTIALS")
-		c.v.SetDefault("env.creds", creds)
-		pwd, _ := os.LookupEnv("PWD")
-		c.v.SetDefault("env.absolute", pwd)
-		host, _ := os.Hostname()
-		c.v.SetDefault("env.host", host)
-	}
-
-	if err := c.v.BindPFlags(cmd.Flags()); err != nil {
-		return err
-	}
-	if err := c.v.BindPFlags(cmd.PersistentFlags()); err != nil {
-		return err
-	}
-	c.v.SetDefault(cmd.Name()+".meta", cmd.Annotations)
-
-	for _, cmds := range cmd.Commands() {
-		if err := c.v.BindPFlags(cmds.Flags()); err != nil {
-			return err
-		}
-		if err := c.v.BindPFlags(cmds.PersistentFlags()); err != nil {
-			return err
-		}
-		c.v.SetDefault(cmds.Name()+".meta", cmd.Annotations)
-	}
-	if err := c.Write(); err != nil {
-		return err
-	}
-	cmd.AddCommand(c.DebugCmd())
-	return nil
+	v    *viper.Viper
+	fmap template.FuncMap
 }
 
 func (c *cache) Write() error {
 	// If a config file is found, read it in.
-	b, err := afero.Exists(OSFS, os.Getenv("HOME")+"/."+filepath.Base(os.Getenv("PWD")+".json"))
+	b, err := afero.Exists(osFs, os.Getenv("HOME")+"/."+filepath.Base(os.Getenv("PWD")+".json"))
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -83,9 +86,9 @@ func (c *cache) Write() error {
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		c.v.SetConfigFile(f.Name())
+		Cache.v.SetConfigFile(f.Name())
 	}
-	if err := c.v.ReadInConfig(); err != nil {
+	if err := Cache.v.ReadInConfig(); err != nil {
 		log.Println("failed to read config file, writing defaults...")
 		if err := c.v.WriteConfig(); err != nil {
 			return errors.Wrap(err, "failed to write config")
@@ -105,7 +108,7 @@ func (c *cache) Write() error {
 	return nil
 }
 
-func (c *cache) DebugCmd() *cobra.Command {
+func (c *cache) WrapCobra(cmd *cobra.Command) error {
 	// debugCmd represents the debug command
 	var debugCmd = &cobra.Command{
 		Use:   "debug",
@@ -114,5 +117,34 @@ func (c *cache) DebugCmd() *cobra.Command {
 			c.v.Debug()
 		},
 	}
-	return debugCmd
+	cmd.AddCommand(debugCmd)
+
+	if err := c.v.BindPFlags(cmd.Flags()); err != nil {
+		return err
+	}
+	if err := c.v.BindPFlags(cmd.PersistentFlags()); err != nil {
+		return err
+	}
+	c.v.SetDefault(cmd.Name()+".meta", cmd.Annotations)
+
+	for _, cmds := range cmd.Commands() {
+		if err := c.v.BindPFlags(cmds.Flags()); err != nil {
+			return err
+		}
+		if err := c.v.BindPFlags(cmds.PersistentFlags()); err != nil {
+			return err
+		}
+		c.v.SetDefault(cmds.Name()+".meta", cmd.Annotations)
+	}
+	cmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
+		if err := c.Write(); err != nil {
+			return err
+		}
+		return nil
+	}
+	return nil
+}
+
+func (c *cache) GetFs() afero.Fs {
+	return osFs
 }

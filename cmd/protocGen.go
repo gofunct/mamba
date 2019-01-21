@@ -29,8 +29,8 @@ import (
 // protocGenCmd represents the protocGen command
 var protocGenCmd = &cobra.Command{
 	Use:   "protocGen",
-	Short: "A brief description of your command",
+	Short: "Compile templates as a protoc plugin",
 	Run: func(cmd *cobra.Command, args []string) {
-		tmpl.Service()
+		tmpl.Service(in, out)
 	},
 }

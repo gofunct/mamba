@@ -3,9 +3,11 @@ package fmap
 import (
 	"encoding/json"
 	"github.com/huandu/xstrings"
+	"github.com/spf13/viper"
 	"reflect"
 	"strings"
 	"text/template"
+	"time"
 )
 
 var ProtoHelpersFuncMap = template.FuncMap{
@@ -139,6 +141,49 @@ var ProtoHelpersFuncMap = template.FuncMap{
 	"fieldMapKeyType":              fieldMapKeyType,
 	"fieldMapValueType":            fieldMapValueType,
 	"replaceDict":                  replaceDict,
-	"setStore":                     setStore,
-	"getStore":                     getStore,
+	"getStringSlice":               getStringSlice,
+	"getInt":                       getInt,
+	"getStringMapString":           getStringMapString,
+	"getStringMapInterface":        getStringMapInterface,
+	"get":                          get,
+	"allSettings":                  allSettings,
+	"allKeys":                      allKeys,
+	"getTime":                      getTime,
+	"getString":                    getString,
+}
+
+var getString = func(key string) string {
+	return viper.GetString(key)
+}
+
+var getStringSlice = func(s string) []string {
+	return viper.GetStringSlice(s)
+}
+
+var getInt = func(key string) int {
+	return viper.GetInt(key)
+}
+
+var getStringMapString = func(key string) map[string]string {
+	return viper.GetStringMapString(key)
+}
+
+var get = func(key string) interface{} {
+	return viper.Get(key)
+}
+
+var getStringMapInterface = func(key string) interface{} {
+	return viper.GetStringMap(key)
+}
+
+var allSettings = func() map[string]interface{} {
+	return viper.AllSettings()
+}
+
+var allKeys = func() []string {
+	return viper.AllKeys()
+}
+
+var getTime = func(key string) time.Time {
+	return viper.GetTime(key)
 }

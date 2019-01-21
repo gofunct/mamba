@@ -34,12 +34,15 @@ import (
 var (
 	in  string
 	out string
+	pkg string
 )
 
 func init() {
 	{
 		rootCmd.PersistentFlags().StringVarP(&in, "input", "i", ".", "path to input directory")
 		rootCmd.PersistentFlags().StringVarP(&out, "output", "o", ".", "path to output directory")
+		rootCmd.PersistentFlags().StringVarP(&pkg, "package", "p", "", "package name")
+
 	}
 	{
 		logger := kitlog.NewJSONLogger(kitlog.NewSyncWriter(os.Stdout))
@@ -55,7 +58,7 @@ func init() {
 		rootCmd.AddCommand(protocGenCmd)
 	}
 	{
-		if err := cache.Cache.Bind(rootCmd); err != nil {
+		if err := cache.Cache.WrapCobra(rootCmd); err != nil {
 			log.Println("failed to bind config to commands\n", err.Error())
 		}
 	}
