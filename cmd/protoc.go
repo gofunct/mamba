@@ -21,8 +21,8 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -33,18 +33,15 @@ var protocCmd = &cobra.Command{
 	Use:   "protoc",
 	Short: "generate protobuf files",
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := WalkGrpc(in); err != nil {
-			log.Fatalln("failed to execute command", err)
+
+		if err := WalkGrpc("."); err != nil {
+			fmt.Printf("%+v", err)
 		}
 	},
 }
 
-func WalkGrpc(d string) error {
-
-	return filepath.Walk(d, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			log.Fatalln(err)
-		}
+func WalkGrpc(path string) error {
+	return filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		// skip vendor directory
 		if info.IsDir() && info.Name() == "vendor" {
 			return filepath.SkipDir
@@ -53,13 +50,16 @@ func WalkGrpc(d string) error {
 		if filepath.Ext(path) == ".proto" {
 			// args
 			args := []string{
-				"--go_out=plugins=grpc:.",
+				"-I=.",
+				fmt.Sprintf("-I=%s", filepath.Join(os.Getenv("GOPATH"), "src")),
+				fmt.Sprintf("-I=%s", filepath.Join(os.Getenv("GOPATH"), "src", "github.com", "gogo", "protobuf", "protobuf")),
+				fmt.Sprintf("--proto_path=%s", filepath.Join(os.Getenv("GOPATH"), "src", "github.com")),
+				"--gogofaster_out=Mgoogle/protobuf/any.proto=github.com/gogo/protobuf/types,Mgoogle/protobuf/duration.proto=github.com/gogo/protobuf/types,Mgoogle/protobuf/struct.proto=github.com/gogo/protobuf/types,Mgoogle/protobuf/timestamp.proto=github.com/gogo/protobuf/types,Mgoogle/protobuf/wrappers.proto=github.com/gogo/protobuf/types:.",
 				path,
 			}
 			cmd := exec.Command("protoc", args...)
-			log.Print("starting command")
-			cmd.Env = os.Environ()
-			if err := cmd.Run(); err != nil {
+			err = cmd.Run()
+			if err != nil {
 				return err
 			}
 		}

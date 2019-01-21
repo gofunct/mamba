@@ -18,13 +18,40 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package local
+package cmd
 
 import (
+	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
+	"gocloud.dev/server"
+	"log"
+	"net/http"
+	"os"
 )
 
-// rootCmd represents the root command
-var RootCmd = &cobra.Command{
-	Use: "local",
+// appCmd represents the app command
+var serveCmd = &cobra.Command{
+	Use:   "serve",
+	Short: "A brief description of your command",
+	Run: func(cmd *cobra.Command, args []string) {
+		srv := server.New(nil)
+		r := mux.NewRouter()
+		r.HandleFunc("/", handle)
+
+		port := os.Getenv("PORT")
+		if port == "" {
+			port = "8080"
+		}
+		log.Printf("Listening on port %s", port)
+		log.Fatal(srv.ListenAndServe(fmt.Sprintf(":%s", port), r))
+	},
+}
+
+func handle(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
+	fmt.Fprint(w, "Hello world!")
 }

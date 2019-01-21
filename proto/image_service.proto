@@ -1,6 +1,6 @@
 syntax = "proto3";
-option go_package = "github.com/gofunct/mamba/api/image_service";
-package image_service;
+
+package proto;
 
 message Image {
     string version_name = 1;

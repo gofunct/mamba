@@ -23,9 +23,8 @@ package cmd
 import (
 	"fmt"
 	kitlog "github.com/go-kit/kit/log"
-	"github.com/gofunct/mamba/cache"
-	"github.com/gofunct/mamba/cmd/gcloud"
-	"github.com/gofunct/mamba/cmd/local"
+	"github.com/pkg/errors"
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"log"
 	"os"
@@ -35,6 +34,8 @@ var (
 	in  string
 	out string
 	pkg string
+	osfs = afero.NewOsFs()
+	baseFs = afero.NewBasePathFs(osfs, os.Getenv("PWD"))
 )
 
 func init() {
@@ -50,17 +51,11 @@ func init() {
 	}
 
 	{
-		rootCmd.AddCommand(gcloud.RootCmd)
-		rootCmd.AddCommand(local.RootCmd)
 		rootCmd.AddCommand(protocCmd)
 		rootCmd.AddCommand(htmlCmd)
 		rootCmd.AddCommand(testCmd)
 		rootCmd.AddCommand(protocGenCmd)
-	}
-	{
-		if err := cache.Cache.WrapCobra(rootCmd); err != nil {
-			log.Println("failed to bind config to commands\n", err.Error())
-		}
+		rootCmd.AddCommand(serveCmd)
 	}
 }
 
@@ -71,7 +66,6 @@ var rootCmd = &cobra.Command{
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		fmt.Printf("%s\n", errors.WithStack(err))
 	}
 }

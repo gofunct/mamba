@@ -1,10 +1,7 @@
 syntax = "proto3";
-
-option go_package = "github.com/gofunct/mamba/common";
 import "google/protobuf/empty.proto";
-import "github.com/gofunct/mamba/plugin/common.proto";
 
-package common;
+package proto;
 
 message ConnInfo {
     uint32 service_id = 1;

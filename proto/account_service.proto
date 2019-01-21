@@ -1,15 +1,14 @@
 syntax = "proto3";
-option go_package = "github.com/gofunct/mamba/api/account_service";
 import "google/protobuf/empty.proto";
-import "github.com/gofunct/mamba/plugin/image_service/image_service.proto";
+import "image_service.proto";
 
-package account_service;
+package proto;
 
 message Account {
     string id = 1;
     string name = 2;
     string email = 3;
-    map<string, image_service.Image> images = 4;
+    map<string, Image> images = 4;
     string confirm_token = 5;
     string password_reset_token = 6;
     map<string, string> metadata = 7;
@@ -58,13 +57,13 @@ message ConfirmAccountRequest {
 message CreateAccountRequest {
     Account account = 1;
     string password = 2;
-    image_service.ImageStoreRequest image = 3;
+    ImageStoreRequest image = 3;
 }
 
 message UpdateAccountRequest {
     string id = 1;
     string password = 2;
-    image_service.ImageStoreRequest image = 3;
+    ImageStoreRequest image = 3;
     Account account = 4;
 }
 
