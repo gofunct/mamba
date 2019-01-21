@@ -21,7 +21,9 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/gofunct/mamba/input"
+	manager2 "github.com/gofunct/mamba/manager"
 
 	"github.com/spf13/cobra"
 )
@@ -55,6 +57,8 @@ var inputCmd = &cobra.Command{
 	Short: "temporary",
 
 	Run: func(cmd *cobra.Command, args []string) {
-		UI.Query()
+		var manager = manager2.NewManager(cmd.Flags())
+		s := manager.GetString("HOE")
+		fmt.Println(s)
 	},
 }

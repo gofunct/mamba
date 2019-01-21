@@ -53,7 +53,7 @@ func (u *UI) trueFalseBool(q string) (bool, error) {
 	return ans == "true", nil
 }
 
-func (u *UI) notEmpty(q string) ValidateFunc {
+func (u *UI) notEmpty() ValidateFunc {
 	return func(ans string) error {
 		if ans == "" {
 			return ErrEmpty

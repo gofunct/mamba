@@ -10,6 +10,9 @@ import (
 
 type Walker struct{}
 
+func NewWalker() *Walker {
+	return &Walker{}
+}
 func (w *Walker) GrpcWalkFunc(args ...string) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		// skip vendor directory

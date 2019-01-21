@@ -15,16 +15,16 @@ func init() {
 	L.SetFormatter(&logrus.JSONFormatter{})
 }
 
-var L *contextLog
+var L *CtxLogger
 
-func NewLogCtx(logger *logrus.Logger) *contextLog {
-	return &contextLog{
+func NewLogCtx(logger *logrus.Logger) *CtxLogger {
+	return &CtxLogger{
 		lgr:     lgr{logger},
 		Context: NewLogrusLogger(logger),
 	}
 }
 
-type contextLog struct {
+type CtxLogger struct {
 	lgr
 	Context log.Logger
 }

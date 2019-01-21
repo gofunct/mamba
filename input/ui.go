@@ -30,6 +30,7 @@ type UI struct {
 	answers map[string]string
 }
 
+
 type Query struct {
 	Q    string
 	Tag  string
@@ -66,4 +67,20 @@ func (u *UI) AddQueries(q ...*Query) {
 	for _, v := range q {
 		u.Queries = append(u.Queries, v)
 	}
+}
+
+func (u *UI) Enquire(q, tag string) string {
+	logging.L.Log("tag", tag, "question", q)
+	logging.L.Debug("beggining query...")
+	ans, err := u.Ask(fmt.Sprintf("%s", q), &Options{
+		Name: tag,
+		ValidateFunc: u.notEmpty(),
+		Required: true,
+		Loop: true,
+	})
+	if err != nil {
+		logging.L.Fatalln(err)
+	}
+	return ans
+
 }
