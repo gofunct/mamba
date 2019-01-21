@@ -4,10 +4,10 @@ import (
 	"github.com/shiyanhui/hero"
 )
 
-type Static struct {}
+type Static struct{}
 
 func NewStatic() *Static {
-	return&Static{}
+	return &Static{}
 }
 
 func (s *Static) Generate(source, dest, pkg string) {

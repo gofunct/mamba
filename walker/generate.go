@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 )
 
-type Walker struct {}
+type Walker struct{}
 
 func (w *Walker) GrpcWalkFunc(args ...string) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {

@@ -30,7 +30,7 @@ var (
 	singlePackageMode = false
 )
 
-type Generator struct {}
+type Generator struct{}
 
 func NewGenerator() *Generator {
 	return &Generator{}

@@ -2,10 +2,13 @@ package function
 
 import (
 	"fmt"
+	"github.com/spf13/cobra"
 	"os"
 	"os/exec"
 	"strings"
 )
+
+type RunFunc func(cmd *cobra.Command, args []string)
 
 func RunString(args ...string) (stdout string, err error) {
 	stdoutb, err := RunBytes(args...)

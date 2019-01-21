@@ -18,30 +18,43 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package db
+package cmd
 
 import (
-	"github.com/gofunct/mamba/logging"
-	"github.com/pkg/errors"
+	"github.com/gofunct/mamba/input"
+
 	"github.com/spf13/cobra"
 )
 
-var (
-	dgraph 	bool
-)
-
-var RootCmd = &cobra.Command{
-	Use:   "db",
-	Short: "A brief description of your command",
-	Run: func(cmd *cobra.Command, args []string) {
-		if dgraph {
-			if err := StartDGraph(); err != nil {
-				logging.L.Fatalf("failed to start dgraph: %s\n", errors.WithStack(err))
-			}
-		}
+var UI = &input.UI{
+	Queries: []*input.Query{
+		{
+		Q: "What is your favorite restaurant?",
+		Opts: &input.Options{
+			ValidateFunc: func(s string) error {
+				if s == "" {
+					return input.ErrEmpty
+				}
+				if len(s) > 50 {
+					return input.ErrOutOfRange
+				}
+				return nil
+			},
+			Default: "Mcdonalds",
+			Required: true,
+			Loop: true,
+		},
+		Tag: "restaurant",
+		},
 	},
 }
 
-func init() {
-	RootCmd.Flags().BoolVar(&dgraph, "dgraph", false, "start a local dgraph database server")
+// inputCmd represents the input command
+var inputCmd = &cobra.Command{
+	Use:   "input",
+	Short: "temporary",
+
+	Run: func(cmd *cobra.Command, args []string) {
+		UI.Query()
+	},
 }

@@ -18,51 +18,40 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package cmd
+package docker
 
 import (
 	"fmt"
-	"github.com/gofunct/mamba/docker"
-	"github.com/gofunct/mamba/generator"
-	"github.com/gofunct/mamba/logging"
-	"github.com/gofunct/mamba/static"
-	"github.com/pkg/errors"
+	"github.com/gofunct/mamba/docker/commands"
 	"github.com/spf13/cobra"
 )
 
 var (
-	in  string
-	out string
-	pkg string
+	dGraph bool
 )
 
 func init() {
-	{
-		logging.AddLoggingFlags(rootCmd)
-		rootCmd.PersistentFlags().StringVarP(&in, "input", "i", ".", "path to input directory")
-		rootCmd.PersistentFlags().StringVarP(&out, "output", "o", ".", "path to output directory")
-		rootCmd.PersistentFlags().StringVarP(&pkg, "package", "p", "", "package name")
-
-	}
-
-	{
-		rootCmd.AddCommand(generator.GoGoCmd)
-		rootCmd.AddCommand(static.RootCmd)
-		rootCmd.AddCommand(testCmd)
-		rootCmd.AddCommand(generator.ProtoGenCmd)
-		rootCmd.AddCommand(serveCmd)
-		rootCmd.AddCommand(docker.RootCmd)
-		rootCmd.AddCommand(inputCmd)
-	}
+	CreateCmd.Flags().BoolVar(&dGraph, "dgraph", false, "start a local dgraph database server")
 }
 
-var rootCmd = &cobra.Command{
-	Use:   "mamba",
-	Short: "A general purpose scripting utility for developers and administrators",
-}
+var CreateCmd = createCmd()
 
-func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Printf("%s\n", errors.WithStack(err))
+func createCmd() *cobra.Command {
+	switch {
+	case dGraph:
+		fmt.Println("running dgraph command...")
+		return &cobra.Command{
+			Use:   "create",
+			Short: "Commands for interacting with a database",
+			Run:   commands.RunDgraph(),
+		}
+	default:
+		fmt.Println("running default command...")
+		return &cobra.Command{
+			Use:   "create",
+			Short: "Commands for interacting with a database",
+			Run:   commands.DefaultFunc(),
+		}
 	}
+
 }
