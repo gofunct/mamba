@@ -1,13 +1,13 @@
-package tmpl
+package generator
 
 import (
-	"github.com/gofunct/mamba/tmpl/encoders"
+	"github.com/gofunct/mamba/generator/encoders"
 	"io/ioutil"
 	"log"
 	"os"
 	"strings"
 
-	"github.com/gofunct/mamba/tmpl/fmap"
+	"github.com/gofunct/mamba/generator/fmap"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/generator"
 	"github.com/golang/protobuf/protoc-gen-go/plugin"
@@ -30,7 +30,12 @@ var (
 	singlePackageMode = false
 )
 
-func Service(in, out string) {
+type Generator struct {}
+
+func NewGenerator() *Generator {
+	return &Generator{}
+}
+func (gen *Generator) Generate(in, out string) {
 	g := generator.New()
 
 	data, err := ioutil.ReadAll(os.Stdin)

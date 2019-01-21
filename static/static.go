@@ -18,18 +18,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package cmd
+package static
 
 import (
-	"github.com/gofunct/mamba/static"
 	"github.com/spf13/cobra"
 )
 
-// htmlCmd represents the html command
-var htmlCmd = &cobra.Command{
-	Use:   "html",
-	Short: "Generate html files",
+var (
+	in, out, pkg string
+)
+
+func init() {
+	RootCmd.PersistentFlags().StringVarP(&in, "input", "i", ".", "path to input directory")
+	RootCmd.PersistentFlags().StringVarP(&out, "output", "o", ".", "path to output directory")
+	RootCmd.PersistentFlags().StringVarP(&pkg, "package", "p", "", "package name")
+}
+
+var RootCmd = &cobra.Command{
+	Use:   "static",
+	Short: "Generate static files",
 	Run: func(cmd *cobra.Command, args []string) {
-		static.Generate(in, out, pkg)
+		s := NewStatic()
+		s.Generate(in, out, pkg)
 	},
 }

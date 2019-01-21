@@ -23,8 +23,11 @@ package cmd
 import (
 	"fmt"
 	kitlog "github.com/go-kit/kit/log"
+	"github.com/gofunct/mamba/db"
+	"github.com/gofunct/mamba/generator"
+	"github.com/gofunct/mamba/logging"
+	"github.com/gofunct/mamba/static"
 	"github.com/pkg/errors"
-	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"log"
 	"os"
@@ -34,12 +37,11 @@ var (
 	in  string
 	out string
 	pkg string
-	osfs = afero.NewOsFs()
-	baseFs = afero.NewBasePathFs(osfs, os.Getenv("PWD"))
 )
 
 func init() {
 	{
+		logging.AddLoggingFlags(rootCmd)
 		rootCmd.PersistentFlags().StringVarP(&in, "input", "i", ".", "path to input directory")
 		rootCmd.PersistentFlags().StringVarP(&out, "output", "o", ".", "path to output directory")
 		rootCmd.PersistentFlags().StringVarP(&pkg, "package", "p", "", "package name")
@@ -51,11 +53,12 @@ func init() {
 	}
 
 	{
-		rootCmd.AddCommand(protocCmd)
-		rootCmd.AddCommand(htmlCmd)
+		rootCmd.AddCommand(generator.GoGoCmd)
+		rootCmd.AddCommand(static.RootCmd)
 		rootCmd.AddCommand(testCmd)
-		rootCmd.AddCommand(protocGenCmd)
+		rootCmd.AddCommand(generator.ProtoGenCmd)
 		rootCmd.AddCommand(serveCmd)
+		rootCmd.AddCommand(db.RootCmd)
 	}
 }
 

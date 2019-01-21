@@ -18,29 +18,51 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package cmd
+package generator
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"os"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/spf13/cobra"
 )
 
+var (
+	in  string
+	out string
+)
+
+func init() {
+	ProtoGenCmd.PersistentFlags().StringVarP(&in, "input", "i", ".", "path to input directory")
+	ProtoGenCmd.PersistentFlags().StringVarP(&out, "output", "o", ".", "path to output directory")
+	GoGoCmd.PersistentFlags().StringVarP(&in, "input", "i", ".", "path to input directory")
+	GoGoCmd.PersistentFlags().StringVarP(&out, "output", "o", ".", "path to output directory")
+}
+
+// protocGenCmd represents the protocGen command
+var ProtoGenCmd = &cobra.Command{
+	Use:   "protocGen",
+	Short: "Compile templates as a protoc plugin",
+	Run: func(cmd *cobra.Command, args []string) {
+		var g = NewGenerator()
+		g.Generate(in, out)
+	},
+}
+
 // protocCmd represents the protoc command
-var protocCmd = &cobra.Command{
+var GoGoCmd = &cobra.Command{
 	Use:   "protoc",
 	Short: "generate protobuf files",
 	Run: func(cmd *cobra.Command, args []string) {
-
-		if err := WalkGrpc("."); err != nil {
+		if err := WalkGoGo(in); err != nil {
 			fmt.Printf("%+v", err)
 		}
 	},
 }
 
-func WalkGrpc(path string) error {
+func WalkGoGo(path string) error {
 	return filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		// skip vendor directory
 		if info.IsDir() && info.Name() == "vendor" {

@@ -10,7 +10,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/gofunct/mamba/tmpl/fmap"
+	"github.com/gofunct/mamba/generator/fmap"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/golang/protobuf/protoc-gen-go/plugin"
 )

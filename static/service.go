@@ -4,6 +4,12 @@ import (
 	"github.com/shiyanhui/hero"
 )
 
-func Generate(source, dest, pkg string) {
+type Static struct {}
+
+func NewStatic() *Static {
+	return&Static{}
+}
+
+func (s *Static) Generate(source, dest, pkg string) {
 	hero.Generate(source, dest, pkg)
 }

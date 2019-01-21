@@ -1,14 +1,16 @@
-package function
+package walker
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
+	"github.com/gofunct/mamba/function"
 	"log"
 	"os"
 	"path/filepath"
 )
 
-func GrpcWalkFunc(args ...string) filepath.WalkFunc {
+type Walker struct {}
+
+func (w *Walker) GrpcWalkFunc(args ...string) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		// skip vendor directory
 		if info.IsDir() && info.Name() == "vendor" {
@@ -17,13 +19,13 @@ func GrpcWalkFunc(args ...string) filepath.WalkFunc {
 		// find all protobuf files
 		if filepath.Ext(path) == ".proto" {
 			args = append([]string{"protoc", "--go_out=plugins=grpc:."}, args...)
-			ValidateString(args...)
+			function.ValidateString(args...)
 		}
 		return nil
 	}
 }
 
-func GoGoWalkFunc(args ...string) filepath.WalkFunc {
+func (w *Walker) GoGoWalkFunc(args ...string) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		// skip vendor directory
 		if info.IsDir() && info.Name() == "vendor" {
@@ -39,13 +41,13 @@ func GoGoWalkFunc(args ...string) filepath.WalkFunc {
 				fmt.Sprintf("--proto_path=%s", filepath.Join(os.Getenv("GOPATH"), "src", "github.com")),
 				"--gogofaster_out=Mgoogle/protobuf/any.proto=github.com/gogo/protobuf/types,Mgoogle/protobuf/duration.proto=github.com/gogo/protobuf/types,Mgoogle/protobuf/struct.proto=github.com/gogo/protobuf/types,Mgoogle/protobuf/timestamp.proto=github.com/gogo/protobuf/types,Mgoogle/protobuf/wrappers.proto=github.com/gogo/protobuf/types:.",
 			}, args...)
-			ValidateString(args...)
+			function.ValidateString(args...)
 		}
 		return nil
 	}
 }
 
-func TmplWalkFunc() filepath.WalkFunc {
+func (w *Walker) TmplWalkFunc() filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		// skip vendor directory
 		if info.IsDir() && info.Name() == "vendor" {
@@ -59,7 +61,7 @@ func TmplWalkFunc() filepath.WalkFunc {
 	}
 }
 
-func ShellWalkFunc(args ...string) filepath.WalkFunc {
+func (w *Walker) ShellWalkFunc(args ...string) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		// skip vendor directory
 		if info.IsDir() && info.Name() == "vendor" {
@@ -68,30 +70,13 @@ func ShellWalkFunc(args ...string) filepath.WalkFunc {
 		// find all protobuf files
 		if filepath.Ext(path) == ".sh" {
 			args = append([]string{"bash"}, args...)
-			ValidateString(args...)
+			function.ValidateString(args...)
 		}
 		return nil
 	}
 }
 
-func ConfigWalkFunc() filepath.WalkFunc {
-	viper.AutomaticEnv()
-	viper.AllowEmptyEnv(true)
-	viper.SetConfigName(".mamba")
-	return func(path string, info os.FileInfo, err error) error {
-		// skip vendor directory
-		if info.IsDir() && info.Name() == "vendor" {
-			return filepath.SkipDir
-		}
-		if info.Name() == ".mamba" {
-			viper.AddConfigPath(path)
-		}
-
-		return nil
-	}
-}
-
-func GoWalkFunc(args ...string) filepath.WalkFunc {
+func (w *Walker) GoWalkFunc(args ...string) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		if path == "" || info == nil || err != nil {
 			log.Fatalf("Walkfunc failure: %s %v %s", path, info, err)
@@ -103,13 +88,13 @@ func GoWalkFunc(args ...string) filepath.WalkFunc {
 		// find all protobuf files
 		if filepath.Ext(path) == ".go" {
 			args = append([]string{"go"}, args...)
-			ValidateString(args...)
+			function.ValidateString(args...)
 		}
 		return nil
 	}
 }
 
-func MakefileWalkFunc(args ...string) filepath.WalkFunc {
+func (w *Walker) MakefileWalkFunc(args ...string) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		// skip vendor directory
 		if info.IsDir() && info.Name() == "vendor" {
@@ -118,13 +103,13 @@ func MakefileWalkFunc(args ...string) filepath.WalkFunc {
 		// find all protobuf files
 		if !info.IsDir() && info.Name() == "Makefile" {
 			args = append([]string{"make"}, args...)
-			ValidateString(args...)
+			function.ValidateString(args...)
 		}
 		return nil
 	}
 }
 
-func DockerfileWalkFunc(args ...string) filepath.WalkFunc {
+func (w *Walker) DockerfileWalkFunc(args ...string) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		// skip vendor directory
 		if info.IsDir() && info.Name() == "vendor" {
@@ -132,8 +117,8 @@ func DockerfileWalkFunc(args ...string) filepath.WalkFunc {
 		}
 		// find all protobuf files
 		if !info.IsDir() && info.Name() == "Dockerfile" {
-			args = append([]string{"go"}, args...)
-			ValidateString(args...)
+			args = append([]string{"docker"}, args...)
+			function.ValidateString(args...)
 		}
 
 		return nil

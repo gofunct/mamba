@@ -18,19 +18,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package cmd
+package db
 
 import (
-	"github.com/gofunct/mamba/tmpl"
-
+	"github.com/gofunct/mamba/logging"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
-// protocGenCmd represents the protocGen command
-var protocGenCmd = &cobra.Command{
-	Use:   "protocGen",
-	Short: "Compile templates as a protoc plugin",
+var (
+	dgraph 	bool
+)
+
+var RootCmd = &cobra.Command{
+	Use:   "db",
+	Short: "A brief description of your command",
 	Run: func(cmd *cobra.Command, args []string) {
-		tmpl.Service(in, out)
+		if dgraph {
+			if err := StartDGraph(); err != nil {
+				logging.L.Fatalf("failed to start dgraph: %s\n", errors.WithStack(err))
+			}
+		}
 	},
+}
+
+func init() {
+	RootCmd.Flags().BoolVar(&dgraph, "dgraph", false, "start a local dgraph database server")
 }
