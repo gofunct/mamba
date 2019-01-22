@@ -1,4 +1,4 @@
 //go:generate go fmt ./...
-//go:generate mamba protoc
+//go:generate go install ./...
 
-package main
+package mamba

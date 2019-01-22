@@ -1,9 +1,0 @@
-config:
-  write: "1"
-config-path: config.yaml
-debug: false
-help: false
-input: .
-output: .
-package: ""
-warn: false
