@@ -3,7 +3,7 @@ package manager
 import (
 	"fmt"
 	"github.com/go-kit/kit/log"
-	"github.com/gofunct/mamba/input"
+	"github.com/gofunct/mamba/manager/input"
 	"github.com/gofunct/mamba/logging"
 	"github.com/gofunct/mamba/walker"
 	"github.com/sirupsen/logrus"

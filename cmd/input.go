@@ -21,7 +21,7 @@
 package cmd
 
 import (
-	"github.com/gofunct/mamba/input"
+	"github.com/gofunct/mamba/manager/input"
 	manager2 "github.com/gofunct/mamba/manager"
 	"github.com/spf13/cobra"
 )
