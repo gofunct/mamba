@@ -202,6 +202,7 @@ func (m *Manager) BindCmd(cmd *cobra.Command) {
 	m.AddFlagSet(cmd.Flags())
 	m.AddFlagSet(cmd.PersistentFlags())
 	m.usg = cmd.UsageString()
+	_ := viper.BindPFlags(m.flags)
 }
 
 func (m *Manager) AddRequirement(s string) {
