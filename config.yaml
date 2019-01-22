@@ -1,0 +1,11 @@
+debug: false
+email: na
+help: false
+input: .
+name: Tyler
+output: .
+package: ""
+query:
+  answers:
+    restaurant: Mcdonalds
+warn: false

@@ -46,8 +46,6 @@ func (u *UI) Query() {
 		u.answers = make(map[string]string)
 	}
 	for _, v := range u.Queries {
-		logging.L.Log("tag", v.Tag, v.Opts.Name, "default", v.Opts.Default)
-		logging.L.Debug("beggining query...")
 
 		if u.ChainFunc != nil {
 			v.Opts.ValidateFunc = u.ChainFunc(v.Opts.ValidateFunc)
@@ -70,8 +68,6 @@ func (u *UI) AddQueries(q ...*Query) {
 }
 
 func (u *UI) Enquire(q, tag string) string {
-	logging.L.Log("tag", tag, "question", q)
-	logging.L.Debug("beggining query...")
 	ans, err := u.Ask(fmt.Sprintf("%s", q), &Options{
 		Name: tag,
 		ValidateFunc: u.notEmpty(),
