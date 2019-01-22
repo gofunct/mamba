@@ -148,9 +148,8 @@ func createRootCmdFile(project *Project) {
 package cmd
 
 import (
-	"fmt"
-	"os"
 	"github.com/gofunct/mamba"
+	"github.com/pkg/errors"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -178,7 +177,7 @@ func Execute() {
 	}
 }
 
-func init() 
+func init() {
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 `

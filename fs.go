@@ -28,7 +28,7 @@ func (m *Command) ReadDir(f string) ([]os.FileInfo, error) {
 	return ioutil.ReadDir(f)
 }
 
-func (c *Command) RunString(args ...string) (stdout string, err error) {
+func (c *Command) ExecString(args ...string) (stdout string, err error) {
 	stdoutb, err := c.ExecBytes(args...)
 	return strings.TrimSpace(string(stdoutb)), err
 }
@@ -45,9 +45,9 @@ func (c *Command) ExecBytes(args ...string) (stdout []byte, err error) {
 }
 
 func (c *Command) OsExec(args ...string) {
-	s, err := c.RunString(args...)
+	s, err := c.ExecString(args...)
 	if s != "" {
-		if _, err := fmt.Fprintf(c.output, s); err != nil {
+		if _, err := fmt.Fprintf(os.Stderr, s); err != nil {
 			c.Warnf("%s\n%s", "failed to write output to stderr", err)
 		}
 	}
