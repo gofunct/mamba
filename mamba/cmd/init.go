@@ -154,18 +154,18 @@ import (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &mamba.Command{
-	Use:   "{{.appName}}",
-	Info: "A brief description of your application",
+	Use:   				"{{.appName}}",
+	Version: 			"v0.1.1",
+	Info: "Change me to a brief description of your application",
+	// k/v pairs will be set to env 
+	Env: 				nil,
 	// Args set in ValidArgs will be set via query if not found
 	ValidArgs:          nil,
-	// custom usage function to populate usage template
-	UsageF:             nil,
-	UsageTmpl:          "",
 	// first run after mamba.OnInitialize
 	PreRun:             nil,
-	// second run after mamba.cmd.PreRun
+	// second run after cmd.PreRun
 	Run:                nil,
-	// third run after cmd.Ru 
+	// third run after cmd.Run 
 	PostRun:            nil,
 	// use for passing args to os.Exec
 	DisableFlagParsing: false,

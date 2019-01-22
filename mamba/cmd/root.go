@@ -37,8 +37,8 @@ var (
 		Info: `Mamba is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Mamba application.`,
-		Hidden:      false,
-		Annotations: nil,
+		Hidden: false,
+		Env:    nil,
 		// Args set in ValidArgs will be set via query if not found
 		ValidArgs: nil,
 		Args:      nil,

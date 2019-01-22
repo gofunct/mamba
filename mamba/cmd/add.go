@@ -133,14 +133,25 @@ import (
 
 // {{.cmdName}}Cmd represents the {{.cmdName}} command
 var {{.cmdName}}Cmd = &mamba.Command{
-	Use:   "{{.cmdName}}",
+	Use:   				"{{.cmdName}}",
+	Version: 			"v0.1.1",
 	Info: "A brief description of your command",
-	// Add all config requirements to Valid Args
-	ValidArgs: []string{},
+	Env: 				nil,
+	// Args set in ValidArgs will be set via query if not found
+	ValidArgs:          nil,
+	// first run after mamba.OnInitialize
+	PreRun:             nil,
+	
+	// use for passing args to os.Exec
+	DisableFlagParsing: 		false,
 	Run: func(cmd *mamba.Command, args []string) {
-		
+		fmt.Println("{{.cmdName}} command info: ", cmd.Info)
 		fmt.Println("{{.cmdName}} valid arguments are: ", cmd.ValidArgs)
+		fmt.Println("{{.cmdName}} env vars are: ", cmd.Env)
+		fmt.Println("{{.cmdName}} is a child of: ", cmd.Root())
 	},
+	// third run after cmd.Run 
+	PostRun:            nil,
 }
 
 func init() {
