@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"github.com/gofunct/mamba/docker"
 	"github.com/gofunct/mamba/generator"
+	"github.com/gofunct/mamba/manager"
 	"github.com/gofunct/mamba/manager/logging"
 	"github.com/gofunct/mamba/static"
 	"github.com/pkg/errors"
@@ -31,6 +32,7 @@ import (
 )
 
 var (
+	mgr = manager.NewManager()
 	in  string
 	out string
 	pkg string

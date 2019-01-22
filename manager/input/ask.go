@@ -5,17 +5,11 @@ import (
 	"fmt"
 )
 
-// Ask asks the user for input using the given query. The response is
-// returned as string. Error is returned based on the given option.
-// If Loop is true, it continue to ask until it receives valid input.
-//
-// If the user sends SIGINT (Ctrl+C) while reading input, it catches
-// it and return it as a error.
-func (i *UI) Ask(query string, opts *Options) (string, error) {
+func (i *UI) Ask(q *Query) (string, error) {
 	i.once.Do(i.setDefault)
 
 	// Display the query to the user.
-	fmt.Fprintf(i.Writer, "%s", query)
+	fmt.Fprintf(i.Writer, "%s", q.Q)
 
 	// resultStr and resultErr are return val of this function
 	var resultStr string
@@ -27,37 +21,28 @@ func (i *UI) Ask(query string, opts *Options) (string, error) {
 
 		// Construct the instruction to user.
 		var buf bytes.Buffer
-		if !opts.HideOrder || loopCount > 1 {
-			buf.WriteString("\nEnter a value")
-		}
 
-		if opts.Default != "" && !opts.HideDefault {
-			defaultVal := opts.Default
-			if opts.MaskDefault {
-				defaultVal = maskString(defaultVal)
-			}
-			buf.WriteString(fmt.Sprintf(" (Default is %s)", defaultVal))
-		}
-
-		// Display the instruction to user and ask to input.
+		buf.WriteString("\nEnter a value")
+		defaultVal := q.Opts.Default
+		buf.WriteString(fmt.Sprintf(" (Default is %s)", defaultVal))
 		buf.WriteString(": ")
 		fmt.Fprintf(i.Writer, buf.String())
 
 		// Read user input from UI.Reader.
-		line, err := i.read(opts.readOpts())
+		line, err := i.read()
 		if err != nil {
 			resultErr = err
 			break
 		}
 
 		// line is empty but default is provided returns it
-		if line == "" && opts.Default != "" {
-			resultStr = opts.Default
+		if line == "" && q.Opts.Default != "" {
+			resultStr = q.Opts.Default
 			break
 		}
 
-		if line == "" && opts.Required {
-			if !opts.Loop {
+		if line == "" && q.Opts.Required {
+			if !q.Opts.Loop {
 				resultErr = ErrEmpty
 				break
 			}
@@ -67,9 +52,9 @@ func (i *UI) Ask(query string, opts *Options) (string, error) {
 		}
 
 		// validate input by custom fuction
-		validate := opts.validateFunc()
+		validate := bind(q)
 		if err := validate(line); err != nil {
-			if !opts.Loop {
+			if !q.Opts.Loop {
 				resultErr = err
 				break
 			}

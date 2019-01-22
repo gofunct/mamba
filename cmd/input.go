@@ -21,33 +21,8 @@
 package cmd
 
 import (
-	manager2 "github.com/gofunct/mamba/manager"
-	"github.com/gofunct/mamba/manager/input"
 	"github.com/spf13/cobra"
 )
-
-var UI = &input.UI{
-	Queries: []*input.Query{
-		{
-			Q: "What is your favorite restaurant?",
-			Opts: &input.Options{
-				ValidateFunc: func(s string) error {
-					if s == "" {
-						return input.ErrEmpty
-					}
-					if len(s) > 50 {
-						return input.ErrOutOfRange
-					}
-					return nil
-				},
-				Default:  "Mcdonalds",
-				Required: true,
-				Loop:     true,
-			},
-			Tag: "restaurant",
-		},
-	},
-}
 
 // inputCmd represents the input command
 var inputCmd = &cobra.Command{
@@ -55,11 +30,9 @@ var inputCmd = &cobra.Command{
 	Short: "temporary",
 
 	Run: func(cmd *cobra.Command, args []string) {
-		var manager = manager2.NewManager([]string{"name", "email"})
-		manager.AddFlagSet(cmd.Flags())
-		manager.Q.AddQueries(UI.Queries...)
-		manager.Q.Query()
-		manager.SyncRequirements()
-		manager.Debug()
+		mgr.AddFlagSet(cmd.Flags())
+		mgr.Q.Enquire()
+		mgr.SyncRequirements()
+		mgr.Debug()
 	},
 }

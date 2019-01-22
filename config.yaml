@@ -1,11 +1,9 @@
+config:
+  write: "1"
+config-path: config.yaml
 debug: false
-email: na
 help: false
 input: .
-name: Tyler
 output: .
 package: ""
-query:
-  answers:
-    restaurant: Mcdonalds
 warn: false
