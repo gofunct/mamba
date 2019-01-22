@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/go-kit/kit/log"
 	"github.com/gofunct/mamba/manager/input"
-	"github.com/gofunct/mamba/logging"
-	"github.com/gofunct/mamba/walker"
+	"github.com/gofunct/mamba/manager/logging"
+	"github.com/gofunct/mamba/manager/walker"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -20,14 +20,13 @@ type Interface interface {
 	GetString(s string) string
 	Unmarshal(interface{}, []byte) error
 	log.Logger
-
 }
 
 type Manager struct {
-	L *logging.CtxLogger
-	Q *input.UI
-	Flags *pflag.FlagSet
-	W *walker.Walker
+	L            *logging.CtxLogger
+	Q            *input.UI
+	Flags        *pflag.FlagSet
+	W            *walker.Walker
 	Requirements []string
 }
 
@@ -58,15 +57,15 @@ func (m *Manager) GetString(s string) string {
 
 func NewManager(vars []string) *Manager {
 	m := &Manager{
-		L: logging.NewLogCtx(logrus.New()),
-		Q: input.DefaultUI(),
-		W: walker.NewWalker(),
+		L:            logging.NewLogCtx(logrus.New()),
+		Q:            input.DefaultUI(),
+		W:            walker.NewWalker(),
 		Requirements: vars,
 	}
 	return m
 }
 
-func (m *Manager) SyncRequirements()  {
+func (m *Manager) SyncRequirements() {
 	for _, s := range m.Requirements {
 		if res := viper.GetString(s); res != "" {
 			if err := viper.BindEnv(s, res); err != nil {
@@ -117,17 +116,16 @@ func (m *Manager) Debug() {
 	viper.Debug()
 	fmt.Println("Requirements: ", m.Requirements)
 	for _, v := range m.Q.Queries {
-		fmt.Println("Question: ",v.Q)
-		fmt.Println("Tag: ",v.Tag)
-		fmt.Println("Name: ",v.Opts.Name)
+		fmt.Println("Question: ", v.Q)
+		fmt.Println("Tag: ", v.Tag)
+		fmt.Println("Name: ", v.Opts.Name)
 		fmt.Println("Required: ", v.Opts.Required)
 		fmt.Println("Default: ", v.Opts.Default)
 	}
 }
 
 func (m *Manager) Write() {
-	if res, err := m.Q.Select("Write current config to disc?", []string{"yes", "no"}, &input.Options{});
-	err == nil && strings.Contains(res, "y") || err == nil && strings.Contains(res, "Y") || err == nil && strings.Contains(res, "yes") {
+	if res, err := m.Q.Select("Write current config to disc?", []string{"yes", "no"}, &input.Options{}); err == nil && strings.Contains(res, "y") || err == nil && strings.Contains(res, "Y") || err == nil && strings.Contains(res, "yes") {
 		if file := m.Q.Enquire("Please provide a path to config file", "file"); file != "" {
 			if err := viper.WriteConfigAs(file); err != nil {
 				m.L.Warn("failed to write config", err.Error())
@@ -150,22 +148,21 @@ func (m *Manager) AllSettings() map[string]interface{} {
 	return viper.AllSettings()
 }
 
-
-func (m *Manager) WriteFile(f string, d []byte)  error {
+func (m *Manager) WriteFile(f string, d []byte) error {
 	return ioutil.WriteFile(f, d, 0755)
 }
 
-func (m *Manager) ReadFile(f string)  ([]byte, error) {
+func (m *Manager) ReadFile(f string) ([]byte, error) {
 	return ioutil.ReadFile(f)
 }
 
-func (m *Manager) ReadStdIn()  ([]byte, error) {
+func (m *Manager) ReadStdIn() ([]byte, error) {
 	return ioutil.ReadAll(os.Stdin)
 }
-func (m *Manager) ReadReader(reader io.Reader)  ([]byte, error) {
+func (m *Manager) ReadReader(reader io.Reader) ([]byte, error) {
 	return ioutil.ReadAll(reader)
 }
 
-func (m *Manager) ReadDir(f string)  ([]os.FileInfo, error) {
+func (m *Manager) ReadDir(f string) ([]os.FileInfo, error) {
 	return ioutil.ReadDir(f)
 }

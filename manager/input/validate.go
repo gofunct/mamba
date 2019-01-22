@@ -2,7 +2,7 @@ package input
 
 import (
 	"fmt"
-	"github.com/gofunct/mamba/logging"
+	"github.com/gofunct/mamba/manager/logging"
 	"github.com/pkg/errors"
 )
 

@@ -21,30 +21,30 @@
 package cmd
 
 import (
-	"github.com/gofunct/mamba/manager/input"
 	manager2 "github.com/gofunct/mamba/manager"
+	"github.com/gofunct/mamba/manager/input"
 	"github.com/spf13/cobra"
 )
 
 var UI = &input.UI{
 	Queries: []*input.Query{
 		{
-		Q: "What is your favorite restaurant?",
-		Opts: &input.Options{
-			ValidateFunc: func(s string) error {
-				if s == "" {
-					return input.ErrEmpty
-				}
-				if len(s) > 50 {
-					return input.ErrOutOfRange
-				}
-				return nil
+			Q: "What is your favorite restaurant?",
+			Opts: &input.Options{
+				ValidateFunc: func(s string) error {
+					if s == "" {
+						return input.ErrEmpty
+					}
+					if len(s) > 50 {
+						return input.ErrOutOfRange
+					}
+					return nil
+				},
+				Default:  "Mcdonalds",
+				Required: true,
+				Loop:     true,
 			},
-			Default: "Mcdonalds",
-			Required: true,
-			Loop: true,
-		},
-		Tag: "restaurant",
+			Tag: "restaurant",
 		},
 	},
 }

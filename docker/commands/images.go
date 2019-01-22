@@ -7,7 +7,7 @@ import (
 	"github.com/fsouza/go-dockerclient"
 	"github.com/gofunct/mamba/docker/client"
 	"github.com/gofunct/mamba/function"
-	"github.com/gofunct/mamba/logging"
+	"github.com/gofunct/mamba/manager/logging"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"time"

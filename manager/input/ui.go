@@ -3,7 +3,7 @@ package input
 import (
 	"bufio"
 	"fmt"
-	"github.com/gofunct/mamba/logging"
+	"github.com/gofunct/mamba/manager/logging"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"io"
@@ -29,7 +29,6 @@ type UI struct {
 	once    sync.Once
 	answers map[string]string
 }
-
 
 type Query struct {
 	Q    string
@@ -69,10 +68,10 @@ func (u *UI) AddQueries(q ...*Query) {
 
 func (u *UI) Enquire(q, tag string) string {
 	ans, err := u.Ask(fmt.Sprintf("%s", q), &Options{
-		Name: tag,
+		Name:         tag,
 		ValidateFunc: u.notEmpty(),
-		Required: true,
-		Loop: true,
+		Required:     true,
+		Loop:         true,
 	})
 	if err != nil {
 		logging.L.Fatalln(err)
