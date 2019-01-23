@@ -1,6 +1,10 @@
 package mamba
 
-import "bytes"
+import (
+	"bytes"
+	"fmt"
+	"github.com/pkg/errors"
+)
 
 // UsageFunc returns either the function set by SetUsageFunc for this command
 // or a parent, or it returns a default usage function.
@@ -59,7 +63,9 @@ func (c *Command) UsageString() string {
 	tmpOutput := c.output
 	bb := new(bytes.Buffer)
 	c.SetOutput(bb)
-	c.Usage()
+	if err := c.Usage(); err != nil {
+		fmt.Printf("%#v", errors.WithStack(err))
+	}
 	c.output = tmpOutput
 	return bb.String()
 }
