@@ -37,26 +37,27 @@ func (c *Command) UsageTemplate() string {
 	if c.hasParent() {
 		return c.parent.UsageTemplate()
 	}
-	return `Usage:
-  {{.UseLine}}
-  {{.CommandPath}} [command]
+	return `
+Usage:
 
-Aliases:
-  {{.nameAndAliases}}
+{{.UseLine}}
+{{.CommandPath}} [command]
+
 
 Available Commands:{{range .Commands}}
-  {{rpad .Name .namePadding }} {{.Info}}
+{{.CommandPath}}
+
+{{.Name}} 
+
+{{.Info}}
 
 Flags:
 {{.LocalFlags.FlagUsages | trimTrailingWhitespaces}}
+{{end}}
 
 Global Flags:
 {{.InheritedFlags.FlagUsages | trimTrailingWhitespaces}}
 
-Additional help topics:{{range .Commands}}
-  {{rpad .CommandPath .CommandPathPadding}} {{.Info}}
-
-Use "{{.CommandPath}} [command] --help" for more information about a command.
 `
 }
 

@@ -26,8 +26,7 @@ func (c *Command) VersionTemplate() string {
 	if c.hasParent() {
 		return c.parent.VersionTemplate()
 	}
-	return `Command version: {{.Version}}
-`
+	return `Command version: {{.Version}}`
 }
 
 // SetVersionTemplate sets version template to be used. Application can use it to set custom template.
