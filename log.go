@@ -1,6 +1,53 @@
 package mamba
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/sirupsen/logrus"
+)
+
+
+var (
+	DebugLevel = func() {
+		logger.SetLevel(logrus.DebugLevel)
+	}
+	WarnLevel = func() {
+		logger.SetLevel(logrus.WarnLevel)
+	}
+)
+
+// AddLoggingFlags sets "--debug" and "--verbose" flags to the given *cobra.Command instance.
+func (c *Command) AddLoggingFlags() {
+	var (
+		debugEnabled, warnEnabled bool
+	)
+
+	c.PersistentFlags().BoolVar(
+		&debugEnabled,
+		"debug",
+		false,
+		fmt.Sprintf("Debug level output"),
+	)
+	c.PersistentFlags().BoolVar(
+		&warnEnabled,
+		"warn",
+		false,
+		fmt.Sprintf("Warn level output"),
+	)
+
+	OnInitialize(func() {
+		switch {
+		case debugEnabled:
+			DebugLevel()
+			logger.Log("cmd", c.Name())
+		case warnEnabled:
+			WarnLevel()
+			logger.Log("cmd", c.Name())
+		default:
+			DebugLevel()
+			logger.Log("cmd", c.Name())
+		}
+	})
+}
 
 func (m *Command) Warnf(f string, args ...interface{}) {
 	logger.Warnf(f, args)

@@ -66,17 +66,15 @@ Init will not use an existing directory with contents.`,
 		}
 
 		initializeProject(project)
-
+		cmd.OsExec("go", "mod", "init")
+		cmd.OsExec("go", "mod", "vendor")
+		cmd.OsExec("go", "fmt", "./...")
+		cmd.OsExec("go", "install")
 		fmt.Fprintln(cmd.OutOrStdout(), `Your Mamba application is ready at
 `+project.AbsPath()+`
 
 Give it a try by going there and running `+"`go run main.go`."+`
 Add commands to it by running `+"`mamba add [cmdname]`.")
-	},
-	PostRun: func(cmd *mamba.Command, args []string) {
-		cmd.OsExec("go", "mod", "init")
-		cmd.OsExec("go", "mod", "vendor")
-		cmd.OsExec("go", "fmt", "./...")
 	},
 }
 

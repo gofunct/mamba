@@ -5,7 +5,6 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 	"os"
 )
 
@@ -51,49 +50,6 @@ func (l lgr) Log(keyvals ...interface{}) error {
 
 type lgr struct {
 	*logrus.Logger
-}
-
-var (
-	DebugLevel = func() {
-		L.SetLevel(logrus.DebugLevel)
-	}
-	WarnLevel = func() {
-		L.SetLevel(logrus.WarnLevel)
-	}
-)
-
-// AddLoggingFlags sets "--debug" and "--verbose" flags to the given *cobra.Command instance.
-func AddLoggingFlags(cmd *cobra.Command) {
-	var (
-		debugEnabled, warnEnabled bool
-	)
-
-	cmd.PersistentFlags().BoolVar(
-		&debugEnabled,
-		"debug",
-		false,
-		fmt.Sprintf("Debug level output"),
-	)
-	cmd.PersistentFlags().BoolVar(
-		&warnEnabled,
-		"warn",
-		false,
-		fmt.Sprintf("Warn level output"),
-	)
-
-	cobra.OnInitialize(func() {
-		switch {
-		case debugEnabled:
-			DebugLevel()
-			L.Log("cmd", cmd.Name())
-		case warnEnabled:
-			WarnLevel()
-			L.Log("cmd", cmd.Name())
-		default:
-			DebugLevel()
-			L.Log("cmd", cmd.Name())
-		}
-	})
 }
 
 var errMissingValue = errors.New("(MISSING)")

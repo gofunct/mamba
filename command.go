@@ -54,8 +54,8 @@ type Command struct {
 	// Expected arguments
 	Args PositionalArgs
 
-	UsageF             func(*Command) error
-	UsageTmpl          string
+	usageFunc             func(*Command) error
+	usageTemplate          string
 	DisableFlagParsing bool
 
 	PreRun MambaFunc
