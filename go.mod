@@ -45,6 +45,7 @@ require (
 	golang.org/x/net v0.0.0-20190110200230-915654e7eabc // indirect
 	golang.org/x/time v0.0.0-20181108054448-85acf8d2951c
 	google.golang.org/genproto v0.0.0-20190111180523-db91494dd46c
+	google.golang.org/grpc v1.17.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6 // indirect
 	gopkg.in/dixonwille/wlog.v2 v2.0.0
 	gopkg.in/dixonwille/wmenu.v4 v4.0.2

@@ -111,3 +111,35 @@ func RangeArgs(min int, max int) PositionalArgs {
 		return nil
 	}
 }
+
+// argsMinusFirstX removes only the first x from args.  Otherwise, commands that look like
+// openshift admin policy add-role-to-user admin my-user, lose the admin argument (arg[4]).
+func argsMinusFirstX(args []string, x string) []string {
+	for i, y := range args {
+		if x == y {
+			ret := []string{}
+			ret = append(ret, args[:i]...)
+			ret = append(ret, args[i+1:]...)
+			return ret
+		}
+	}
+	return args
+}
+
+func isFlagArg(arg string) bool {
+	return ((len(arg) >= 3 && arg[1] == '-') ||
+		(len(arg) >= 2 && arg[0] == '-' && arg[1] != '-'))
+}
+
+// ArgsLenAtDash will return the length of c.Flags().Args at the moment
+// when a -- was found during args parsing.
+func (c *Command) argsLenAtDash() int {
+	return c.Flags().ArgsLenAtDash()
+}
+
+func (c *Command) validateArgs(args []string) error {
+	if c.Args == nil {
+		return nil
+	}
+	return c.Args(c, args)
+}

@@ -161,14 +161,16 @@ var rootCmd = &mamba.Command{
 	Env: 				nil,
 	// Args set in ValidArgs will be set via query if not found
 	ValidArgs:          nil,
+	// use for passing args to os.Exec
+	DisableFlagParsing: false,
 	// first run after mamba.OnInitialize
 	PreRun:             nil,
 	// second run after cmd.PreRun
 	Run:                nil,
 	// third run after cmd.Run 
 	PostRun:            nil,
-	// use for passing args to os.Exec
-	DisableFlagParsing: false,
+	// if Router is not nil, it will be added to its parents router and executed at runtime
+	Router: 			nil,
 }
 
 func Execute() {

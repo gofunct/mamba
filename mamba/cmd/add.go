@@ -141,7 +141,7 @@ var {{.cmdName}}Cmd = &mamba.Command{
 	ValidArgs:          nil,
 	// first run after mamba.OnInitialize
 	PreRun:             nil,
-	
+	// If Handler is not nil, it will be called last to start the parents http.Server
 	// use for passing args to os.Exec
 	DisableFlagParsing: 		false,
 	Run: func(cmd *mamba.Command, args []string) {
@@ -152,6 +152,8 @@ var {{.cmdName}}Cmd = &mamba.Command{
 	},
 	// third run after cmd.Run 
 	PostRun:            nil,
+	// if Router is not nil, it will be added to its parents router and executed at runtime
+	Router: 			nil,
 }
 
 func init() {
