@@ -50,9 +50,8 @@ func (c *Command) HelpTemplate() string {
 	if c.hasParent() {
 		return c.parent.HelpTemplate()
 	}
-	return `{{with (or .Info)}}{{. | trimTrailingWhitespaces}}
-
-{{end}}{{if or .Runnable .hasSubCommands}}{{.UsageString}}{{end}}`
+	return `{{.Info}}
+{{.UsageString}}`
 }
 
 func (c *Command) initDefaultHelpCmd() {

@@ -26,7 +26,7 @@ func (c *Command) VersionTemplate() string {
 	if c.hasParent() {
 		return c.parent.VersionTemplate()
 	}
-	return `{{with .Name}}{{printf "%s " .}}{{end}}{{printf "version %s" .Version}}
+	return `Command version: {{.Version}}
 `
 }
 

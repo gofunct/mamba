@@ -37,26 +37,26 @@ func (c *Command) UsageTemplate() string {
 	if c.hasParent() {
 		return c.parent.UsageTemplate()
 	}
-	return `Usage:{{if .Runnable}}
-  {{.UseLine}}{{end}}{{if .hasAvailableSubCommands}}
-  {{.CommandPath}} [command]{{end}}{{if gt (len .Aliases) 0}}
+	return `Usage:
+  {{.UseLine}}
+  {{.CommandPath}} [command]
 
 Aliases:
   {{.nameAndAliases}}
 
-Available Commands:{{range .Commands}}{{if (or .isAvailableCommand (eq .Name "help"))}}
-  {{rpad .Name .namePadding }} {{.Info}}{{end}}{{end}}{{end}}{{if .hasAvailableLocalFlags}}
+Available Commands:{{range .Commands}}
+  {{rpad .Name .namePadding }} {{.Info}}
 
 Flags:
-{{.LocalFlags.FlagUsages | trimTrailingWhitespaces}}{{end}}{{if .hasAvailableInheritedFlags}}
+{{.LocalFlags.FlagUsages | trimTrailingWhitespaces}}
 
 Global Flags:
-{{.InheritedFlags.FlagUsages | trimTrailingWhitespaces}}{{end}}{{if .hasHelpSubCommands}}
+{{.InheritedFlags.FlagUsages | trimTrailingWhitespaces}}
 
-Additional help topics:{{range .Commands}}{{if .isAdditionalHelpTopicCommand}}
-  {{rpad .CommandPath .CommandPathPadding}} {{.Info}}{{end}}{{end}}{{end}}{{if .hasAvailableSubCommands}}
+Additional help topics:{{range .Commands}}
+  {{rpad .CommandPath .CommandPathPadding}} {{.Info}}
 
-Use "{{.CommandPath}} [command] --help" for more information about a command.{{end}}
+Use "{{.CommandPath}} [command] --help" for more information about a command.
 `
 }
 
