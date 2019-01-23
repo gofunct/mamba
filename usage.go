@@ -2,8 +2,6 @@ package mamba
 
 import (
 	"bytes"
-	"fmt"
-	"github.com/pkg/errors"
 )
 
 // UsageFunc returns either the function set by SetUsageFunc for this command
@@ -19,7 +17,7 @@ func (c *Command) UsageFunc() (f func(*Command) error) {
 		c.mergePersistentFlags()
 		err := tmpl(c.OutOrStderr(), c.UsageTemplate(), c)
 		if err != nil {
-			c.Println(err)
+			panic(err)
 		}
 		return err
 	}
@@ -63,7 +61,7 @@ func (c *Command) UsageString() string {
 	bb := new(bytes.Buffer)
 	c.SetOutput(bb)
 	if err := c.Usage(); err != nil {
-		fmt.Printf("%#v", errors.WithStack(err))
+		panic(err)
 	}
 	c.output = tmpOutput
 	return bb.String()
