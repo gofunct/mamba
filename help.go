@@ -52,7 +52,7 @@ func (c *Command) HelpTemplate() string {
 	}
 	return `{{with (or .Info)}}{{. | trimTrailingWhitespaces}}
 
-{{end}}{{if or .Runnable .HasSubCommands}}{{.UsageString}}{{end}}`
+{{end}}{{if or .Runnable .hasSubCommands}}{{.UsageString}}{{end}}`
 }
 
 func (c *Command) initDefaultHelpCmd() {
