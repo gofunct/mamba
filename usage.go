@@ -44,8 +44,7 @@ func (c *Command) UsageTemplate() string {
   {{.UseLine}}{{end}}{{if .HasAvailableSubCommands}}
   {{.CommandPath}} [command]{{end}}{{if gt (len .Aliases) 0}}
 Aliases:
-  {{.NameAndAliases}}{{end}}
-
+  {{.NameAndAliases}}{{end}}{{if .HasAvailableSubCommands}}
 Available Commands:{{range .Commands}}{{if (or .isAvailableCommand (eq .Name "help"))}}
   {{rpad .Name .namePadding }} {{.Info}}{{end}}{{end}}{{end}}{{if .hasAvailableLocalFlags}}
 Flags:
