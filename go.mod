@@ -37,6 +37,7 @@ require (
 	github.com/shiyanhui/hero v0.0.1
 	github.com/sirupsen/logrus v1.3.0
 	github.com/soheilhy/cmux v0.1.4
+	github.com/spf13/afero v1.1.2
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/viper v1.3.1
 	github.com/tcnksm/go-input v0.0.0-20180404061846-548a7d7a8ee8 // indirect

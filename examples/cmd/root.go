@@ -34,9 +34,14 @@ var (
 
 var root = &mamba.Command{
 	Version: "v0.1.1",
+	// You will be prompted to set these environmental variables if they are not found
+	Dependencies: []string{"MAMBA_PORT"},
 	// Scripts run as they would from the terminal. They run before the server starts
 	Scripts: [][]string{
 		// This is just an example
+		[]string{"echo", "vendoring dependencies..."},
+		[]string{"go", "mod", "vendor"},
+		[]string{"dependencies vendored successfully!"},
 	},
 	// a map of a handler path(without a "/") and a handlerfunc
 	// these handlers are served after the scripts finish successfully

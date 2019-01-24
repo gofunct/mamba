@@ -1,0 +1,10 @@
+go111module: "on"
+gobin: /Users/coleman/go/bin
+gopath: /Users/coleman/go
+goroot: /usr/local/opt/go/libexec
+gosrc: /Users/coleman/go/src
+home: /Users/coleman
+path: /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/usr/local/Cellar/go/1.11.4/libexec/bin:/Users/coleman/google-cloud-sdk/bin:/Users/coleman/go/bin:/usr/local/opt/go/libexec/bin:/usr/local:/Users/coleman/go/src/github.com/gofunct/hack/bin:/Users/coleman/go/bin:/usr/local/opt/go/libexec/bin:/usr/local:/usr/local/bin:/Users/coleman/go/src/github.com/gofunct/hack/bin
+pwd: /Users/coleman/go/src/github.com/gofunct/mamba/examples
+shell: /bin/bash
+user: coleman
