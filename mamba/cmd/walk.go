@@ -81,8 +81,8 @@ var jsCmd = &cobra.Command{
 	Use:   "js",
 	Short: "🐍 Compile grpc javascript protobuf stubs",
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := WalkProtoJs(in); err != nil {
-			fmt.Printf("%#v", err)
+		if err := filepath.Walk(in, WalkProtoJs()); err != nil {
+			fmt.Printf("%s", err)
 		}
 	},
 }
@@ -130,7 +130,7 @@ func WalkGrpc(args ...string) filepath.WalkFunc {
 		return nil
 	}
 }
-func WalkProtoJs(args ...string) filepath.WalkFunc {
+func WalkProtoJs() filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		// skip vendor directory
 		if info.IsDir() && info.Name() == "vendor" {
@@ -138,7 +138,7 @@ func WalkProtoJs(args ...string) filepath.WalkFunc {
 		}
 		// find all protobuf files
 		if filepath.Ext(path) == ".proto" {
-			args = []string{
+			args := []string{
 				"-I=.",
 				fmt.Sprintf("-I=%s", "vendor"),
 				fmt.Sprintf("-I=%s", "proto"),
