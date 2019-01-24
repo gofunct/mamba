@@ -51,9 +51,10 @@ type Command struct {
 }
 
 func (c *Command) execute(ctx context.Context) (err error) {
-	if c.Dependencies != nil {
+	if len(c.Dependencies) > 0 {
 		c.SyncRequirements()
 	}
+
 	if c.PreRun != nil {
 		c.PreRun(c, ctx)
 	}
