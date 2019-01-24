@@ -17,7 +17,6 @@ syntax = "proto3";
 
 package third_party;
 
-option go_package = "google.golang.org/genproto/googleapis/api/serviceconfig;serviceconfig";
 option java_multiple_files = true;
 option java_outer_classname = "DocumentationProto";
 option java_package = "com.google.api";
