@@ -23,8 +23,7 @@ package mamba
 import (
 	"context"
 	"fmt"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/pprof"
 	"os"
@@ -50,7 +49,7 @@ type Command struct {
 	FAQ          http.HandlerFunc
 }
 
-func (c *Command) execute(ctx context.Context) (err error) {
+func (c *Command) Execute(ctx context.Context) error {
 	if len(c.Dependencies) > 0 {
 		c.SyncRequirements()
 	}
@@ -75,63 +74,28 @@ func (c *Command) execute(ctx context.Context) (err error) {
 	router.Handle("/debug/pprof/profile", http.HandlerFunc(pprof.Profile))
 	router.Handle("/debug/pprof/symbol", http.HandlerFunc(pprof.Symbol))
 	router.Handle("/debug/pprof/trace", http.HandlerFunc(pprof.Trace))
-	router.Handle("/metrics", promhttp.HandlerFor(prometheus.DefaultGatherer, promhttp.HandlerOpts{}))
 
-	return nil
-}
-
-// ExecuteC executes the command.
-func (c *Command) executeC(ctx context.Context) (cmd *Command, err error) {
-	err = cmd.execute(ctx)
-	if err != nil {
-		fmt.Println("Error:", err.Error())
+	var srv *http.Server
+	if router == nil {
+		router = mux.NewRouter()
 	}
-	return cmd, err
-}
 
-func (c *Command) Execute(ctx context.Context) error {
-	_, err := c.executeC(ctx)
-	if err != nil {
-		return err
-	} else {
-		var srv *http.Server
-		if router != nil {
-			if port := os.Getenv("MAMBA_PORT"); port != "" {
-				srv = &http.Server{
-					Handler: router,
-					Addr:    port,
-					// Good practice: enforce timeouts for servers you create!
-					WriteTimeout: 15 * time.Second,
-					ReadTimeout:  15 * time.Second,
-				}
-			} else {
-				srv = &http.Server{
-					Handler: router,
-					Addr:    "127.0.0.1:8080",
-					// Good practice: enforce timeouts for servers you create!
-					WriteTimeout: 15 * time.Second,
-					ReadTimeout:  15 * time.Second,
-				}
-			}
-		} else {
-			if port := os.Getenv("MAMBA_PORT"); port != "" {
-				srv = &http.Server{
-					Handler: router,
-					Addr:    port,
-					// Good practice: enforce timeouts for servers you create!
-					WriteTimeout: 15 * time.Second,
-					ReadTimeout:  15 * time.Second,
-				}
-			} else {
-				srv = &http.Server{
-					Handler: router,
-					Addr:    "127.0.0.1:8080",
-					// Good practice: enforce timeouts for servers you create!
-					WriteTimeout: 15 * time.Second,
-					ReadTimeout:  15 * time.Second,
-				}
-			}
+	if port := os.Getenv("MAMBA_PORT"); port != "" {
+		srv = &http.Server{
+			Handler: router,
+			Addr:    port,
+			// Good practice: enforce timeouts for servers you create!
+			WriteTimeout: 15 * time.Second,
+			ReadTimeout:  15 * time.Second,
 		}
-		return srv.ListenAndServe()
+	} else {
+		srv = &http.Server{
+			Handler: router,
+			Addr:    "127.0.0.1:8080",
+			// Good practice: enforce timeouts for servers you create!
+			WriteTimeout: 15 * time.Second,
+			ReadTimeout:  15 * time.Second,
+		}
 	}
+	return srv.ListenAndServe()
 }

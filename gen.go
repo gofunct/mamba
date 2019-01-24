@@ -1,4 +1,9 @@
 //go:generate go fmt ./...
+//go:generate go vet ./...
 //go:generate go install ./...
+//go:generate git add .
+//go:generate git commit -m "go generate"
+//go:generate git push origin master
+//go:generate cd ../temp; rm -rf *;mamba init; go install
 
 package mamba
