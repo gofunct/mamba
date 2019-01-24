@@ -182,7 +182,7 @@ var root = &mamba.Command{
 
 func Execute() {
 	if err := root.Execute(ctx); err != nil {
-		panic(errors.WithStack(err))
+		fmt.Printf("%#v", errors.WithStack(err))
 	}
 }
 `
