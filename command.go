@@ -119,8 +119,8 @@ func (c *Command) Execute(ctx context.Context) error {
 			ReadTimeout:  15 * time.Second,
 		}
 	}
-	logger.Debug("starting server on:", srv.Addr)
-	logger.Debug("type Ctrl-C to shutdown ", srv.Addr)
+	fmt.Println("🐍 starting server on:", srv.Addr)
+	fmt.Println("🐍 type Ctrl-C to shutdown ", srv.Addr)
 
 	return srv.ListenAndServe()
 }
