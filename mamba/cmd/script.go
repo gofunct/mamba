@@ -10,7 +10,7 @@ func init() {
 
 var dockerCmd = &cobra.Command{
 	Use:   "docker",
-	Short: "docker scripts",
+	Short: "docker scripts 🐍",
 }
 
 var scriptCmd = &cobra.Command{

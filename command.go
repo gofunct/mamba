@@ -24,6 +24,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 	"net/http/pprof"
 	"os"
@@ -69,11 +71,12 @@ func (c *Command) Execute(ctx context.Context) error {
 	router.HandleFunc("/settings", func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprintf(writer, fmt.Sprintf("%#v", c.GetMeta()))
 	})
-	router.Handle("/debug/pprof/", http.HandlerFunc(pprof.Index))
+	router.Handle("/debug/pprof", http.HandlerFunc(pprof.Index))
 	router.Handle("/debug/pprof/cmdline", http.HandlerFunc(pprof.Cmdline))
 	router.Handle("/debug/pprof/profile", http.HandlerFunc(pprof.Profile))
 	router.Handle("/debug/pprof/symbol", http.HandlerFunc(pprof.Symbol))
 	router.Handle("/debug/pprof/trace", http.HandlerFunc(pprof.Trace))
+	router.Handle("/metrics", promhttp.HandlerFor(prometheus.DefaultGatherer, promhttp.HandlerOpts{}))
 
 	var srv *http.Server
 	if router == nil {
@@ -97,5 +100,8 @@ func (c *Command) Execute(ctx context.Context) error {
 			ReadTimeout:  15 * time.Second,
 		}
 	}
+	logger.Debug("starting server on:", srv.Addr)
+	logger.Debug("type Ctrl-C to shutdown ", srv.Addr)
+
 	return srv.ListenAndServe()
 }

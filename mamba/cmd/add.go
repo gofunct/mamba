@@ -38,7 +38,7 @@ var packageName, parentName string
 var addCmd = &cobra.Command{
 	Use:     "add [command name]",
 	Aliases: []string{"command"},
-	Long: `Add (mamba add) will create a new command, with a license and
+	Long: `🐍 Add (mamba add) will create a new command, with a license and
 the appropriate structure for a Mamba-based CLI application,
 and register it to its parent (default rootCmd).
 

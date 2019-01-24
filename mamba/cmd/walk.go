@@ -47,7 +47,7 @@ func init() {
 // protocGenCmd represents the protocGen command
 var protoGenCmd = &cobra.Command{
 	Use:   "protocGen",
-	Short: "Compile templates as a protoc plugin",
+	Short: "🐍 Compile templates as a protoc plugin",
 	Run: func(cmd *cobra.Command, args []string) {
 		var g = generator.NewGenerator()
 		g.Generate(in, out)
@@ -57,7 +57,7 @@ var protoGenCmd = &cobra.Command{
 // protocCmd represents the protoc command
 var goGoCmd = &cobra.Command{
 	Use:   "gogo",
-	Short: "Compile templates as a protoc plugin",
+	Short: "🐍 Compile templates as a protoc plugin",
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := WalkGoGoProto(in); err != nil {
 			fmt.Printf("%+v", err)
@@ -68,7 +68,7 @@ var goGoCmd = &cobra.Command{
 // protocCmd represents the protoc command
 var grpcCmd = &cobra.Command{
 	Use:   "grpc",
-	Short: "Compile templates as a protoc plugin",
+	Short: "🐍 Compile templates as a protoc plugin",
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := WalkGoGoProto(in); err != nil {
 			fmt.Printf("%+v", err)
@@ -79,12 +79,12 @@ var grpcCmd = &cobra.Command{
 // protocCmd represents the protoc command
 var walkCmd = &cobra.Command{
 	Use:   "walk",
-	Short: "walk a filepath with a given function and file extension",
+	Short: "🐍 Walk a filepath with a given function and file extension",
 }
 
 var htmlCmd = &cobra.Command{
 	Use:   "html",
-	Short: "Generate html files",
+	Short: "🐍 Generate html files",
 	Run: func(cmd *cobra.Command, args []string) {
 		generate(in, out, pkg)
 	},

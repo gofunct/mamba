@@ -33,7 +33,7 @@ var (
 
 	rootCmd = &cobra.Command{
 		Use:   "mamba",
-		Short: "A generator for Mamba based Applications",
+		Short: "A generator for Mamba based Applications 🐍",
 		Long: `Mamba is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Mamba application.`,

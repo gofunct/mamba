@@ -30,7 +30,7 @@ import (
 // testCmd represents the test command
 var testCmd = &cobra.Command{
 	Use:   "test",
-	Short: "run an interactive web server to test code in current repository",
+	Short: "🐍 Run an interactive web server to test code in current repository",
 	Run: func(cmd *cobra.Command, args []string) {
 		c := exec.Command("goconvey", args...)
 		c.Env = append(c.Env, os.Environ()...)

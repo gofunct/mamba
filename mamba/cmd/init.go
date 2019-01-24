@@ -31,7 +31,7 @@ import (
 var initCmd = &cobra.Command{
 	Use:     "init [name]",
 	Aliases: []string{"initialize", "initialise", "create"},
-	Long: `Initialize (mamba init) will create a new application, with a license
+	Long: `🐍 Initialize (mamba init) will create a new application, with a license
 and the appropriate structure for a Mamba-based CLI application.
 
   * If a name is provided, it will be created in the current directory;
