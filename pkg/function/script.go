@@ -1,14 +1,23 @@
 package function
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"github.com/Masterminds/sprig"
+	"text/template"
+	htemplate "html/template"
 	"github.com/gofunct/mamba/pkg/input"
 	"github.com/prometheus/common/log"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"google.golang.org/grpc"
 	"io"
+	"io/ioutil"
+	"net"
+	"net/http"
+	"path/filepath"
 
 	"os"
 	"os/exec"
@@ -22,9 +31,8 @@ func init() {
 	v.SetConfigName("mamba.json")
 	v.AutomaticEnv()
 	v.AllowEmptyEnv(true)
-	v.SetEnvPrefix("mamba")
-
 }
+
 type CobraFunc func(command *cobra.Command, args []string)
 type InitFunc func()
 
@@ -108,4 +116,184 @@ func Script(writer io.Writer, args ...string) InitFunc {
 			log.Fatalf("Failure: %#v", err)
 		}
 	}
+}
+
+func Get(buf *bytes.Buffer, url string) InitFunc {
+	return func() {
+		res, err := http.Get(url)
+		if err != nil {
+			log.Fatal(err)
+		}
+		data, err := ioutil.ReadAll(res.Body)
+		res.Body.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+		buf.Read(data)
+	}
+}
+
+func Dial(url string, option ...grpc.DialOption) InitFunc {
+	return func() {
+		grpc.Dial(url, option...)
+	}
+}
+
+func Serve(lis net.Listener, handler http.Handler) InitFunc {
+	return func() {
+		http.Serve(lis, handler)
+	}
+}
+
+
+func WriteConfig() InitFunc {
+	return func() {
+		v.WriteConfig()
+	}
+}
+
+func Touch(path string) InitFunc {
+	return func() {
+		fs.Create(path)
+	}
+}
+
+func Mkdir(path string) InitFunc {
+	return func() {
+		fs.Mkdir(path, 0755)
+	}
+}
+
+func MkdirAll(path string) InitFunc {
+	return func() {
+		fs.MkdirAll(path, 0755)
+	}
+}
+
+func RemoveAll(path string) InitFunc {
+	return func() {
+		fs.RemoveAll(path)
+	}
+}
+
+func Rename(old string, new string) InitFunc {
+	return func() {
+		fs.Rename(old, new)
+	}
+}
+
+func WalkGrpc(path string, args ...string) InitFunc {
+	return func() {
+		if err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+			// skip vendor directory
+			if info.IsDir() && info.Name() == "vendor" {
+				return filepath.SkipDir
+			}
+			// find all protobuf files
+			if filepath.Ext(path) == ".proto" {
+				args = []string{
+					"-I=.",
+					fmt.Sprintf("-I=%s", filepath.Join(os.Getenv("GOPATH"), "src")),
+					fmt.Sprintf("-I=%s", filepath.Join(os.Getenv("GOPATH"), "src", "github.com", "gogo", "protobuf", "protobuf")),
+					fmt.Sprintf("--proto_path=%s", filepath.Join(os.Getenv("GOPATH"), "src", "github.com")),
+					"--go_out=plugins=grpc:.",
+					path,
+				}
+				cmd := exec.Command("protoc", args...)
+				err = cmd.Run()
+				if err != nil {
+					return err
+				}
+			}
+			return nil
+		}); err != nil {
+			ERR(err)
+		}
+	}
+}
+
+func WalkGoGoProto(path string) InitFunc {
+	return func() {
+		if err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		// skip vendor directory
+		if info.IsDir() && info.Name() == "vendor" {
+			return filepath.SkipDir
+		}
+		// find all protobuf files
+		if filepath.Ext(path) == ".proto" {
+			// args
+			args := []string{
+				"-I=.",
+				fmt.Sprintf("-I=%s", filepath.Join(os.Getenv("GOPATH"), "src")),
+				fmt.Sprintf("-I=%s", filepath.Join(os.Getenv("GOPATH"), "src", "github.com", "gogo", "protobuf", "protobuf")),
+				fmt.Sprintf("--proto_path=%s", filepath.Join(os.Getenv("GOPATH"), "src", "github.com")),
+				"--gogofaster_out=Mgoogle/protobuf/any.proto=github.com/gogo/protobuf/types,Mgoogle/protobuf/duration.proto=github.com/gogo/protobuf/types,Mgoogle/protobuf/struct.proto=github.com/gogo/protobuf/types,Mgoogle/protobuf/timestamp.proto=github.com/gogo/protobuf/types,Mgoogle/protobuf/wrappers.proto=github.com/gogo/protobuf/types:.",
+				path,
+			}
+			cmd := exec.Command("protoc", args...)
+			err = cmd.Run()
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
+		ERR(err)
+	}
+}
+}
+func WalkTmpl(path string, w io.Writer, object interface{}) InitFunc {
+	return func() {
+		if err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+
+			if info.IsDir() && info.Name() == "vendor" {
+				return filepath.SkipDir
+			}
+			// find all protobuf files
+			if filepath.Ext(path) == ".tmpl" {
+				tmpldata, err := ioutil.ReadFile(info.Name())
+				if err != nil {
+					ERR(err)
+				}
+				text := fmt.Sprint(tmpldata)
+
+				t := template.New(info.Name())
+				t.Funcs(sprig.GenericFuncMap())
+				template.Must(t.Parse(text))
+				return t.Execute(w, object)
+			}
+			return nil
+		}); err != nil {
+			ERR(err)
+		}
+	}
+}
+func WalkHtmlTmpl(path string, w io.Writer, object interface{}) InitFunc {
+	return func() {
+		if err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+
+			if info.IsDir() && info.Name() == "vendor" {
+				return filepath.SkipDir
+			}
+			// find all protobuf files
+			if filepath.Ext(path) == ".gohtml" {
+				tmpldata, err := ioutil.ReadFile(info.Name())
+				if err != nil {
+					ERR(err)
+				}
+				text := fmt.Sprint(tmpldata)
+				t := htemplate.New(info.Name())
+				t.Funcs(sprig.HtmlFuncMap())
+				htemplate.Must(t.Parse(text))
+				return t.Execute(w, object)
+			}
+			return nil
+		}); err != nil {
+			ERR(err)
+		}
+	}
+}
+
+func ERR(err error) {
+	log.Fatalf("%#v\n%s\n", err, err.Error())
 }
