@@ -30,7 +30,7 @@
 
 syntax = "proto3";
 
-package third_party
+package third_party;
 
 option csharp_namespace = "Google.Protobuf.WellKnownTypes";
 option java_package = "com.google.protobuf";
