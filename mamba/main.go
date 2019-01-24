@@ -20,8 +20,12 @@
 
 package main
 
-import "github.com/gofunct/mamba/mamba/cmd"
+import (
+	"github.com/gofunct/mamba/mamba/cmd"
+	"os"
+)
 
 func main() {
+	os.Setenv("GO111MODULE", "on")
 	cmd.Execute()
 }

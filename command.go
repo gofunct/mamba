@@ -55,7 +55,6 @@ func (c *Command) execute(ctx context.Context) (err error) {
 	if c == nil {
 		return fmt.Errorf("Called Execute() on a nil Command")
 	}
-	os.Setenv("GO111MODULE", "on")
 	if c.Dependencies != nil {
 		c.SyncRequirements()
 	}
