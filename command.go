@@ -64,6 +64,7 @@ type Command struct {
 	Version      string
 	Dependencies []string
 	PreRun       MambaFunc
+	Hanldlers    map[string]http.HandlerFunc
 	Login        http.HandlerFunc
 	Home         http.HandlerFunc
 	FAQ          http.HandlerFunc
@@ -78,18 +79,11 @@ func (c *Command) Execute(ctx context.Context) error {
 	if c.PreRun != nil {
 		c.PreRun(c, ctx)
 	}
-	if c.Login != nil {
-		router.Handle("/login", c.Login)
+
+	for k, v := range c.Hanldlers {
+		router.Handle("/"+k, v)
 	}
-	if c.Home != nil {
-		router.Handle("/", c.Home)
-	}
-	if c.FAQ != nil {
-		router.Handle("/faq", c.FAQ)
-	}
-	router.HandleFunc("/settings", func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprintf(writer, fmt.Sprintf("%#v", c.GetMeta()))
-	})
+
 	router.Handle("/debug/pprof", http.HandlerFunc(pprof.Index))
 	router.Handle("/debug/pprof/cmdline", http.HandlerFunc(pprof.Cmdline))
 	router.Handle("/debug/pprof/profile", http.HandlerFunc(pprof.Profile))

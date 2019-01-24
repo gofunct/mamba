@@ -167,17 +167,17 @@ var root = &mamba.Command{
 	Version:      "v0.1.1",
 	Dependencies: nil,
 	PreRun: func(svc *mamba.Command, ctx context.Context) {
-		fmt.Println("Welcome "+os.Getenv("USER")+"!")
+		fmt.Println("Welcome " + os.Getenv("USER") + "!")
 	},
-	Login: func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprintf(writer, "this is where your users will login")
-	},
-	Home: func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprintf(writer, "this is where your web app will be located")
-
-	},
-	FAQ: func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprintf(writer, "this is where your users will go for help")
+	Hanldlers: map[string]http.HandlerFunc{
+		"": func(writer http.ResponseWriter, request *http.Request) {
+			fmt.Fprintf(writer, "this is where your web app will be located")
+		},
+		"login": func(writer http.ResponseWriter, request *http.Request) {
+			fmt.Fprintf(writer, "this is where your users will login")
+		},
+		"faq": func(writer http.ResponseWriter, request *http.Request) {
+			fmt.Fprintf(writer, "this is where your users will go for help")		},
 	},
 }
 
