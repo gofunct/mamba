@@ -4,5 +4,6 @@
 //go:generate git add .
 //go:generate git commit -m "successful go generate 🐍"
 //go:generate git push origin master
+//go:generate cd ../temp/
 
 package mamba
