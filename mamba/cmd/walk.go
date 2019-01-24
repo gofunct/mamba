@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"github.com/gofunct/mamba/pkg/function"
 	"github.com/gofunct/mamba/pkg/generator"
+	"github.com/pkg/errors"
 	"github.com/shiyanhui/hero"
 	"github.com/spf13/cobra"
 	"io"
@@ -82,7 +83,7 @@ var jsCmd = &cobra.Command{
 	Short: "🐍 Compile grpc javascript protobuf stubs",
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := filepath.Walk(in, WalkProtoJs()); err != nil {
-			fmt.Printf("%s", err)
+			fmt.Printf("%s", errors.WithStack(err))
 		}
 	},
 }

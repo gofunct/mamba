@@ -1,4 +1,4 @@
 build:
 	go generate
-	rm -rf examples/basic/*
-	cd examples/basic && mamba init && go install
+	rm -rf examples/*
+	cd examples && mamba init && go install
