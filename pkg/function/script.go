@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/Masterminds/sprig"
 	"github.com/gofunct/mamba/pkg/input"
-	"github.com/prometheus/common/log"
+	"github.com/mitchellh/go-homedir"
 	"github.com/robfig/cron"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -15,11 +15,13 @@ import (
 	htemplate "html/template"
 	"io"
 	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
 	"path/filepath"
 	"text/template"
 
+	kitlog "github.com/go-kit/kit/log"
 	"os"
 	"os/exec"
 )
@@ -304,6 +306,39 @@ func WalkHtmlTmpl(path string, w io.Writer, object interface{}) InitFunc {
 	}
 }
 
+func ReplaceLogger(writer io.Writer) InitFunc {
+	return func() {
+		logger := kitlog.NewJSONLogger(kitlog.NewSyncWriter(writer))
+		logger = kitlog.With(logger, "ts", kitlog.DefaultTimestampUTC, "caller", kitlog.DefaultCaller)
+		log.SetOutput(kitlog.NewStdlibAdapter(logger))
+	}
+}
+
 func ERR(err error) {
 	log.Fatalf("%#v\n%s\n", err, err.Error())
+}
+
+func InitConfig(file string) InitFunc {
+	return func() {
+		if file != "" {
+			// Use config file from the flag.
+			viper.SetConfigFile(file)
+		} else {
+			// Find home directory.
+			home, err := homedir.Dir()
+			if err != nil {
+				ERR(err)
+			}
+
+			// Search config in home directory with name ".cobra" (without extension).
+			viper.AddConfigPath(home)
+			viper.SetConfigName(".cobra")
+		}
+
+		viper.AutomaticEnv()
+
+		if err := viper.ReadInConfig(); err == nil {
+			fmt.Println("Using config file:", viper.ConfigFileUsed())
+		}
+	}
 }

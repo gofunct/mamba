@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+import "empty.proto";
+
+package service;
+
+import "google/protobuf/timestamp.proto";
+
+service Scripter {
+    rpc Exec (Command) returns (stream Raw) {}
+    rpc Control (Empty) returns (Command) {}
+    rpc Cron (Empty) returns (Command) {}
+    rpc Help (Empty) returns (Raw) {}
+}
+
+message ConnInfo {
+    uint32 service_id = 1;
+    string network = 2;
+    string address = 3;
+}
+
+message Raw {
+    repeated bytes out = 1;
+}
+
+// RawState holds the stored state for a resource to be upgraded by the
+// provider. It can be in one of two formats, the current json encoded format
+// in bytes, or the legacy flatmap format as a map of strings.
+message RawState {
+    bytes json = 1;
+    map<string, string> flatmap = 2;
+}
+
+message Args {
+    repeated string args = 1;
+}
+
+message Command {
+    string name =1;
+    string dir = 2;
+    repeated string args = 3;
+    repeated string env = 4;
+}

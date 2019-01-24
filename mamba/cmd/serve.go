@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
-	"log"
 	"net"
 )
 
@@ -38,7 +37,7 @@ var serveCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", port))
 		if err != nil {
-			log.Fatalf("failed to listen: %v", err)
+			logger.Fatalf("failed to listen: %v", err)
 		}
 		var opts []grpc.ServerOption
 
@@ -50,14 +49,4 @@ var serveCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(serveCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// serveCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// serveCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

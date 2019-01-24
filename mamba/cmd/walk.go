@@ -36,13 +36,6 @@ import (
 
 func init() {
 	walkCmd.AddCommand(protoGenCmd, goGoCmd, grpcCmd, htmlCmd, jsCmd)
-	protoGenCmd.PersistentFlags().StringVarP(&in, "input", "i", ".", "path to input directory")
-	protoGenCmd.PersistentFlags().StringVarP(&out, "output", "o", ".", "path to output directory")
-	goGoCmd.PersistentFlags().StringVarP(&in, "input", "i", ".", "path to input directory")
-	goGoCmd.PersistentFlags().StringVarP(&out, "output", "o", ".", "path to output directory")
-	htmlCmd.PersistentFlags().StringVarP(&in, "input", "i", ".", "path to input directory")
-	htmlCmd.PersistentFlags().StringVarP(&out, "output", "o", ".", "path to output directory")
-	htmlCmd.PersistentFlags().StringVarP(&pkg, "package", "p", "", "package name")
 }
 
 // protocGenCmd represents the protocGen command
@@ -61,7 +54,7 @@ var goGoCmd = &cobra.Command{
 	Short: "🐍 Compile gogo protobuf stubs",
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := WalkGoGoProto(in); err != nil {
-			fmt.Printf("%+v", err)
+			logger.Fatalf("%s", errors.WithStack(err))
 		}
 	},
 }
@@ -71,8 +64,8 @@ var grpcCmd = &cobra.Command{
 	Use:   "grpc",
 	Short: "🐍 Compile grpc protobuf stubs",
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := WalkGoGoProto(in); err != nil {
-			fmt.Printf("%+v", err)
+		if err := WalkGrpc(in); err != nil {
+			logger.Fatalf("%s", errors.WithStack(err))
 		}
 	},
 }
@@ -82,8 +75,8 @@ var jsCmd = &cobra.Command{
 	Use:   "js",
 	Short: "🐍 Compile grpc javascript protobuf stubs",
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := filepath.Walk(in, WalkProtoJs()); err != nil {
-			fmt.Printf("%s", errors.WithStack(err))
+		if err := WalkProtoJs(in); err != nil {
+			logger.Fatalf("%s", errors.WithStack(err))
 		}
 	},
 }
@@ -106,61 +99,59 @@ func generate(source, dest, pkg string) {
 	hero.Generate(source, dest, pkg)
 }
 
-func WalkGrpc(args ...string) filepath.WalkFunc {
-	return func(path string, info os.FileInfo, err error) error {
-		// skip vendor directory
+func WalkGrpc(path string) error {
+
+	return filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			fmt.Printf("prevent panic by handling failure accessing a path %q: %v\n", path, err)
+			return err
+		}
 		if info.IsDir() && info.Name() == "vendor" {
 			return filepath.SkipDir
 		}
 		// find all protobuf files
 		if filepath.Ext(path) == ".proto" {
-			args = []string{
+			// args
+			args := []string{
 				"-I=.",
-				fmt.Sprintf("-I=%s", filepath.Join(os.Getenv("GOPATH"), "src")),
-				fmt.Sprintf("-I=%s", filepath.Join(os.Getenv("GOPATH"), "src", "github.com", "gogo", "protobuf", "protobuf")),
-				fmt.Sprintf("--proto_path=%s", filepath.Join(os.Getenv("GOPATH"), "src", "github.com")),
-				"--go_out=plugins=grpc:.",
+				fmt.Sprintf("-I=%s", filepath.Join(os.Getenv("GOPATH"), "bin")),
+				fmt.Sprintf("-I=%s", filepath.Join(os.Getenv("GOPATH"), "src", "github.com", "gppg;e", "googlapis", "protobuf")),
+				fmt.Sprintf("--go_out=plugins=grpc:%s", "."),
 				path,
 			}
+
 			cmd := exec.Command("protoc", args...)
-			err = cmd.Run()
-			if err != nil {
-				return err
-			}
+			cmd.Env = os.Environ()
+			o, _ := cmd.Output()
+			fmt.Println(o)
 		}
 		return nil
-	}
+	})
 }
-func WalkProtoJs() filepath.WalkFunc {
-	return func(path string, info os.FileInfo, err error) error {
-		// skip vendor directory
-		if info.IsDir() && info.Name() == "vendor" {
-			return filepath.SkipDir
-		}
+func WalkProtoJs(path string) error {
+	return filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		// find all protobuf files
 		if filepath.Ext(path) == ".proto" {
 			args := []string{
 				"-I=.",
-				fmt.Sprintf("-I=%s", "vendor"),
-				fmt.Sprintf("-I=%s", "proto"),
 				fmt.Sprintf("-I=%s", filepath.Join(os.Getenv("GOPATH"), "src")),
 				fmt.Sprintf("-I=%s", filepath.Join(os.Getenv("GOPATH"), "src", "github.com", "gogo", "protobuf", "protobuf")),
 				fmt.Sprintf("--proto_path=%s", filepath.Join(os.Getenv("GOPATH"), "src", "github.com")),
-				"--gopherjs_out=plugins=grpc,Mgoogle/protobuf/timestamp.proto=github.com/johanbrandhorst/protobuf/ptypes/timestamp:$$GOPATH/src",
-				"--go_out=plugins=grpc:$$GOPATH/src",
+				"--gopherjs_out=plugins=grpc,Mgoogle/protobuf/timestamp.proto=github.com/johanbrandhorst/protobuf/ptypes/timestamp:.",
 				path,
 			}
 			cmd := exec.Command("protoc", args...)
-			err = cmd.Run()
-			if err != nil {
-				return err
-			}
+			cmd.Env = os.Environ()
+			fmt.Println("cmd.path:", cmd.Path, "cmd.dir:", cmd.Dir, "cmd.args", cmd.Args, "cmd.state", cmd.ProcessState.String())
+			o, _ := cmd.Output()
+			fmt.Println(o)
 		}
 		return nil
-	}
+	})
 }
 
 func WalkGoGoProto(path string) error {
+
 	return filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		// skip vendor directory
 		if info.IsDir() && info.Name() == "vendor" {
@@ -178,15 +169,13 @@ func WalkGoGoProto(path string) error {
 				path,
 			}
 			cmd := exec.Command("protoc", args...)
-			err = cmd.Run()
-			if err != nil {
-				return err
-			}
+			cmd.Env = os.Environ()
+			o, _ := cmd.Output()
+			fmt.Println(o)
 		}
 		return nil
 	})
 }
-
 func WalkTmpl(wr io.Writer, text string) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() && info.Name() == "vendor" {

@@ -21,8 +21,8 @@
 package cmd
 
 import (
-	"fmt"
-	"github.com/mitchellh/go-homedir"
+	"github.com/gofunct/mamba/pkg/function"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -30,8 +30,8 @@ import (
 var (
 	// Used for flags.
 	cfgFile, userLicense, in, out, pkg string
-
-	rootCmd = &cobra.Command{
+	logger                             *logrus.Logger
+	rootCmd                            = &cobra.Command{
 		Use:   "mamba",
 		Short: "A generator for Mamba based Applications 🐍",
 		Long: `Mamba is a CLI library for Go that empowers applications.
@@ -42,47 +42,40 @@ to quickly create a Mamba application.`,
 
 // Execute executes the root command.
 func Execute() {
-	rootCmd.Execute()
+	if err := rootCmd.Execute(); err != nil {
+		logger.Fatalf("failed to execute:%s/n", err)
+	}
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
-
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
-	rootCmd.PersistentFlags().StringP("author", "a", "YOUR NAME", "author name for copyright attribution")
-	rootCmd.PersistentFlags().StringVarP(&userLicense, "license", "l", "", "name of license for the project")
-	rootCmd.PersistentFlags().Bool("viper", true, "use Viper for configuration")
-	viper.BindPFlag("author", rootCmd.PersistentFlags().Lookup("author"))
-	viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
-	viper.SetDefault("author", "NAME HERE <EMAIL ADDRESS>")
-	viper.SetDefault("license", "apache")
-
-	rootCmd.AddCommand(addCmd)
-	rootCmd.AddCommand(initCmd)
-	rootCmd.AddCommand(testCmd)
-	rootCmd.AddCommand(walkCmd)
-	rootCmd.AddCommand(htmlCmd)
-}
-
-func initConfig() {
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory.
-		home, err := homedir.Dir()
-		if err != nil {
-			er(err)
-		}
-
-		// Search config in home directory with name ".cobra" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".cobra")
+	cobra.OnInitialize(
+		func() { logger = logrus.New() },
+		function.InitConfig(cfgFile),
+	)
+	{
+		rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
+		rootCmd.PersistentFlags().StringP("author", "a", "YOUR NAME", "author name for copyright attribution")
+		rootCmd.PersistentFlags().StringVarP(&userLicense, "license", "l", "", "name of license for the project")
+		rootCmd.PersistentFlags().Bool("viper", true, "use Viper for configuration")
+		rootCmd.PersistentFlags().StringVarP(&in, "input", "i", ".", "use Viper for configuration")
+		rootCmd.PersistentFlags().StringVarP(&out, "output", "o", ".", "use Viper for configuration")
+		rootCmd.PersistentFlags().StringVarP(&pkg, "package", "p", "", "use Viper for configuration")
 	}
 
-	viper.AutomaticEnv()
+	{
+		viper.BindPFlags(rootCmd.Flags())
+		viper.BindPFlags(rootCmd.PersistentFlags())
+		viper.SetDefault("author", "NAME HERE <EMAIL ADDRESS>")
+		viper.SetDefault("license", "apache")
+		viper.SetDefault("input", ".")
+		viper.SetDefault("output", ".")
+	}
 
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	{
+		rootCmd.AddCommand(addCmd)
+		rootCmd.AddCommand(initCmd)
+		rootCmd.AddCommand(testCmd)
+		rootCmd.AddCommand(walkCmd)
+		rootCmd.AddCommand(htmlCmd)
 	}
 }
