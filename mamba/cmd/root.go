@@ -21,58 +21,69 @@
 package cmd
 
 import (
-	"github.com/gofunct/mamba"
-	"github.com/pkg/errors"
+	"fmt"
+	"github.com/mitchellh/go-homedir"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
-	userLicense string
-	in          string
-	out         string
-	pkg         string
-	rootCmd     = &mamba.Command{
-		Use:     "mamba",
-		Version: "",
-		Aliases: nil,
-		Info: `Mamba is a CLI library for Go that empowers applications.
+	// Used for flags.
+	cfgFile, userLicense, in, out, pkg string
+
+	rootCmd = &cobra.Command{
+		Use:   "mamba",
+		Short: "A generator for Mamba based Applications",
+		Long: `Mamba is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Mamba application.`,
-		Hidden: false,
-		Env:    nil,
-		// Args set in ValidArgs will be set via query if not found
-		ValidArgs: nil,
-		Args:      nil,
-		UsageF:    nil,
-		UsageTmpl: "",
-		PreRun:    nil,
-		Run:       nil,
-		PostRun:   nil,
-		// Useful for passing args to os.Exec
-		DisableFlagParsing: false,
 	}
 )
 
+// Execute executes the root command.
 func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		rootCmd.Fatalf("%s\n", errors.WithStack(err))
-	}
+	rootCmd.Execute()
 }
 
 func init() {
-	{
-		rootCmd.PersistentFlags().StringP("author", "a", "YOUR NAME", "author name for copyright attribution")
-		rootCmd.PersistentFlags().StringVarP(&userLicense, "license", "l", "", "name of license for the project")
+	cobra.OnInitialize(initConfig)
+
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
+	rootCmd.PersistentFlags().StringP("author", "a", "YOUR NAME", "author name for copyright attribution")
+	rootCmd.PersistentFlags().StringVarP(&userLicense, "license", "l", "", "name of license for the project")
+	rootCmd.PersistentFlags().Bool("viper", true, "use Viper for configuration")
+	viper.BindPFlag("author", rootCmd.PersistentFlags().Lookup("author"))
+	viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
+	viper.SetDefault("author", "NAME HERE <EMAIL ADDRESS>")
+	viper.SetDefault("license", "apache")
+
+	rootCmd.AddCommand(addCmd)
+	rootCmd.AddCommand(initCmd)
+	rootCmd.AddCommand(scriptCmd)
+	rootCmd.AddCommand(testCmd)
+	rootCmd.AddCommand(walkCmd)
+	rootCmd.AddCommand(htmlCmd)
+}
+
+func initConfig() {
+	if cfgFile != "" {
+		// Use config file from the flag.
+		viper.SetConfigFile(cfgFile)
+	} else {
+		// Find home directory.
+		home, err := homedir.Dir()
+		if err != nil {
+			er(err)
+		}
+
+		// Search config in home directory with name ".cobra" (without extension).
+		viper.AddConfigPath(home)
+		viper.SetConfigName(".cobra")
 	}
 
-	rootCmd.Set("author", "NAME HERE <EMAIL ADDRESS>")
-	rootCmd.Set("license", "apache")
+	viper.AutomaticEnv()
 
-	{
-		rootCmd.AddCommand(walkCmd)
-		rootCmd.AddCommand(scriptCmd)
-		rootCmd.AddCommand(addCmd)
-		rootCmd.AddCommand(initCmd)
-		rootCmd.AddCommand(testCmd)
+	if err := viper.ReadInConfig(); err == nil {
+		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
-
 }

@@ -2,15 +2,12 @@ package mamba
 
 import (
 	"fmt"
-	"github.com/Masterminds/sprig"
 	"github.com/gofunct/mamba/pkg/function"
-	"github.com/spf13/viper"
 	"io"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"text/template"
 )
 
 func (c *Command) WalkGrpc(args ...string) filepath.WalkFunc {
@@ -68,10 +65,7 @@ func (c *Command) WalkGoGoProto(path string) error {
 
 func (c *Command) WalkTmpl(wr io.Writer, text string) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
-		t := template.New("top")
-		t.Funcs(sprig.GenericFuncMap())
-		template.Must(t.Parse(text))
-		return t.Execute(wr, viper.AllSettings())
+
 		if info.IsDir() && info.Name() == "vendor" {
 			return filepath.SkipDir
 		}

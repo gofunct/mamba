@@ -21,6 +21,7 @@
 package mamba
 
 import (
+	"context"
 	"fmt"
 	"github.com/gofunct/mamba/pkg/input"
 	"github.com/gofunct/mamba/pkg/logging"
@@ -38,7 +39,6 @@ func inti() {
 
 }
 
-var initializers []func()
 var logger *logging.CtxLogger
 var query *input.UI
 
@@ -49,12 +49,11 @@ const MousetrapHelpText string = `This is a command line tool.
 You need to open cmd.exe and run it from there.
 `
 
-type MambaFunc func(command *Command, args []string)
+type MambaFunc func(command *Command, ctx context.Context)
 
 func OnInitialize(y ...func()) {
 	initializers = append(initializers, y...)
 }
-
 
 func (m *Command) WriteFile(f string, d []byte) error {
 	return ioutil.WriteFile(f, d, 0755)

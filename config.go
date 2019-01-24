@@ -18,9 +18,6 @@ func (m *Command) GetString(s string) string {
 	if res := viper.GetString(s); res != "" {
 		return res
 	}
-	if res, err := m.flags.GetString(s); res != "" && err != nil {
-		return res
-	}
 
 	if res := os.Getenv(strings.ToUpper(s)); res != "" {
 		return res
@@ -42,14 +39,8 @@ func (m *Command) GetString(s string) string {
 }
 
 func (m *Command) SyncRequirements() {
-	for _, s := range m.ValidArgs {
+	for _, s := range m.Dependencies {
 		if res := viper.GetString(s); res != "" {
-			if err := viper.BindEnv(s, res); err != nil {
-				logger.Warn("failed to bind env", s, res)
-			}
-		}
-		if res, err := m.flags.GetString(s); res != "" && err != nil {
-			viper.SetDefault(s, res)
 			if err := viper.BindEnv(s, res); err != nil {
 				logger.Warn("failed to bind env", s, res)
 			}
@@ -77,9 +68,9 @@ func (m *Command) SyncRequirements() {
 	logger.Debug("all requirements have been synced")
 }
 
-func (m *Command) GetValidArgs() map[string]string {
+func (m *Command) GetDependencies() map[string]string {
 	set := make(map[string]string)
-	for _, v := range m.ValidArgs {
+	for _, v := range m.Dependencies {
 		set[v] = m.GetString(v)
 	}
 	return set
@@ -87,7 +78,7 @@ func (m *Command) GetValidArgs() map[string]string {
 
 func (m *Command) DebugQuery() {
 	fmt.Println("Config:")
-	fmt.Println("Requirements: ", m.ValidArgs)
+	fmt.Println("Dependencies: ", m.Dependencies)
 	for _, v := range query.Queries {
 		fmt.Println("Question: ", v.Q)
 		fmt.Println("Key: ", v.Opts.Key)
@@ -95,7 +86,6 @@ func (m *Command) DebugQuery() {
 		fmt.Println("Required: ", v.Opts.Required)
 		fmt.Println("Default: ", v.Opts.Default)
 		fmt.Println("Loop: ", v.Opts.Loop)
-
 	}
 }
 

@@ -1,10 +1,9 @@
 package mamba
 
 import (
-	"fmt"
+	"github.com/gofunct/mamba/pkg/input"
 	"github.com/sirupsen/logrus"
 )
-
 
 var (
 	DebugLevel = func() {
@@ -17,34 +16,29 @@ var (
 
 // AddLoggingFlags sets "--debug" and "--verbose" flags to the given *cobra.Command instance.
 func (c *Command) AddLoggingFlags() {
-	var (
-		debugEnabled, warnEnabled bool
-	)
 
-	c.PersistentFlags().BoolVar(
-		&debugEnabled,
-		"debug",
-		false,
-		fmt.Sprintf("Debug level output"),
-	)
-	c.PersistentFlags().BoolVar(
-		&warnEnabled,
-		"warn",
-		false,
-		fmt.Sprintf("Warn level output"),
-	)
+	l, _ := query.Select(&input.Query{
+		Q: "what level logging to enable?",
+		Opts: &input.Options{
+			Key:      "log-level",
+			Options:  []string{"warn", "debug"},
+			Default:  "debug",
+			Loop:     false,
+			Required: false,
+		},
+	})
 
 	OnInitialize(func() {
 		switch {
-		case debugEnabled:
+		case l == "debug":
 			DebugLevel()
-			logger.Log("cmd", c.Name())
-		case warnEnabled:
+			logger.Log("cmd", c.Version)
+		case l == "warn":
 			WarnLevel()
-			logger.Log("cmd", c.Name())
+			logger.Log("cmd", c.Version)
 		default:
 			DebugLevel()
-			logger.Log("cmd", c.Name())
+			logger.Log("cmd", c.Version)
 		}
 	})
 }
@@ -64,19 +58,4 @@ func (m *Command) Log(args ...interface{}) {
 	if err := logger.Log(args); err != nil {
 		logger.Warn("failed to log context", err.Error())
 	}
-}
-
-// Print is a convenience method to Print to the defined output, fallback to Stderr if not set.
-func (c *Command) Print(i ...interface{}) {
-	fmt.Fprint(c.OutOrStderr(), i...)
-}
-
-// Println is a convenience method to Println to the defined output, fallback to Stderr if not set.
-func (c *Command) Println(i ...interface{}) {
-	c.Print(fmt.Sprintln(i...))
-}
-
-// Printf is a convenience method to Printf to the defined output, fallback to Stderr if not set.
-func (c *Command) Printf(format string, i ...interface{}) {
-	c.Print(fmt.Sprintf(format, i...))
 }

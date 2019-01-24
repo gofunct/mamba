@@ -3,10 +3,10 @@ package mamba
 import (
 	"fmt"
 	"github.com/Masterminds/sprig"
+	"io"
 	"strings"
 	"text/template"
 	"unicode"
-	"io"
 )
 
 func init() {
@@ -28,7 +28,6 @@ func AddTemplateFuncs(tmplFuncs template.FuncMap) {
 		templateFuncs[k] = v
 	}
 }
-
 
 func trimRightSpace(s string) string {
 	return strings.TrimRightFunc(s, unicode.IsSpace)

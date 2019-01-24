@@ -1,17 +1,19 @@
 package cmd
 
-import "github.com/gofunct/mamba"
+import (
+	"github.com/spf13/cobra"
+)
 
 func init() {
 	scriptCmd.AddCommand(dockerCmd)
 }
 
-var dockerCmd = &mamba.Command{
-	Use:  "docker",
-	Info: "docker scripts",
+var dockerCmd = &cobra.Command{
+	Use:   "docker",
+	Short: "docker scripts",
 }
 
-var scriptCmd = &mamba.Command{
-	Use:  "script",
-	Info: "helpful scripts",
+var scriptCmd = &cobra.Command{
+	Use:   "script",
+	Short: "helpful scripts",
 }

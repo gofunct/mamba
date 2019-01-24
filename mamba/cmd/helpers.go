@@ -23,8 +23,12 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"github.com/gofunct/mamba/pkg/input"
+	"github.com/gofunct/mamba/pkg/logging"
+	"github.com/spf13/viper"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -146,4 +150,57 @@ func commentifyString(in string) string {
 		}
 	}
 	return strings.Join(newlines, "\n")
+}
+
+func OsExec(args ...string) {
+	s, err := ExecString(args...)
+	if s != "" {
+		if _, err := fmt.Fprintf(os.Stderr, s); err != nil {
+			fmt.Printf("%s\n%s", "failed to write output to stderr", err)
+		}
+	}
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+}
+
+func ExecString(args ...string) (stdout string, err error) {
+	stdoutb, err := ExecBytes(args...)
+	return strings.TrimSpace(string(stdoutb)), err
+}
+
+func ExecBytes(args ...string) (stdout []byte, err error) {
+	cmd := exec.Command(args[0], args[1:]...)
+	cmd.Stderr = os.Stderr
+	cmd.Env = append(cmd.Env, os.Environ()...)
+	stdoutb, err := cmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("running %v: %v", cmd.Args, err)
+	}
+	return stdoutb, nil
+}
+
+func Enquire(s string) string {
+	var query = input.DefaultUI()
+	if res := viper.GetString(s); res != "" {
+		return res
+	}
+
+	if res := os.Getenv(strings.ToUpper(s)); res != "" {
+		return res
+	}
+	q := &input.Query{
+		Q: "Please provide a value for: " + s,
+		Opts: &input.Options{
+			Key:      s,
+			Loop:     true,
+			Required: true,
+		},
+	}
+	if res, err := query.Ask(q); res != "" && err == nil {
+		return res
+	} else {
+		logging.L.Fatalf("%s failed to retrieve value for: %s\n%s", s, err.Error())
+	}
+	return ""
 }

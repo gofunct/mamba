@@ -22,16 +22,16 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/gofunct/mamba"
+	"github.com/spf13/cobra"
 	"os"
 	"path"
 	"path/filepath"
 )
 
-var initCmd = &mamba.Command{
+var initCmd = &cobra.Command{
 	Use:     "init [name]",
 	Aliases: []string{"initialize", "initialise", "create"},
-	Info: `Initialize (mamba init) will create a new application, with a license
+	Long: `Initialize (mamba init) will create a new application, with a license
 and the appropriate structure for a Mamba-based CLI application.
 
   * If a name is provided, it will be created in the current directory;
@@ -42,7 +42,7 @@ and the appropriate structure for a Mamba-based CLI application.
   * If the directory already exists but is empty, it will be used.
 
 Init will not use an existing directory with contents.`,
-	Run: func(cmd *mamba.Command, args []string) {
+	Run: func(cmd *cobra.Command, args []string) {
 		wd, err := os.Getwd()
 		if err != nil {
 			er(err)
@@ -66,10 +66,10 @@ Init will not use an existing directory with contents.`,
 		}
 
 		initializeProject(project)
-		cmd.OsExec("go", "mod", "init")
-		cmd.OsExec("go", "mod", "vendor")
-		cmd.OsExec("go", "fmt", "./...")
-		cmd.OsExec("go", "install")
+		OsExec("go", "mod", "init")
+		OsExec("go", "mod", "vendor")
+		OsExec("go", "fmt", "./...")
+		OsExec("go", "install")
 		fmt.Fprintln(cmd.OutOrStdout(), `Your Mamba application is ready at
 `+project.AbsPath()+`
 
@@ -150,35 +150,36 @@ import (
 	"github.com/pkg/errors"
 )
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &mamba.Command{
-	Use:   				"{{.appName}}",
-	Version: 			"v0.1.1",
-	Info: "Change me to a brief description of your application",
-	// k/v pairs will be set to env 
-	Env: 				nil,
-	// Args set in ValidArgs will be set via query if not found
-	ValidArgs:          nil,
-	// use for passing args to os.Exec
-	DisableFlagParsing: false,
-	// first run after mamba.OnInitialize
-	PreRun:             nil,
-	// second run after cmd.PreRun
-	Run:                nil,
-	// third run after cmd.Run 
-	PostRun:            nil,
-	// if Router is not nil, it will be added to its parents router and executed at runtime
-	Router: 			nil,
+func init() {
+	ctx = context.TODO()
+}
+
+var (
+	ctx context.Context
+)
+
+var root = &mamba.Command{
+	Version:      "v0.1.1",
+	Dependencies: nil,
+	PreRun: func(svc *mamba.Command, ctx context.Context) {
+		fmt.Println("Welcome "+os.Getenv("USER")+"!")
+	},
+	Login: func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprintf(writer, "this is where your users will login")
+	},
+	Home: func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprintf(writer, "this is where your web app will be located")
+
+	},
+	FAQ: func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprintf(writer, "this is where your users will go for help")
+	},
 }
 
 func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		rootCmd.Fatalf("%s\n", errors.WithStack(err))
+	if err := root.Execute(ctx); err != nil {
+		panic(errors.WithStack(err))
 	}
-}
-
-func init() {
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 `
 

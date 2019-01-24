@@ -21,21 +21,22 @@
 package cmd
 
 import (
-	"github.com/gofunct/mamba"
+	"github.com/spf13/cobra"
+	"log"
 	"os"
 	"os/exec"
 )
 
 // testCmd represents the test command
-var testCmd = &mamba.Command{
-	Use:  "test",
-	Info: "run an interactive web server to test code in current repository",
-	Run: func(cmd *mamba.Command, args []string) {
+var testCmd = &cobra.Command{
+	Use:   "test",
+	Short: "run an interactive web server to test code in current repository",
+	Run: func(cmd *cobra.Command, args []string) {
 		c := exec.Command("goconvey", args...)
 		c.Env = append(c.Env, os.Environ()...)
 		c.Stderr = os.Stderr
 		if err := c.Run(); err != nil {
-			cmd.Fatalf("%s", "failed to run command", err.Error())
+			log.Fatalf("%#v", "failed to run command "+err.Error())
 		}
 	},
 }

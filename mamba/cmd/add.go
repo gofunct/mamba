@@ -22,7 +22,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/gofunct/mamba"
+	"github.com/spf13/cobra"
 	"os"
 	"path/filepath"
 	"unicode"
@@ -35,10 +35,10 @@ func init() {
 
 var packageName, parentName string
 
-var addCmd = &mamba.Command{
+var addCmd = &cobra.Command{
 	Use:     "add [command name]",
 	Aliases: []string{"command"},
-	Info: `Add (mamba add) will create a new command, with a license and
+	Long: `Add (mamba add) will create a new command, with a license and
 the appropriate structure for a Mamba-based CLI application,
 and register it to its parent (default rootCmd).
 
@@ -47,7 +47,7 @@ with an initial uppercase letter.
 
 Example: mamba add server -> resulting in a new cmd/server.go`,
 
-	Run: func(cmd *mamba.Command, args []string) {
+	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 1 {
 			er("add needs a name for the command")
 		}
@@ -133,31 +133,25 @@ import (
 
 // {{.cmdName}}Cmd represents the {{.cmdName}} command
 var {{.cmdName}}Cmd = &mamba.Command{
-	Use:   				"{{.cmdName}}",
-	Version: 			"v0.1.1",
-	Info: "A brief description of your command",
-	Env: 				nil,
-	// Args set in ValidArgs will be set via query if not found
-	ValidArgs:          nil,
-	// first run after mamba.OnInitialize
-	PreRun:             nil,
-	// If Handler is not nil, it will be called last to start the parents http.Server
-	// use for passing args to os.Exec
-	DisableFlagParsing: 		false,
-	Run: func(cmd *mamba.Command, args []string) {
-		fmt.Println("{{.cmdName}} command info: ", cmd.Info)
-		fmt.Println("{{.cmdName}} valid arguments are: ", cmd.ValidArgs)
-		fmt.Println("{{.cmdName}} env vars are: ", cmd.Env)
-		fmt.Println("{{.cmdName}} is a child of: ", cmd.Root())
+	Version:      "v0.1.1",
+	Dependencies: nil,
+	PreRun: func(svc *mamba.Command, ctx context.Context) {
+		fmt.Println("Welcome "+os.Getenv("USER")+"!")
 	},
-	// third run after cmd.Run 
-	PostRun:            nil,
-	// if Router is not nil, it will be added to its parents router and executed at runtime
-	Router: 			nil,
+	Login: func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprintf(writer, "this is where your users will login")
+	},
+	Home: func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprintf(writer, "this is where your web app will be located")
+
+	},
+	FAQ: func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprintf(writer, "this is where your users will go for help")
+	},
 }
 
 func init() {
-	{{.parentName}}.AddCommand({{.cmdName}}Cmd)
+	root.AddCommand({{.cmdName}}Cmd)
 }
 `
 

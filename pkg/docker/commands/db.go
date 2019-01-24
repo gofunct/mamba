@@ -2,6 +2,7 @@ package commands
 
 import (
 	"bytes"
+	"context"
 	"github.com/gofunct/mamba"
 	"github.com/gofunct/mamba/pkg/function"
 	"github.com/gofunct/mamba/pkg/logging"
@@ -10,7 +11,7 @@ import (
 )
 
 func RunDgraph() mamba.MambaFunc {
-	return func(cmd *mamba.Command, args []string) {
+	return func(cmd *mamba.Command, ctx context.Context) {
 		var b []byte
 		logging.L.Debug("pulling dgraph docker image...\n")
 		pull, err := function.RunBytes("docker", "pull", "dgraph/dgraph")

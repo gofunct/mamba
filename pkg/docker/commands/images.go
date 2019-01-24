@@ -3,6 +3,7 @@ package commands
 import (
 	"archive/tar"
 	"bytes"
+	"context"
 	"fmt"
 	"github.com/fsouza/go-dockerclient"
 	"github.com/gofunct/mamba"
@@ -14,7 +15,7 @@ import (
 
 func ListImages() mamba.MambaFunc {
 	var err error
-	return func(cmd *mamba.Command, args []string) {
+	return func(cmd *mamba.Command, ctx context.Context) {
 		if err != nil {
 			logging.L.Fatalln(err.Error())
 		}
@@ -33,7 +34,7 @@ func ListImages() mamba.MambaFunc {
 	}
 }
 func BuildImage() mamba.MambaFunc {
-	return func(cmd *mamba.Command, args []string) {
+	return func(cmd *mamba.Command, ctx context.Context) {
 		t := time.Now()
 		inputbuf, outputbuf := bytes.NewBuffer(nil), bytes.NewBuffer(nil)
 		tr := tar.NewWriter(inputbuf)
