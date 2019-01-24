@@ -67,8 +67,9 @@ Init will not use an existing directory with contents.`,
 
 		initializeProject(project)
 		OsExec("go", "mod", "init")
-		OsExec("go", "mod", "vendor")
+		OsExec("go", "get", "github.com/gofunct/mamba/...")
 		OsExec("go", "fmt", "./...")
+		OsExec("go", "mod", "vendor")
 		OsExec("go", "install")
 		fmt.Fprintln(cmd.OutOrStdout(), `Your Mamba application is ready at
 `+project.AbsPath()+`
