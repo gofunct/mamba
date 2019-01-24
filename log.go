@@ -15,7 +15,7 @@ var (
 )
 
 // AddLoggingFlags sets "--debug" and "--verbose" flags to the given *cobra.Command instance.
-func (c *Command) AddLoggingFlags() {
+func (c *Command) AddLogging() {
 
 	l, _ := query.Select(&input.Query{
 		Q: "what level logging to enable?",

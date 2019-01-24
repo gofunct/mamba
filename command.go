@@ -70,6 +70,7 @@ type Command struct {
 }
 
 func (c *Command) Execute(ctx context.Context) error {
+	c.AddLogging()
 	if len(c.Dependencies) > 0 {
 		c.SyncRequirements()
 	}
