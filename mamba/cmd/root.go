@@ -59,7 +59,6 @@ func init() {
 
 	rootCmd.AddCommand(addCmd)
 	rootCmd.AddCommand(initCmd)
-	rootCmd.AddCommand(scriptCmd)
 	rootCmd.AddCommand(testCmd)
 	rootCmd.AddCommand(walkCmd)
 	rootCmd.AddCommand(htmlCmd)

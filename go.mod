@@ -34,6 +34,7 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/prometheus/client_golang v0.9.0
 	github.com/prometheus/common v0.0.0-20181015124227-bcb74de08d37
+	github.com/robfig/cron v0.0.0-20180505203441-b41be1df6967
 	github.com/shiyanhui/hero v0.0.1
 	github.com/sirupsen/logrus v1.3.0
 	github.com/soheilhy/cmux v0.1.4
