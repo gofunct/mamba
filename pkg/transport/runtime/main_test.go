@@ -1,10 +1,10 @@
-package transport_test
+package runtime_test
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/gofunct/mamba/pkg/transport"
+	"github.com/gofunct/mamba/pkg/transport/runtime"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -30,7 +30,7 @@ func orDie(t *testing.T, err error) {
 	}
 }
 
-func startServer(t *testing.T, s *transport.Engine) func() {
+func startServer(t *testing.T, s *runtime.Engine) func() {
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
@@ -48,9 +48,9 @@ func startServer(t *testing.T, s *transport.Engine) func() {
 
 func Test_server_onlyGateway(t *testing.T) {
 	var port int64 = 15261
-	s := transport.New(
-		transport.WithGatewayAddr("tcp", ":"+strconv.FormatInt(port, 10)),
-		transport.WithServers(
+	s := runtime.New(
+		runtime.WithGatewayAddr("tcp", ":"+strconv.FormatInt(port, 10)),
+		runtime.WithServers(
 			server.NewLibraryServiceServer(),
 		),
 	)
@@ -85,9 +85,9 @@ func Test_server_onlyGateway(t *testing.T) {
 func Test_server_samePort(t *testing.T) {
 	var port int64 = 15261
 	addr := ":" + strconv.FormatInt(port, 10)
-	s := transport.New(
-		transport.WithAddr("tcp", addr),
-		transport.WithServers(
+	s := runtime.New(
+		runtime.WithAddr("tcp", addr),
+		runtime.WithServers(
 			server.NewLibraryServiceServer(),
 		),
 	)
@@ -150,10 +150,10 @@ func Test_server_differentPort(t *testing.T) {
 	grpcAddr := ":" + strconv.FormatInt(grpcPort, 10)
 	httpAddr := ":" + strconv.FormatInt(httpPort, 10)
 
-	s := transport.New(
-		transport.WithGrpcAddr("tcp", grpcAddr),
-		transport.WithGatewayAddr("tcp", httpAddr),
-		transport.WithServers(
+	s := runtime.New(
+		runtime.WithGrpcAddr("tcp", grpcAddr),
+		runtime.WithGatewayAddr("tcp", httpAddr),
+		runtime.WithServers(
 			server.NewLibraryServiceServer(),
 		),
 	)

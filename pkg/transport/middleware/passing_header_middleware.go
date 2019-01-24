@@ -1,4 +1,4 @@
-package transport
+package middleware
 
 import (
 	"net/http"
@@ -10,7 +10,7 @@ import (
 // PassedHeaderDeciderFunc returns true if given header should be passed to gRPC server metadata.
 type PassedHeaderDeciderFunc func(string) bool
 
-func createPassingHeaderMiddleware(decide PassedHeaderDeciderFunc) HTTPServerMiddleware {
+func CreatePassingHeaderMiddleware(decide PassedHeaderDeciderFunc) HTTPServerMiddleware {
 	return func(next http.Handler) http.Handler {
 		cache := new(sync.Map)
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

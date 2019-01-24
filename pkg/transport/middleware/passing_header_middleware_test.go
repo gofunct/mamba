@@ -1,4 +1,4 @@
-package transport
+package middleware
 
 import (
 	"net/http"
@@ -48,7 +48,7 @@ func Test_passingHeaderMiddleware(t *testing.T) {
 				wantHeader.Set(k, v[0])
 			}
 
-			wrap := createPassingHeaderMiddleware(c.decider)
+			wrap := CreatePassingHeaderMiddleware(c.decider)
 			s := httptest.NewServer(wrap(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				gotHeader = r.Header
 				w.WriteHeader(200)

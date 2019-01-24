@@ -1,7 +1,9 @@
-package transport
+package config
 
 import (
 	"crypto/tls"
+	"github.com/gofunct/mamba/pkg/transport/api"
+	"github.com/gofunct/mamba/pkg/transport/middleware"
 	"net"
 	"net/http"
 	"os"
@@ -15,7 +17,25 @@ import (
 	"google.golang.org/grpc"
 )
 
-func createDefaultConfig() *Config {
+// Config contains configurations of gRPC and Gateway server.
+type Config struct {
+	GrpcAddr                        *Address
+	GrpcInternalAddr                *Address
+	GatewayAddr                     *Address
+	Servers                         []api.Server
+	GrpcServerUnaryInterceptors     []grpc.UnaryServerInterceptor
+	GrpcServerStreamInterceptors    []grpc.StreamServerInterceptor
+	GatewayServerUnaryInterceptors  []grpc.UnaryClientInterceptor
+	GatewayServerStreamInterceptors []grpc.StreamClientInterceptor
+	GrpcServerOption                []grpc.ServerOption
+	GatewayDialOption               []grpc.DialOption
+	GatewayMuxOptions               []runtime.ServeMuxOption
+	GatewayServerConfig             *HTTPServerConfig
+	MaxConcurrentStreams            uint32
+	GatewayServerMiddlewares        []middleware.HTTPServerMiddleware
+}
+
+func CreateDefaultConfig() *Config {
 	config := &Config{
 		GrpcInternalAddr: &Address{
 			Network: "unix",
@@ -47,7 +67,7 @@ type Address struct {
 	Addr    string
 }
 
-func (a *Address) createListener() (net.Listener, error) {
+func (a *Address) CreateListener() (net.Listener, error) {
 	if a.Network == "unix" {
 		dir := filepath.Dir(a.Addr)
 		f, err := os.Stat(dir)
@@ -77,7 +97,7 @@ type HTTPServerConfig struct {
 	ConnState         func(net.Conn, http.ConnState)
 }
 
-func (c *HTTPServerConfig) applyTo(s *http.Server) {
+func (c *HTTPServerConfig) ApplyTo(s *http.Server) {
 	s.TLSConfig = c.TLSConfig
 	s.ReadTimeout = c.ReadTimeout
 	s.ReadHeaderTimeout = c.ReadHeaderTimeout
@@ -88,25 +108,7 @@ func (c *HTTPServerConfig) applyTo(s *http.Server) {
 	s.ConnState = c.ConnState
 }
 
-// Config contains configurations of gRPC and Gateway server.
-type Config struct {
-	GrpcAddr                        *Address
-	GrpcInternalAddr                *Address
-	GatewayAddr                     *Address
-	Servers                         []Server
-	GrpcServerUnaryInterceptors     []grpc.UnaryServerInterceptor
-	GrpcServerStreamInterceptors    []grpc.StreamServerInterceptor
-	GatewayServerUnaryInterceptors  []grpc.UnaryClientInterceptor
-	GatewayServerStreamInterceptors []grpc.StreamClientInterceptor
-	GrpcServerOption                []grpc.ServerOption
-	GatewayDialOption               []grpc.DialOption
-	GatewayMuxOptions               []runtime.ServeMuxOption
-	GatewayServerConfig             *HTTPServerConfig
-	MaxConcurrentStreams            uint32
-	GatewayServerMiddlewares        []HTTPServerMiddleware
-}
-
-func (c *Config) serverOptions() []grpc.ServerOption {
+func (c *Config) ServerOptions() []grpc.ServerOption {
 	return append(
 		[]grpc.ServerOption{
 			grpc_middleware.WithUnaryServerChain(c.GrpcServerUnaryInterceptors...),
@@ -117,7 +119,7 @@ func (c *Config) serverOptions() []grpc.ServerOption {
 	)
 }
 
-func (c *Config) clientOptions() []grpc.DialOption {
+func (c *Config) ClientOptions() []grpc.DialOption {
 	return append(
 		[]grpc.DialOption{
 			grpc.WithInsecure(),

@@ -1,7 +1,9 @@
-package transport
+package runtime
 
 import (
 	"context"
+	"github.com/gofunct/mamba/pkg/transport/api"
+	"github.com/gofunct/mamba/pkg/transport/config"
 	"net"
 	"net/http"
 	"time"
@@ -13,7 +15,7 @@ import (
 )
 
 // NewGatewayServer creates GrpcServer instance.
-func NewGatewayServer(c *Config) Interface {
+func NewGatewayServer(c *config.Config) api.Interface {
 	return &GatewayServer{
 		Config: c,
 	}
@@ -22,7 +24,7 @@ func NewGatewayServer(c *Config) Interface {
 // GatewayServer wraps gRPC gateway server setup process.
 type GatewayServer struct {
 	server *http.Server
-	*Config
+	*config.Config
 }
 
 // Serve implements Server.Shutdown
@@ -63,7 +65,7 @@ func (s *GatewayServer) Shutdown() {
 }
 
 func (s *GatewayServer) createConn() (conn *grpc.ClientConn, err error) {
-	conn, err = grpc.Dial(s.GrpcInternalAddr.Addr, s.clientOptions()...)
+	conn, err = grpc.Dial(s.GrpcInternalAddr.Addr, s.ClientOptions()...)
 	if err != nil {
 		err = errors.Wrap(err, "failed to connect to gRPC server")
 	}
@@ -97,7 +99,7 @@ func (s *GatewayServer) createServer(conn *grpc.ClientConn) (*http.Server, error
 		Handler: handler,
 	}
 	if cfg := s.GatewayServerConfig; cfg != nil {
-		cfg.applyTo(svr)
+		cfg.ApplyTo(svr)
 	}
 
 	return svr, nil

@@ -1,6 +1,7 @@
-package transport
+package runtime
 
 import (
+	"github.com/gofunct/mamba/pkg/transport/api"
 	"github.com/pkg/errors"
 	"github.com/soheilhy/cmux"
 	"google.golang.org/grpc/grpclog"
@@ -14,7 +15,7 @@ type MuxServer struct {
 }
 
 // NewMuxServer creates MuxServer instance.
-func NewMuxServer(mux cmux.CMux, lis net.Listener) Interface {
+func NewMuxServer(mux cmux.CMux, lis net.Listener) api.Interface {
 	return &MuxServer{
 		mux: mux,
 		lis: lis,

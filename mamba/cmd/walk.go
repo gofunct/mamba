@@ -34,7 +34,7 @@ import (
 )
 
 func init() {
-	walkCmd.AddCommand(protoGenCmd, goGoCmd, grpcCmd, htmlCmd)
+	walkCmd.AddCommand(protoGenCmd, goGoCmd, grpcCmd, htmlCmd, jsCmd)
 	protoGenCmd.PersistentFlags().StringVarP(&in, "input", "i", ".", "path to input directory")
 	protoGenCmd.PersistentFlags().StringVarP(&out, "output", "o", ".", "path to output directory")
 	goGoCmd.PersistentFlags().StringVarP(&in, "input", "i", ".", "path to input directory")
@@ -57,7 +57,7 @@ var protoGenCmd = &cobra.Command{
 // protocCmd represents the protoc command
 var goGoCmd = &cobra.Command{
 	Use:   "gogo",
-	Short: "🐍 Compile templates as a protoc plugin",
+	Short: "🐍 Compile gogo protobuf stubs",
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := WalkGoGoProto(in); err != nil {
 			fmt.Printf("%+v", err)
@@ -68,10 +68,21 @@ var goGoCmd = &cobra.Command{
 // protocCmd represents the protoc command
 var grpcCmd = &cobra.Command{
 	Use:   "grpc",
-	Short: "🐍 Compile templates as a protoc plugin",
+	Short: "🐍 Compile grpc protobuf stubs",
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := WalkGoGoProto(in); err != nil {
 			fmt.Printf("%+v", err)
+		}
+	},
+}
+
+// protocCmd represents the protoc command
+var jsCmd = &cobra.Command{
+	Use:   "js",
+	Short: "🐍 Compile grpc javascript protobuf stubs",
+	Run: func(cmd *cobra.Command, args []string) {
+		if err := WalkProtoJs(in); err != nil {
+			fmt.Printf("%#v", err)
 		}
 	},
 }
@@ -108,6 +119,34 @@ func WalkGrpc(args ...string) filepath.WalkFunc {
 				fmt.Sprintf("-I=%s", filepath.Join(os.Getenv("GOPATH"), "src", "github.com", "gogo", "protobuf", "protobuf")),
 				fmt.Sprintf("--proto_path=%s", filepath.Join(os.Getenv("GOPATH"), "src", "github.com")),
 				"--go_out=plugins=grpc:.",
+				path,
+			}
+			cmd := exec.Command("protoc", args...)
+			err = cmd.Run()
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+}
+func WalkProtoJs(args ...string) filepath.WalkFunc {
+	return func(path string, info os.FileInfo, err error) error {
+		// skip vendor directory
+		if info.IsDir() && info.Name() == "vendor" {
+			return filepath.SkipDir
+		}
+		// find all protobuf files
+		if filepath.Ext(path) == ".proto" {
+			args = []string{
+				"-I=.",
+				fmt.Sprintf("-I=%s", "vendor"),
+				fmt.Sprintf("-I=%s", "proto"),
+				fmt.Sprintf("-I=%s", filepath.Join(os.Getenv("GOPATH"), "src")),
+				fmt.Sprintf("-I=%s", filepath.Join(os.Getenv("GOPATH"), "src", "github.com", "gogo", "protobuf", "protobuf")),
+				fmt.Sprintf("--proto_path=%s", filepath.Join(os.Getenv("GOPATH"), "src", "github.com")),
+				"--gopherjs_out=plugins=grpc,Mgoogle/protobuf/timestamp.proto=github.com/johanbrandhorst/protobuf/ptypes/timestamp:$$GOPATH/src",
+				"--go_out=plugins=grpc:$$GOPATH/src",
 				path,
 			}
 			cmd := exec.Command("protoc", args...)

@@ -16,6 +16,7 @@ require (
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/protobuf v1.2.0
 	github.com/google/go-cmp v0.2.0
+	github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1
 	github.com/gorilla/mux v1.6.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
 	github.com/grpc-ecosystem/grpc-gateway v1.5.1
@@ -52,4 +53,6 @@ require (
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6 // indirect
 	gopkg.in/dixonwille/wlog.v2 v2.0.0 // indirect
 	gopkg.in/dixonwille/wmenu.v4 v4.0.2 // indirect
+	honnef.co/go/js/dom v0.0.0-20181202134054-9dbdcd412bde
+	myitcv.io v0.0.0-20190122100129-e0d07439eb38
 )

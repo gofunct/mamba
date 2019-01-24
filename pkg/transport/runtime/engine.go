@@ -1,7 +1,9 @@
-package transport
+package runtime
 
 import (
 	"context"
+	"github.com/gofunct/mamba/pkg/transport/api"
+	"github.com/gofunct/mamba/pkg/transport/config"
 	"github.com/pkg/errors"
 	"github.com/soheilhy/cmux"
 	"golang.org/x/sync/errgroup"
@@ -15,7 +17,7 @@ import (
 
 // Engine is the framework instance.
 type Engine struct {
-	*Config
+	*config.Config
 	cancelFunc func()
 }
 
@@ -29,13 +31,13 @@ func New(opts ...Option) *Engine {
 // Serve starts gRPC and Gateway servers.
 func (e *Engine) Serve() error {
 	var (
-		grpcServer, gatewayServer, muxServer Interface
+		grpcServer, gatewayServer, muxServer api.Interface
 		grpcLis, gatewayLis, internalLis     net.Listener
 		err                                  error
 	)
 
 	if e.GrpcAddr != nil && e.GatewayAddr != nil && reflect.DeepEqual(e.GrpcAddr, e.GatewayAddr) {
-		lis, err := e.GrpcAddr.createListener()
+		lis, err := e.GrpcAddr.CreateListener()
 		if err != nil {
 			return errors.Wrap(err, "failed to listen network for servers")
 		}
@@ -50,7 +52,7 @@ func (e *Engine) Serve() error {
 
 	// Setup listeners
 	if grpcLis == nil && e.GrpcAddr != nil {
-		grpcLis, err = e.GrpcAddr.createListener()
+		grpcLis, err = e.GrpcAddr.CreateListener()
 		if err != nil {
 			return errors.Wrap(err, "failed to listen network for gRPC server")
 		}
@@ -59,7 +61,7 @@ func (e *Engine) Serve() error {
 
 	if e.GatewayAddr != nil {
 		gatewayServer = NewGatewayServer(e.Config)
-		internalLis, err = e.GrpcInternalAddr.createListener()
+		internalLis, err = e.GrpcInternalAddr.CreateListener()
 		if err != nil {
 			return errors.Wrap(err, "failed to listen network for gRPC server internal")
 		}
@@ -67,7 +69,7 @@ func (e *Engine) Serve() error {
 	}
 
 	if gatewayLis == nil && e.GatewayAddr != nil {
-		gatewayLis, err = e.GatewayAddr.createListener()
+		gatewayLis, err = e.GatewayAddr.CreateListener()
 		if err != nil {
 			return errors.Wrap(err, "failed to listen network for gateway server")
 		}
@@ -95,7 +97,7 @@ func (e *Engine) Serve() error {
 
 	select {
 	case <-ctx.Done():
-		for _, s := range []Interface{gatewayServer, grpcServer, muxServer} {
+		for _, s := range []api.Interface{gatewayServer, grpcServer, muxServer} {
 			if s != nil {
 				s.Shutdown()
 			}
