@@ -173,7 +173,6 @@ var root = &mamba.Command{
 		// This is just an example
 		[]string{"echo", "vendoring dependencies..."},
 		[]string{"go", "mod", "vendor"},
-		[]string{"echo", dependencies vendored successfully!"},
 	},
 	// a map of a handler path(without a "/") and a handlerfunc
 	// these handlers are served after the scripts finish successfully

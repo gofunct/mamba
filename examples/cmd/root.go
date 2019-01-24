@@ -15,21 +15,42 @@
 package cmd
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"github.com/gofunct/mamba"
+	"github.com/gofunct/mamba/pkg/function"
 	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 	"net/http"
+	"os"
 )
 
 func init() {
 	ctx = context.TODO()
+
 }
 
 var (
 	ctx context.Context
+	buf = bytes.NewBuffer([]byte{})
+	script = &function.Scripter{
+		ProjectId: "N/A",
+		Initializers: []func(){
+			function.WriteConfig(),
+			function.Get(bytes.NewBuffer(nil), "https://godoc.org/github.com/robfig/cron"),
+		},
+		Run: func(command *cobra.Command, args []string) {
+		fmt.Println("Im so powerfule")
+	},
+	PostRun: func(command *cobra.Command, args []string) {
+		if _, err := buf.WriteTo(os.Stdout); err != nil {
+			function.ERR(err)
+		}
+	},
+	}
 )
 
 var root = &mamba.Command{
@@ -41,7 +62,7 @@ var root = &mamba.Command{
 		// This is just an example
 		[]string{"echo", "vendoring dependencies..."},
 		[]string{"go", "mod", "vendor"},
-		[]string{"dependencies vendored successfully!"},
+		[]string{"echo", "dependencies vendored successfully!"},
 	},
 	// a map of a handler path(without a "/") and a handlerfunc
 	// these handlers are served after the scripts finish successfully
@@ -70,6 +91,9 @@ var root = &mamba.Command{
 }
 
 func Execute() {
+	if err := script.Execute(os.Stdout, script.ProjectId, "script", "a scripting utilitiy tool"); err != nil {
+		fmt.Printf("%#v", errors.WithStack(err))
+	}
 	// func main() calls this function to execute the root command
 	if err := root.Execute(ctx); err != nil {
 		fmt.Printf("%#v", errors.WithStack(err))

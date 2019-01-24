@@ -1,0 +1,8 @@
+{
+  "config": {
+    "path": "config.json",
+    "write": "1"
+  },
+  "log-level": "2",
+  "mamba_port": ":8080"
+}
