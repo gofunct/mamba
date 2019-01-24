@@ -13,18 +13,12 @@ func init() {
 
 var router *mux.Router
 
-func (c *Command) HandleGrpc(grpcServer *grpc.Server) http.Handler {
+func (c *Command) handleGrpc(server *grpc.Server) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
-			grpcServer.ServeHTTP(w, r)
+			server.ServeHTTP(w, r)
 		} else {
 			router.ServeHTTP(w, r)
 		}
 	})
-}
-
-func (c *Command) AddCommand(prefix string, cmd *Command) {
-	router.Handle(prefix+"/faq", cmd.FAQ)
-	router.Handle(prefix+"/", cmd.Home)
-	router.Handle(prefix+"/login", cmd.Login)
 }

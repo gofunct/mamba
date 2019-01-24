@@ -26,9 +26,12 @@ import (
 	"github.com/gofunct/mamba/pkg/input"
 	"github.com/gofunct/mamba/pkg/logging"
 	"github.com/gorilla/mux"
+	"github.com/oklog/oklog/pkg/group"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/common/log"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -48,6 +51,7 @@ func init() {
 }
 
 var (
+	g            group.Group
 	logger       *logging.CtxLogger
 	query        *input.UI
 	initializers []func()
@@ -63,21 +67,22 @@ You need to open cmd.exe and run it from there.
 type Command struct {
 	Version      string
 	Dependencies []string
-	PreRun       MambaFunc
+	Scripts      [][]string
 	Hanldlers    map[string]http.HandlerFunc
-	Login        http.HandlerFunc
-	Home         http.HandlerFunc
-	FAQ          http.HandlerFunc
+	Options      []grpc.ServerOption
+	PostRun      MambaFunc
+	exec         *executor
 }
 
 func (c *Command) Execute(ctx context.Context) error {
+	log.Info("starting scripts...")
+	for _, v := range c.Scripts {
+		c.Script(ctx, v...)
+	}
+	grpcServer := grpc.NewServer(c.Options...)
 	c.AddLogging()
 	if len(c.Dependencies) > 0 {
 		c.SyncRequirements()
-	}
-
-	if c.PreRun != nil {
-		c.PreRun(c, ctx)
 	}
 
 	for k, v := range c.Hanldlers {
@@ -98,7 +103,7 @@ func (c *Command) Execute(ctx context.Context) error {
 
 	if port := os.Getenv("MAMBA_PORT"); port != "" {
 		srv = &http.Server{
-			Handler: router,
+			Handler: c.handleGrpc(grpcServer),
 			Addr:    port,
 			// Good practice: enforce timeouts for servers you create!
 			WriteTimeout: 15 * time.Second,
@@ -106,7 +111,7 @@ func (c *Command) Execute(ctx context.Context) error {
 		}
 	} else {
 		srv = &http.Server{
-			Handler: router,
+			Handler: c.handleGrpc(grpcServer),
 			Addr:    "127.0.0.1:8080",
 			// Good practice: enforce timeouts for servers you create!
 			WriteTimeout: 15 * time.Second,
@@ -115,8 +120,18 @@ func (c *Command) Execute(ctx context.Context) error {
 	}
 	fmt.Println("🐍 starting server on:", srv.Addr)
 	fmt.Println("🐍 type Ctrl-C to shutdown ", srv.Addr)
-
-	return srv.ListenAndServe()
+	g.Add(func() error {
+		logger.Log("transport", "server/HTTP", "addr", srv.Addr)
+		return srv.ListenAndServe()
+	}, func(error) {
+		srv.Shutdown(ctx)
+	})
+	if c.PostRun != nil {
+		srv.RegisterOnShutdown(func() {
+			c.PostRun(c, ctx)
+		})
+	}
+	return g.Run()
 }
 
 type MambaFunc func(command *Command, ctx context.Context)

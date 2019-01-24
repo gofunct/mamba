@@ -147,11 +147,12 @@ func createRootCmdFile(project *Project) {
 package cmd
 
 import (
-	"github.com/gofunct/mamba"
-	"github.com/pkg/errors"
 	"context"
 	"fmt"
-	"os"
+	"github.com/gofunct/mamba"
+	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
+	"github.com/pkg/errors"
+	"google.golang.org/grpc"
 	"net/http"
 )
 
@@ -165,23 +166,43 @@ var (
 
 var root = &mamba.Command{
 	Version:      "v0.1.1",
-	Dependencies: nil,
-	PreRun: func(svc *mamba.Command, ctx context.Context) {
-		fmt.Println("Welcome " + os.Getenv("USER") + "!")
+	// You will be prompted to set these environmental variables if they are not found
+	Dependencies: []string{"MAMBA_PORT"},
+	// Scripts run as they would from the terminal. They run before the server starts
+	Scripts: [][]string{
+		// This is just an example
+		[]string{"echo", "vendoring dependencies..."},
+		[]string{"go", "mod", "vendor"},
+		[]string{"dependencies vendored successfully!"},
 	},
+	// a map of a handler path(without a "/") and a handlerfunc
+	// these handlers are served after the scripts finish successfully
 	Hanldlers: map[string]http.HandlerFunc{
 		"": func(writer http.ResponseWriter, request *http.Request) {
-			fmt.Fprintf(writer, "this is where your web app will be located")
+			fmt.Fprintf(writer, "this is the base url")
 		},
 		"login": func(writer http.ResponseWriter, request *http.Request) {
-			fmt.Fprintf(writer, "this is where your users will login")
+			fmt.Fprintf(writer, "this is where your users could login")
 		},
 		"faq": func(writer http.ResponseWriter, request *http.Request) {
-			fmt.Fprintf(writer, "this is where your users will go for help")		},
+			fmt.Fprintf(writer, "this is where your users could go for help")
+		},
+	},
+	// the grpc server handles all grpc requests on the same port as the http handlers
+	// this is where you specify grpc middleware
+	Options: []grpc.ServerOption{
+		grpc.UnaryInterceptor(
+			grpc_recovery.UnaryServerInterceptor(),
+		),
+	},
+	// PostRun runs after the server has shutdown successfully
+	PostRun: func(svc *mamba.Command, ctx context.Context) {
+		fmt.Println("server shutdown successfully!")
 	},
 }
 
 func Execute() {
+	// func main() calls this function to execute the root command
 	if err := root.Execute(ctx); err != nil {
 		fmt.Printf("%#v", errors.WithStack(err))
 	}

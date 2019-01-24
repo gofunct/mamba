@@ -30,9 +30,10 @@ require (
 	github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a // indirect
 	github.com/mattn/go-sqlite3 v1.10.0 // indirect
 	github.com/mitchellh/go-homedir v1.0.0
-	github.com/oklog/oklog v0.3.2 // indirect
+	github.com/oklog/oklog v0.3.2
 	github.com/pkg/errors v0.8.1
 	github.com/prometheus/client_golang v0.9.0
+	github.com/prometheus/common v0.0.0-20181015124227-bcb74de08d37
 	github.com/shiyanhui/hero v0.0.1
 	github.com/sirupsen/logrus v1.3.0
 	github.com/soheilhy/cmux v0.1.4
