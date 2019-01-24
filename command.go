@@ -71,7 +71,6 @@ type Command struct {
 	Hanldlers    map[string]http.HandlerFunc
 	Options      []grpc.ServerOption
 	PostRun      MambaFunc
-	exec         *executor
 }
 
 func (c *Command) Execute(ctx context.Context) error {

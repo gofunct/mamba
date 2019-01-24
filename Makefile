@@ -1,6 +1,5 @@
-test:
+build:
 	go generate
-	cd ../temp \
-	rm -rf * \
-	mamba init
+	cd examples/basic && rm -rf * && mamba init && go install
+	git add . && git commit -m "successful build" && git push origin master
 	temp
