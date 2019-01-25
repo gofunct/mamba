@@ -8,7 +8,9 @@ require (
 	github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc // indirect
 	github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf // indirect
 	github.com/aokoli/goutils v1.1.0 // indirect
+	github.com/cheggaaa/pb v2.0.6+incompatible // indirect
 	github.com/daviddengcn/go-colortext v0.0.0-20180409174941-186a3d44e920 // indirect
+	github.com/fatih/color v1.7.0
 	github.com/foobaz/go-zopfli v0.0.0-20140122214029-7432051485e2 // indirect
 	github.com/fsouza/go-dockerclient v1.3.5
 	github.com/go-kit/kit v0.8.0
@@ -22,7 +24,7 @@ require (
 	github.com/gorilla/mux v1.6.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
 	github.com/grpc-ecosystem/grpc-gateway v1.7.0
-	github.com/hashicorp/go-getter v0.0.0-20190112230949-c68364a1fae1 // indirect
+	github.com/hashicorp/go-getter v1.0.1
 	github.com/hashicorp/go-version v1.1.0 // indirect
 	github.com/hashicorp/hcl2 v0.0.0-20190116200548-7b147fbae47a // indirect
 	github.com/howeyc/fsnotify v0.9.0 // indirect
@@ -32,7 +34,7 @@ require (
 	github.com/izumin5210/grapi v0.3.2 // indirect
 	github.com/jinzhu/gorm v1.9.2
 	github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a // indirect
-	github.com/johanbrandhorst/protobuf v0.7.1
+	github.com/johanbrandhorst/protobuf v0.7.1 // indirect
 	github.com/mattn/go-sqlite3 v1.10.0 // indirect
 	github.com/mitchellh/go-homedir v1.0.0
 	github.com/neelance/astrewrite v0.0.0-20160511093645-99348263ae86 // indirect
@@ -59,9 +61,16 @@ require (
 	golang.org/x/sync v0.0.0-20181221193216-37e7f081c4d4
 	google.golang.org/genproto v0.0.0-20190111180523-db91494dd46c
 	google.golang.org/grpc v1.17.0
+	gopkg.in/VividCortex/ewma.v1 v1.1.1 // indirect
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6 // indirect
+	gopkg.in/cheggaaa/pb.v1 v1.0.27
+	gopkg.in/cheggaaa/pb.v2 v2.0.6 // indirect
 	gopkg.in/dixonwille/wlog.v2 v2.0.0 // indirect
 	gopkg.in/dixonwille/wmenu.v4 v4.0.2 // indirect
+	gopkg.in/fatih/color.v1 v1.7.0 // indirect
+	gopkg.in/mattn/go-colorable.v0 v0.0.9 // indirect
+	gopkg.in/mattn/go-isatty.v0 v0.0.4 // indirect
+	gopkg.in/mattn/go-runewidth.v0 v0.0.3 // indirect
 	honnef.co/go/js/dom v0.0.0-20181202134054-9dbdcd412bde // indirect
 	myitcv.io v0.0.0-20190122100129-e0d07439eb38 // indirect
 )

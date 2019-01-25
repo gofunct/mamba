@@ -21,6 +21,7 @@
 package cmd
 
 import (
+	"github.com/gofunct/mamba/mamba/cmd/contain"
 	"github.com/gofunct/mamba/pkg/function"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -77,5 +78,8 @@ func init() {
 		rootCmd.AddCommand(testCmd)
 		rootCmd.AddCommand(walkCmd)
 		rootCmd.AddCommand(htmlCmd)
+		rootCmd.AddCommand(loadCmd)
+		rootCmd.AddCommand(contain.RootCmd)
+		rootCmd.AddCommand(treeCmd)
 	}
 }
