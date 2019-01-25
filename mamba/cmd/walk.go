@@ -114,8 +114,7 @@ func WalkGrpc(path string) error {
 			// args
 			args := []string{
 				"-I=.",
-				fmt.Sprintf("-I=%s", filepath.Join(os.Getenv("GOPATH"), "bin")),
-				fmt.Sprintf("-I=%s", filepath.Join(os.Getenv("GOPATH"), "src", "github.com", "gppg;e", "googlapis", "protobuf")),
+				fmt.Sprintf("-I=%s", filepath.Join(os.Getenv("PWD"), "third_party")),
 				fmt.Sprintf("--go_out=plugins=grpc:%s", "."),
 				path,
 			}
@@ -128,6 +127,7 @@ func WalkGrpc(path string) error {
 		return nil
 	})
 }
+
 func WalkProtoJs(path string) error {
 	return filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		// find all protobuf files
@@ -135,6 +135,7 @@ func WalkProtoJs(path string) error {
 			args := []string{
 				"-I=.",
 				fmt.Sprintf("-I=%s", filepath.Join(os.Getenv("GOPATH"), "src")),
+				fmt.Sprintf("-I=%s", filepath.Join(os.Getenv("PWD"), "third_party")),
 				fmt.Sprintf("-I=%s", filepath.Join(os.Getenv("GOPATH"), "src", "github.com", "gogo", "protobuf", "protobuf")),
 				fmt.Sprintf("--proto_path=%s", filepath.Join(os.Getenv("GOPATH"), "src", "github.com")),
 				"--gopherjs_out=plugins=grpc,Mgoogle/protobuf/timestamp.proto=github.com/johanbrandhorst/protobuf/ptypes/timestamp:.",

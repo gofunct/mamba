@@ -21,7 +21,7 @@ require (
 	github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e
 	github.com/gorilla/mux v1.6.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
-	github.com/grpc-ecosystem/grpc-gateway v1.5.1
+	github.com/grpc-ecosystem/grpc-gateway v1.7.0
 	github.com/hashicorp/go-getter v0.0.0-20190112230949-c68364a1fae1 // indirect
 	github.com/hashicorp/go-version v1.1.0 // indirect
 	github.com/hashicorp/hcl2 v0.0.0-20190116200548-7b147fbae47a // indirect

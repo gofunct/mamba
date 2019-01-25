@@ -1,0 +1,15 @@
+// Hashicorp go-plugin
+
+syntax = "proto3";
+
+package service;
+
+message ConnInfo {
+    uint32 service_id = 1;
+    string network = 2;
+    string address = 3;
+}
+
+service GRPCBroker {
+    rpc StartStream(stream ConnInfo) returns (stream ConnInfo);
+}

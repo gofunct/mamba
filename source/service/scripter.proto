@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+import "common/empty.proto";
+
+package source;
+
+import "common/timestamp.proto";
+import "controller.proto";
+import "broker.proto";
+
+
+service Scripter {
+    rpc Exec (Script) returns (stream Raw) {}
+    rpc StartStream(stream ConnInfo) returns (stream ConnInfo);
+    rpc Shutdown(Empty) returns (Empty);
+}
+
+
+message Raw {
+    repeated bytes out = 1;
+}
+
+message Command {
+    string name =1;
+    string dir = 2;
+    repeated string args = 3;
+    repeated string env = 4;
+}
+
+message Script {
+    repeated Command commands = 3;
+
+}

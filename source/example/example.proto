@@ -1,0 +1,98 @@
+syntax="proto3";
+
+// GoGo gRPC Example
+//
+// This example is used to show how to use gRPC and
+// gRPC-Gateway with GoGo Protobuf.
+package example;
+
+import "common/empty.proto";
+import "common/timestamp.proto";
+import "common/duration.proto";
+import "common/field_mask.proto";
+import "source/http.proto";
+import "source/annotations.proto";
+import "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options/annotations.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "source/validate.proto";
+
+
+// Enable custom Marshal method.
+option (gogoproto.marshaler_all) = true;
+// Enable custom Unmarshal method.
+option (gogoproto.unmarshaler_all) = true;
+// Enable custom Size method (Required by Marshal and Unmarshal).
+option (gogoproto.sizer_all) = true;
+// Enable registration with golang/protobuf for the grpc-gateway.
+option (gogoproto.goproto_registration) = true;
+// Enable generation of XXX_MessageName methods for grpc-go/status.
+option (gogoproto.messagename_all) = true;
+
+service UserService {
+    rpc AddUser(User) returns (common.Empty) {
+        option (source.http) = {
+            post: "/api/v1/users"
+            body: "*"
+        };
+    }
+    rpc ListUsers(ListUsersRequest) returns (stream User) {
+        option (source.http) = {
+            get: "/api/v1/users"
+        };
+    }
+    rpc ListUsersByRole(UserRole) returns (stream User) {
+        option (source.http) = {
+            get: "/api/v1/users/role"
+        };
+    }
+    rpc UpdateUser(UpdateUserRequest) returns (User) {
+        option (source.http) = {
+            patch: "/api/v1/users/{user.id}"
+            body: "user"
+        };
+    }
+}
+
+enum Role {
+    GUEST = 0;
+    MEMBER = 1;
+    ADMIN = 2;
+}
+
+message User {
+    uint32 id = 1 [
+                  (gogoproto.customname) = "ID",
+                  (validate.field) = {
+            int_gt: 0
+            human_error: "ID must a positive integer"
+        }
+                  ];
+    Role role = 2;
+    common.Timestamp create_date = 3 [
+                                              (gogoproto.stdtime) = true
+                                              ];
+}
+
+message UserRole {
+    Role role = 1;
+}
+
+message UpdateUserRequest {
+    // The user resource which replaces the resource on the server.
+    User user = 1;
+
+    // The update mask applies to the resource. For the `FieldMask` definition,
+    // see https://developers.google.com/protocol-buffers/docs/reference/common#fieldmask
+    common.FieldMask update_mask = 2;
+}
+
+message ListUsersRequest {
+    // Only list users created after this timestamp
+    common.Timestamp created_since = 1 [
+                                                (gogoproto.stdtime) = true
+                                                ];
+    // Only list users older than this Duration
+    common.Duration older_than = 2 [
+                                            (gogoproto.stdduration) = true
+                                            ];
+}
