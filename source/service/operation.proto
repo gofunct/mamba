@@ -18,7 +18,7 @@ package service;
 
 import "source/annotations.proto";
 import "log_entry.proto";
-import "metric_value.proto";
+import "metric.proto";
 import "google/protobuf/timestamp.proto";
 
 option cc_enable_arenas = true;

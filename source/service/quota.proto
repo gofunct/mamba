@@ -17,7 +17,7 @@ syntax = "proto3";
 package service;
 
 import "source/annotations.proto";
-import "metric_value.proto";
+import "metric.proto";
 
 option cc_enable_arenas = true;
 option go_package = "google.golang.org/genproto/googleapis/api/servicecontrol/v1;servicecontrol";

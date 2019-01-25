@@ -15,7 +15,7 @@
 
 syntax = "proto3";
 
-package google.logging.type;
+package service;
 
 import "google/api/annotations.proto";
 

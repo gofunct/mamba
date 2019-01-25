@@ -17,7 +17,7 @@ syntax = "proto3";
 package service;
 
 import "source/annotations.proto";
-import "distribution.proto";
+import "distro.proto";
 import "google/protobuf/timestamp.proto";
 import "google/type/money.proto";
 

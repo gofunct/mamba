@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "common/empty.proto";
 
-package source;
+package service;
 
 import "common/timestamp.proto";
 import "controller.proto";
