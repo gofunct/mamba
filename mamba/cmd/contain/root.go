@@ -21,14 +21,20 @@
 package contain
 
 import (
-	"github.com/sirupsen/logrus"
+	"github.com/fsouza/go-dockerclient"
+	"github.com/gofunct/mamba/pkg/input"
+	"github.com/prometheus/common/log"
 	"github.com/spf13/cobra"
 )
 
 var (
-	logger   *logrus.Logger
-	endpoint string
-	RootCmd  = &cobra.Command{
+	endpoint, containerName, imageName, repoName string
+	shell                                        []string
+	ports                                        = make(map[docker.Port]struct{})
+	client                                       *docker.Client
+	ui                                           *input.UI
+
+	RootCmd = &cobra.Command{
 		Use: "contain",
 	}
 )
@@ -36,13 +42,23 @@ var (
 // Execute executes the root command.
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
-		logger.Fatalf("failed to execute:%s/n", err)
+		log.Fatalf("failed to execute:%s/n", err)
 	}
 }
 
 func init() {
+	var err error
 	cobra.OnInitialize(
-		func() { logger = logrus.New() },
+		func() {
+			client, err = docker.NewClient(endpoint)
+			if err != nil {
+				log.Fatalln("failed to setup docker client", err.Error())
+
+			}
+		},
+		func() {
+			ui = input.DefaultUI()
+		},
 	)
 
 	{
@@ -55,8 +71,13 @@ func init() {
 		RootCmd.AddCommand(pullCmd)
 		RootCmd.AddCommand(pullCmd)
 		RootCmd.AddCommand(storeCmd)
+		RootCmd.AddCommand(inspectCmd)
 	}
 	{
+		RootCmd.PersistentFlags().StringSliceVar(&shell, "shell", []string{"echo", "hello world"}, "inter-container commands")
+		RootCmd.PersistentFlags().StringVar(&repoName, "repo", "", "repo name")
+		RootCmd.PersistentFlags().StringVar(&imageName, "image", "", "image name")
+		RootCmd.PersistentFlags().StringVar(&containerName, "container", "", "container name")
 		RootCmd.PersistentFlags().StringVar(&endpoint, "endpoint", "unix:///var/run/docker.sock", "endpoint for docker client to connect to")
 	}
 }

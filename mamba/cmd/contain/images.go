@@ -30,10 +30,6 @@ func init() {
 var imgCmd = &cobra.Command{
 	Use: "images",
 	Run: func(cmd *cobra.Command, args []string) {
-		client, err := docker.NewClient(endpoint)
-		if err != nil {
-			panic(err)
-		}
 		imgs, err := client.ListImages(docker.ListImagesOptions{All: false})
 		if err != nil {
 			panic(err)

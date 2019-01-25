@@ -15,15 +15,34 @@
 package contain
 
 import (
-	"fmt"
-
+	"github.com/fsouza/go-dockerclient"
 	"github.com/spf13/cobra"
+	"log"
 )
 
 // pullCmd represents the pull command
 var pullCmd = &cobra.Command{
-	Use: "pull",
+	Use:   "pull",
+	Short: "mamba contain pull --image busybox --repo busybox",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("pull called")
+		if err := client.PullImage(docker.PullImageOptions{Repository: repoName}, docker.AuthConfiguration{}); err != nil {
+			log.Fatal(err.Error())
+		}
+		ports["8080/tcp"] = struct{}{}
+		config := docker.Config{
+			ExposedPorts: ports,
+			Env:          nil,
+			Cmd:          shell,
+			Image:        imageName,
+		}
+		opts := docker.CreateContainerOptions{Name: containerName, Config: &config}
+		if cont, err := client.CreateContainer(opts); err != nil {
+			log.Fatalln(err.Error())
+		} else {
+			if err := client.StartContainer(cont.ID, &docker.HostConfig{}); err != nil {
+				log.Fatalln(err.Error())
+			}
+		}
+
 	},
 }

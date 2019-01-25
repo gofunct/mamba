@@ -40,6 +40,7 @@ require (
 	github.com/neelance/astrewrite v0.0.0-20160511093645-99348263ae86 // indirect
 	github.com/neelance/sourcemap v0.0.0-20151028013722-8c68805598ab // indirect
 	github.com/oklog/oklog v0.3.2
+	github.com/openfaas-incubator/of-watchdog v0.0.0-20181230134825-d66c16559e2b
 	github.com/pkg/errors v0.8.1
 	github.com/prometheus/client_golang v0.9.0
 	github.com/prometheus/common v0.0.0-20181015124227-bcb74de08d37
