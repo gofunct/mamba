@@ -1,15 +1,15 @@
-install:
-	go fmt ./...
-	go vet ./...
-	go install ./...
-
+.PHONY: build
 build:
-	go generate
-	rm -rf examples/*
-	cd examples && mamba init && go install
+	bash build.sh
 
-js:
-	cd proto; mamba walk js
+.PHONY: push
+push: build test
+	 bash push.sh
 
-grpc:
-	cd proto; mamba walk grpc
+.PHONY: push-latest
+push-latest:
+	bash push.sh true
+
+.PHONY: tag-latest
+tag-latest:
+	bash build.sh true

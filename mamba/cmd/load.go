@@ -32,7 +32,6 @@ var loadCmd = &cobra.Command{
 	Use:   "load",
 	Short: "download files from remote or local sources",
 	Run: func(cmd *cobra.Command, args []string) {
-		// Get the mode
 		var mode = getter.ClientModeAny
 
 		// Get the pwd

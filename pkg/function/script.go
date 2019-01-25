@@ -111,7 +111,7 @@ func (s *Scripter) Unmarshal(object interface{}) InitFunc {
 	}
 }
 
-func (s *Scripter) AddConfigPaths(path ...string) InitFunc {
+func AddConfigPaths(path ...string) InitFunc {
 	return func() {
 		for _, p := range path {
 			v.AddConfigPath(p)

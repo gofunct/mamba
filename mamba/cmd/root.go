@@ -30,6 +30,7 @@ import (
 )
 
 var (
+
 	// Used for flags.
 	cfgFile, userLicense, in, out, pkg string
 	logger                             *logrus.Logger
@@ -51,7 +52,6 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(
-		func() { logger = logrus.New() },
 		function.InitConfig(cfgFile),
 	)
 	{
@@ -81,5 +81,14 @@ func init() {
 		rootCmd.AddCommand(loadCmd)
 		rootCmd.AddCommand(contain.RootCmd)
 		rootCmd.AddCommand(ctl.RootCmd)
+	}
+}
+
+func AddConfigPaths(path ...string) func() {
+
+	return func() {
+		for _, p := range path {
+			viper.AddConfigPath(p)
+		}
 	}
 }
