@@ -73,5 +73,8 @@ require (
 	gopkg.in/mattn/go-isatty.v0 v0.0.4 // indirect
 	gopkg.in/mattn/go-runewidth.v0 v0.0.3 // indirect
 	honnef.co/go/js/dom v0.0.0-20181202134054-9dbdcd412bde // indirect
+	k8s.io/api v0.0.0-20181221193117-173ce66c1e39
+	k8s.io/apimachinery v0.0.0-20181227073029-9c4c36654334
+	k8s.io/client-go v10.0.0+incompatible
 	myitcv.io v0.0.0-20190122100129-e0d07439eb38 // indirect
 )
