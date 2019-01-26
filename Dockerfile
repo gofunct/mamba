@@ -1,117 +1,50 @@
-ARG alpine=3.8
-ARG go=1.11.0
-ARG grpc
-ARG grpc_java
-
-FROM golang:$go-alpine$alpine AS build
-
-# TIL docker arg variables need to be redefined in each build stage
-ARG grpc
-ARG grpc_java
+FROM golang:1.11-alpine3.7
 
 RUN set -ex && apk --update --no-cache add \
-    bash \
-    make \
-    cmake \
-    autoconf \
-    automake \
-    curl \
-    tar \
-    libtool \
-    g++ \
-    git \
-    openjdk8-jre \
-    libstdc++ \
-    ca-certificates
+        bash \
+        make \
+        cmake \
+        autoconf \
+        automake \
+        curl \
+        tar \
+        libtool \
+        g++ \
+        git \
+        openjdk8-jre \
+        libstdc++ \
+        ca-certificates \
+        jq \
+        grep \
+        gettext \
+        ca-certificates
 
-WORKDIR /tmp
-COPY hack/install-protobuf.sh /tmp
-RUN chmod +x /tmp/install-protobuf.sh
-RUN /tmp/install-protobuf.sh ${grpc} ${grpc_java}
-RUN git clone https://github.com/googleapis/googleapis
+RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && \
+    mv kubectl /usr/local/bin
+RUN go get github.com/gofunct/mamba/...
+WORKDIR /go/bin
+RUN mamba load https://kubernetes-helm.storage.googleapis.com/helm-canary-linux-amd64.tar.gz /usr/local/bin
+RUN mamba load github.com/googleapis/googleapis//google .
+RUN mamba load google.golang.org/grpc .
 
-RUN curl -sSL https://github.com/uber/prototool/releases/download/v1.3.0/prototool-$(uname -s)-$(uname -m) \
-    -o /usr/local/bin/prototool && \
-    chmod +x /usr/local/bin/prototool
+## Binaries
+RUN mamba load github.com/spf13/cobra/... .
+RUN mamba load github.com/kisielk/errcheck .
+RUN mamba load https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.zip .
+RUN mamba load golang.org/x/tools/cmd/goimports .
+RUN mamba load github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway .
+RUN mamba load github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger .
+RUN mamba load github.com/golang/protobuf/protoc-gen-go .
+RUN mamba load github.com/gogo/protobuf/protoc-gen-gogo .
+RUN mamba load github.com/gogo/protobuf/protoc-gen-gogofast .
+RUN mamba load github.com/gogo/protobuf/protoc-gen-gogoslick .
+RUN mamba load https://releases.hashicorp.com/terraform/0.11.11/terraform_0.11.11_linux_amd64.zip .
+RUN mamba load github.com/ckaznocha/protoc-gen-lint .
+RUN mamba load github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc .
+RUN mamba load https://github.com/grpc/grpc-web/releases/download/1.0.3/protoc-gen-grpc-web-1.0.3-linux-x86_64 .
+RUN chmod +x /usr/local/bin/*
+RUN chmod +x /go/bin/bin/*
 
-
-# Go get go-related bins
-RUN go get github.com/hashicorp/go-getter
-RUN go install github.com/hashicorp/go-getter/cmd/go-getter
-RUN go-getter https://releases.hashicorp.com/terraform/0.11.11/terraform_0.11.11_linux_amd64.zip /usr/local/bin/terraform && \
-        chmod +x /usr/local/bin/terraform
-RUN go-getter https://github.com/gofunct/mamba.git /usr/local/bin/
-
-RUN go get -u google.golang.org/grpc && \
-    chmod +x /usr/local/bin/mamba
-
-RUN go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
-RUN go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
-RUN go get -u github.com/golang/protobuf/protoc-gen-go
-
-RUN go get -u github.com/gogo/protobuf/protoc-gen-gogo
-RUN go get -u github.com/gogo/protobuf/protoc-gen-gogofast
-RUN go get -u github.com/gogo/protobuf/protoc-gen-gogoslick
-
-
-RUN go get -u github.com/ckaznocha/protoc-gen-lint
-RUN go get -u github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc
-
-# Add grpc-web support
-
-RUN curl -sSL https://github.com/grpc/grpc-web/releases/download/1.0.3/protoc-gen-grpc-web-1.0.3-linux-x86_64 \
-    -o /tmp/grpc_web_plugin && \
-    chmod +x /tmp/grpc_web_plugin
-
-FROM alpine:$alpine AS protoc-all
-
-RUN set -ex && apk --update --no-cache add \
-    bash \
-    libstdc++ \
-    libc6-compat \
-    ca-certificates
-
-COPY --from=build /tmp/grpc/bins/opt/grpc_* /usr/local/bin/
-COPY --from=build /tmp/grpc/bins/opt/protobuf/protoc /usr/local/bin/
-COPY --from=build /tmp/grpc/libs/opt/ /usr/local/lib/
-COPY --from=build /tmp/grpc-java/compiler/build/exe/java_plugin/protoc-gen-grpc-java /usr/local/bin/
-COPY --from=build /tmp/googleapis/google/ /usr/local/include/google
-COPY --from=build /usr/local/include/google/ /usr/local/include/google
-COPY --from=build /usr/local/bin/prototool /usr/local/bin/prototool
-COPY --from=build /go/bin/* /usr/local/bin/
-COPY --from=build /tmp/grpc_web_plugin /usr/local/bin/grpc_web_plugin
-
-COPY --from=build /go/src/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options/ /usr/local/include/protoc-gen-swagger/options/
-
-ADD hack/entrypoint.sh /usr/local/bin
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
-WORKDIR /defs
-ENTRYPOINT [ "entrypoint.sh" ]
-
-# protoc
-FROM protoc-all AS protoc
-ENTRYPOINT [ "protoc", "-I/usr/local/include" ]
-
-# prototool
-FROM protoc-all AS prototool
-ENTRYPOINT [ "prototool" ]
-
-# grpc-cli
-FROM protoc-all as grpc-cli
-
-ADD ./hack/cli_entrypoint.sh /cli_entrypoint.sh
-RUN chmod +x /cli_entrypoint.sh
-
-WORKDIR /run
-ENTRYPOINT [ "/cli_entrypoint.sh" ]
-
-# gen-grpc-gateway
-FROM protoc-all AS gen-grpc-gateway
-
-COPY templates /templates
-COPY hack/generate_gateway.sh /usr/local/bin
-RUN chmod +x /usr/local/bin/generate_gateway.sh
-
-WORKDIR /defs
-ENTRYPOINT [ "generate_gateway.sh" ]
+WORKDIR /mamba
+COPY . .
+RUN go install ./...

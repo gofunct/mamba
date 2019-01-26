@@ -22,8 +22,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/gofunct/mamba/pkg/function"
-	"github.com/gofunct/mamba/pkg/generator"
+	"github.com/gofunct/mamba/runtime/function"
 	"github.com/pkg/errors"
 	"github.com/shiyanhui/hero"
 	"github.com/spf13/cobra"
@@ -35,17 +34,7 @@ import (
 )
 
 func init() {
-	walkCmd.AddCommand(protoGenCmd, goGoCmd, grpcCmd, htmlCmd, jsCmd)
-}
-
-// protocGenCmd represents the protocGen command
-var protoGenCmd = &cobra.Command{
-	Use:   "protocGen",
-	Short: "🐍 Compile templates as a protoc plugin",
-	Run: func(cmd *cobra.Command, args []string) {
-		var g = generator.NewGenerator()
-		g.Generate(in, out)
-	},
+	walkCmd.AddCommand(goGoCmd, grpcCmd, htmlCmd, jsCmd)
 }
 
 // protocCmd represents the protoc command

@@ -19,7 +19,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/fsouza/go-dockerclient"
-	"github.com/gofunct/mamba/pkg/logging"
+	"github.com/gofunct/mamba/runtime/logging"
 	"github.com/pkg/errors"
 	"time"
 

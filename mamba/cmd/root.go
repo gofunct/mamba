@@ -23,7 +23,7 @@ package cmd
 import (
 	"github.com/gofunct/mamba/mamba/cmd/contain"
 	"github.com/gofunct/mamba/mamba/cmd/ctl"
-	"github.com/gofunct/mamba/pkg/function"
+	"github.com/gofunct/mamba/runtime/function"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

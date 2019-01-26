@@ -23,8 +23,8 @@ package cmd
 import (
 	"bytes"
 	"fmt"
-	"github.com/gofunct/mamba/pkg/input"
-	"github.com/gofunct/mamba/pkg/logging"
+	"github.com/gofunct/mamba/runtime/input"
+	"github.com/gofunct/mamba/runtime/logging"
 	"github.com/spf13/viper"
 	"io"
 	"os"

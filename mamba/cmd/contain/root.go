@@ -22,7 +22,7 @@ package contain
 
 import (
 	"github.com/fsouza/go-dockerclient"
-	"github.com/gofunct/mamba/pkg/input"
+	"github.com/gofunct/mamba/runtime/input"
 	"github.com/prometheus/common/log"
 	"github.com/spf13/cobra"
 )

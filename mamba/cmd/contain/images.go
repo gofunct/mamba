@@ -16,7 +16,7 @@ package contain
 
 import (
 	"github.com/fsouza/go-dockerclient"
-	"github.com/gofunct/mamba/pkg/encode"
+	"github.com/gofunct/mamba/runtime/encode"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/common/log"
 	"github.com/spf13/cobra"

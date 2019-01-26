@@ -2,16 +2,15 @@ package contain
 
 import (
 	"bytes"
-	"context"
-	"github.com/gofunct/mamba"
-	"github.com/gofunct/mamba/pkg/function"
-	"github.com/gofunct/mamba/pkg/logging"
+	"github.com/gofunct/mamba/runtime/function"
+	"github.com/gofunct/mamba/runtime/logging"
 	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
 	"os"
 )
 
-func RunDgraph() mamba.MambaFunc {
-	return func(cmd *mamba.Command, ctx context.Context) {
+func RunDgraph() func(cmd *cobra.Command, args []string) {
+	return func(cmd *cobra.Command, args []string) {
 		var b []byte
 		logging.L.Debug("pulling dgraph docker image...\n")
 		pull, err := function.RunBytes("docker", "pull", "dgraph/dgraph")
