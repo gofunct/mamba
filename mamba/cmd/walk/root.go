@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package load
+package walk
 
 import (
 	"os"
@@ -22,15 +22,19 @@ import (
 )
 
 var (
-	lConfig string
+	wConfig, in, out, pkg string
 )
 
-// deployCmd represents the deploy command
+// protocCmd represents the protoc command
 var RootCmd = &cobra.Command{
-	Use: "load",
+	Use:   "walk",
+	Short: "🐍 Walk a filepath with a given function and file extension",
 }
 
 func init() {
-	RootCmd.AddCommand(loadCmd)
-	RootCmd.PersistentFlags().StringVar(&lConfig, "config", filepath.Join(os.Getenv("PWD"), "config", "load.yaml"), "load config path")
+	RootCmd.AddCommand(htmlCmd, goGoCmd, grpcCmd, jsCmd)
+	RootCmd.PersistentFlags().StringVar(&wConfig, "config", filepath.Join(os.Getenv("PWD"), "config", "walk.yaml"), "walk config path")
+	RootCmd.PersistentFlags().StringVarP(&in, "input", "i", ".", "input dir")
+	RootCmd.PersistentFlags().StringVarP(&out, "output", "o", ".", "output dir")
+	RootCmd.PersistentFlags().StringVarP(&pkg, "package", "p", "", "package name")
 }

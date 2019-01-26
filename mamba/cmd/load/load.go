@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cmd
+package load
 
 import (
 	"context"
@@ -29,8 +29,7 @@ import (
 
 // getCmd represents the get command
 var loadCmd = &cobra.Command{
-	Use:   "load",
-	Short: "download files from remote or local sources",
+	Use: "once",
 	Run: func(cmd *cobra.Command, args []string) {
 		var mode = getter.ClientModeAny
 

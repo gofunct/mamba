@@ -23,8 +23,9 @@ package cmd
 import (
 	"github.com/gofunct/mamba/mamba/cmd/contain"
 	"github.com/gofunct/mamba/mamba/cmd/ctl"
-	"github.com/gofunct/mamba/runtime/function"
-	"github.com/sirupsen/logrus"
+	"github.com/gofunct/mamba/mamba/cmd/load"
+	"github.com/gofunct/mamba/mamba/cmd/walk"
+	"github.com/prometheus/common/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -33,7 +34,6 @@ var (
 
 	// Used for flags.
 	cfgFile, userLicense, in, out, pkg string
-	logger                             *logrus.Logger
 	rootCmd                            = &cobra.Command{
 		Use:   "mamba",
 		Short: "A generator for Mamba based Applications 🐍",
@@ -46,14 +46,12 @@ to quickly create a Mamba application.`,
 // Execute executes the root command.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		logger.Fatalf("failed to execute:%s/n", err)
+		log.Fatalf("failed to execute:%s/n", err)
 	}
 }
 
 func init() {
-	cobra.OnInitialize(
-		function.InitConfig(cfgFile),
-	)
+	cobra.OnInitialize()
 	{
 		rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
 		rootCmd.PersistentFlags().StringP("author", "a", "YOUR NAME", "author name for copyright attribution")
@@ -76,9 +74,8 @@ func init() {
 	{
 		rootCmd.AddCommand(addCmd)
 		rootCmd.AddCommand(initCmd)
-		rootCmd.AddCommand(walkCmd)
-		rootCmd.AddCommand(htmlCmd)
-		rootCmd.AddCommand(loadCmd)
+		rootCmd.AddCommand(walk.RootCmd)
+		rootCmd.AddCommand(load.RootCmd)
 		rootCmd.AddCommand(contain.RootCmd)
 		rootCmd.AddCommand(ctl.RootCmd)
 	}

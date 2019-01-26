@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/prometheus/common/log"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 	"net"
@@ -37,7 +38,7 @@ var serveCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", port))
 		if err != nil {
-			logger.Fatalf("failed to listen: %v", err)
+			log.Fatalf("failed to listen: %v", err)
 		}
 		var opts []grpc.ServerOption
 

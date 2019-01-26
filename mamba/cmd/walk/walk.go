@@ -18,24 +18,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package cmd
+package walk
 
 import (
 	"fmt"
 	"github.com/gofunct/mamba/runtime/function"
 	"github.com/pkg/errors"
+	"github.com/prometheus/common/log"
 	"github.com/shiyanhui/hero"
 	"github.com/spf13/cobra"
 	"io"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 )
-
-func init() {
-	walkCmd.AddCommand(goGoCmd, grpcCmd, htmlCmd, jsCmd)
-}
 
 // protocCmd represents the protoc command
 var goGoCmd = &cobra.Command{
@@ -43,7 +39,7 @@ var goGoCmd = &cobra.Command{
 	Short: "🐍 Compile gogo protobuf stubs",
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := WalkGoGoProto(in); err != nil {
-			logger.Fatalf("%s", errors.WithStack(err))
+			log.Fatalf("%s", errors.WithStack(err))
 		}
 	},
 }
@@ -54,7 +50,7 @@ var grpcCmd = &cobra.Command{
 	Short: "🐍 Compile grpc protobuf stubs",
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := WalkGrpc(in); err != nil {
-			logger.Fatalf("%s", errors.WithStack(err))
+			log.Fatalf("%s", errors.WithStack(err))
 		}
 	},
 }
@@ -65,15 +61,9 @@ var jsCmd = &cobra.Command{
 	Short: "🐍 Compile grpc javascript protobuf stubs",
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := WalkProtoJs(in); err != nil {
-			logger.Fatalf("%s", errors.WithStack(err))
+			log.Fatalf("%s", errors.WithStack(err))
 		}
 	},
-}
-
-// protocCmd represents the protoc command
-var walkCmd = &cobra.Command{
-	Use:   "walk",
-	Short: "🐍 Walk a filepath with a given function and file extension",
 }
 
 var htmlCmd = &cobra.Command{
