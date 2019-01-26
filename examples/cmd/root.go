@@ -17,7 +17,7 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/gofunct/mamba"
+	"github.com/gofunct/mamba/runtime"
 	"github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
@@ -32,7 +32,7 @@ var (
 	ctx context.Context
 )
 
-var root = &mamba.Command{
+var root = &runtime.Command{
 	Version: "v0.1.1",
 	// You will be prompted to set these environmental variables if they are not found
 	Dependencies: []string{"MAMBA_PORT"},
@@ -63,7 +63,7 @@ var root = &mamba.Command{
 		),
 	},
 	// PostRun runs after the server has shutdown successfully
-	PostRun: func(svc *mamba.Command, ctx context.Context) {
+	PostRun: func(svc *runtime.Command, ctx context.Context) {
 		fmt.Println("server shutdown successfully!")
 	},
 }
