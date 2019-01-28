@@ -23,14 +23,13 @@ package runtime
 import (
 	"context"
 	"fmt"
-	"github.com/gofunct/mamba/runtime/input"
-	"github.com/gofunct/mamba/runtime/logging"
+	"github.com/gofunct/common/pkg/input"
+	"github.com/gofunct/common/pkg/logger"
 	"github.com/gorilla/mux"
 	"github.com/oklog/oklog/pkg/group"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/log"
-	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"io"
 	"io/ioutil"
@@ -43,7 +42,6 @@ import (
 )
 
 func init() {
-	logger = logging.NewLogCtx(logrus.New())
 	query = input.DefaultUI()
 	for _, x := range initializers {
 		x()
@@ -52,7 +50,6 @@ func init() {
 
 var (
 	g            group.Group
-	logger       *logging.CtxLogger
 	query        *input.UI
 	initializers []func()
 )

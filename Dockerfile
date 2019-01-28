@@ -48,3 +48,4 @@ RUN chmod +x /go/bin/bin/*
 WORKDIR /mamba
 COPY . .
 RUN go install ./...
+

@@ -2,8 +2,8 @@ package runtime
 
 import (
 	"fmt"
-	"github.com/gofunct/mamba/runtime/input"
-	"github.com/gofunct/mamba/runtime/logging"
+	"github.com/gofunct/common/pkg/input"
+	"github.com/gofunct/common/pkg/logger"
 	"github.com/spf13/viper"
 	"os"
 	"strings"
@@ -33,7 +33,7 @@ func (m *Command) GetString(s string) string {
 	if res, err := query.Ask(q); res != "" && err == nil {
 		return res
 	} else {
-		logging.L.Fatalf("%s failed to retrieve value for: %s\n%s", s, err.Error())
+		logger.LogF("failed to retrieve value for: %s\n%s", err)
 	}
 	return ""
 }
