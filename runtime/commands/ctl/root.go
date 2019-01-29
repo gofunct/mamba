@@ -29,6 +29,7 @@ var (
 // deployCmd represents the deploy command
 var RootCmd = &cobra.Command{
 	Use: "ctl",
+	Short: "🐍 A Kubernetes development utility",
 }
 
 func init() {

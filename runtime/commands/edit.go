@@ -39,7 +39,7 @@ type DefaultFlags struct {
 // editCmd represents the edit command
 var editCmd = &cobra.Command{
 	Use:   "edit",
-	Short: "A brief description of your command",
+	Short: "🐍 A edit templates for protoc output",
 	Run: func(cmd *cobra.Command, args []string) {
 		r := mux.NewRouter()
 

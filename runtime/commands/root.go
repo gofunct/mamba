@@ -18,7 +18,7 @@ import (
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "mamba",
-	Short: "A snake powered boilerplate generator",
+	Short: "🐍 A snake powered boilerplate generator",
 }
 
 // Run adds all child commands to the root command sets flags appropriately.

@@ -24,7 +24,7 @@ import (
 // scriptCmd represents the script command
 var scriptCmd = &cobra.Command{
 	Use:   "script",
-	Short: "A brief description of your command",
+	Short: "🐍 One line golang scripts",
 
 	RunE: func(cmd *cobra.Command, args []string) error {
 		mux := mux2.NewRouter()
