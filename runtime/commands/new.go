@@ -13,7 +13,6 @@ import (
 	"github.com/gofunct/mamba/runtime/generator"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // newCmd represents the new command
@@ -26,7 +25,7 @@ such as the host, port, etc., if you have saved it before.
 Otherwise, the default settings will be used.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg := new(config.Config)
-		if err := viper.Unmarshal(&cfg); err != nil {
+		if err := V.Unmarshal(&cfg); err != nil {
 			fmt.Println("Error parsing of configuration, used default:", err)
 		}
 		if !path.IsAbs(cfg.Directories.Templates) {
@@ -51,9 +50,9 @@ func init() {
 	RootCmd.PersistentFlags().String("github", "my-account", "A Github account name")
 	RootCmd.PersistentFlags().Bool("git-init", false, "Initialize repository with git")
 	RootCmd.PersistentFlags().Bool("contract-example", false, "A example of contract API using")
-	zap.LogF("Flag error", viper.BindPFlag("name", newCmd.PersistentFlags().Lookup("name")))
-	zap.LogF("Flag error", viper.BindPFlag("description", newCmd.PersistentFlags().Lookup("description")))
-	zap.LogF("Flag error", viper.BindPFlag("github", RootCmd.PersistentFlags().Lookup("github")))
-	zap.LogF("Flag error", viper.BindPFlag("gitinit", RootCmd.PersistentFlags().Lookup("git-init")))
-	zap.LogF("Flag error", viper.BindPFlag("contract", RootCmd.PersistentFlags().Lookup("contract-example")))
+	zap.LogF("Flag error", V.BindPFlag("name", newCmd.PersistentFlags().Lookup("name")))
+	zap.LogF("Flag error", V.BindPFlag("description", newCmd.PersistentFlags().Lookup("description")))
+	zap.LogF("Flag error", V.BindPFlag("github", RootCmd.PersistentFlags().Lookup("github")))
+	zap.LogF("Flag error", V.BindPFlag("gitinit", RootCmd.PersistentFlags().Lookup("git-init")))
+	zap.LogF("Flag error", V.BindPFlag("contract", RootCmd.PersistentFlags().Lookup("contract-example")))
 }

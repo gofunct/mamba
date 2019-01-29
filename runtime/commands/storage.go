@@ -9,7 +9,6 @@ import (
 
 	"github.com/gofunct/common/pkg/config"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // storageCmd represents the storage command
@@ -17,31 +16,31 @@ var storageCmd = &cobra.Command{
 	Use:   "storage",
 	Short: "Setup your storage modules",
 	Run: func(cmd *cobra.Command, args []string) {
-		if viper.GetBool("storage.postgres") || viper.GetBool("storage.mysql") {
-			viper.Set("storage.enabled", true)
-			if viper.GetBool("storage.postgres") {
-				viper.Set("storage.mysql", false)
+		if V.GetBool("storage.postgres") || V.GetBool("storage.mysql") {
+			V.Set("storage.enabled", true)
+			if V.GetBool("storage.postgres") {
+				V.Set("storage.mysql", false)
 			}
-			if viper.GetBool("storage.mysql") &&
-				viper.GetInt("storage.driver.port") == config.DefaultPostgresPort {
-				viper.Set("storage.driver.host", config.StorageMySQL)
-				viper.Set("storage.driver.port", config.DefaultMySQLPort)
-				viper.Set("storage.driver.name", config.StorageMySQL)
-				viper.Set("storage.driver.username", config.StorageMySQL)
-				viper.Set("storage.driver.password", config.StorageMySQL)
+			if V.GetBool("storage.mysql") &&
+				V.GetInt("storage.driver.port") == config.DefaultPostgresPort {
+				V.Set("storage.driver.host", config.StorageMySQL)
+				V.Set("storage.driver.port", config.DefaultMySQLPort)
+				V.Set("storage.driver.name", config.StorageMySQL)
+				V.Set("storage.driver.username", config.StorageMySQL)
+				V.Set("storage.driver.password", config.StorageMySQL)
 			}
-			if viper.GetBool("storage.postgres") &&
-				viper.GetInt("storage.driver.port") == config.DefaultMySQLPort {
-				viper.Set("storage.driver.host", config.StoragePostgres)
-				viper.Set("storage.driver.port", config.DefaultPostgresPort)
-				viper.Set("storage.driver.name", config.StoragePostgres)
-				viper.Set("storage.driver.username", config.StoragePostgres)
-				viper.Set("storage.driver.password", config.StoragePostgres)
+			if V.GetBool("storage.postgres") &&
+				V.GetInt("storage.driver.port") == config.DefaultMySQLPort {
+				V.Set("storage.driver.host", config.StoragePostgres)
+				V.Set("storage.driver.port", config.DefaultPostgresPort)
+				V.Set("storage.driver.name", config.StoragePostgres)
+				V.Set("storage.driver.username", config.StoragePostgres)
+				V.Set("storage.driver.password", config.StoragePostgres)
 			}
 		} else {
-			viper.Set("storage.enabled", false)
+			V.Set("storage.enabled", false)
 		}
-		err := viper.WriteConfig()
+		err := V.WriteConfig()
 		if err != nil {
 			fmt.Println("Error of writing storage configuration:", err)
 		}
@@ -57,14 +56,14 @@ func init() {
 	storageCmd.PersistentFlags().Bool("mysql", false, "A mysql module using")
 	zap.LogF(
 		"Flag error",
-		viper.BindPFlag("storage.enabled", storageCmd.PersistentFlags().Lookup("enabled")),
+		V.BindPFlag("storage.enabled", storageCmd.PersistentFlags().Lookup("enabled")),
 	)
 	zap.LogF(
 		"Flag error",
-		viper.BindPFlag("storage.postgres", storageCmd.PersistentFlags().Lookup("postgres")),
+		V.BindPFlag("storage.postgres", storageCmd.PersistentFlags().Lookup("postgres")),
 	)
 	zap.LogF(
 		"Flag error",
-		viper.BindPFlag("storage.mysql", storageCmd.PersistentFlags().Lookup("mysql")),
+		V.BindPFlag("storage.mysql", storageCmd.PersistentFlags().Lookup("mysql")),
 	)
 }

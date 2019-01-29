@@ -9,7 +9,6 @@ import (
 	"github.com/gofunct/common/pkg/logger/zap"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // apiCmd represents the api command
@@ -17,15 +16,15 @@ var apiCmd = &cobra.Command{
 	Use:   "api",
 	Short: "Select API modules which used in the service",
 	Run: func(cmd *cobra.Command, args []string) {
-		if viper.GetBool("api.rest") || viper.GetBool("api.grpc") {
-			viper.Set("api.enabled", true)
-			if viper.GetBool("api.rest") {
-				viper.Set("api.grpc", true)
+		if V.GetBool("api.rest") || V.GetBool("api.grpc") {
+			V.Set("api.enabled", true)
+			if V.GetBool("api.rest") {
+				V.Set("api.grpc", true)
 			}
 		} else {
-			viper.Set("api.enabled", false)
+			V.Set("api.enabled", false)
 		}
-		err := viper.WriteConfig()
+		err := V.WriteConfig()
 		if err != nil {
 			fmt.Println("Error of writing API configuration:", err)
 		}
@@ -41,14 +40,14 @@ func init() {
 	apiCmd.PersistentFlags().Bool("grpc", false, "A gRPC module using")
 	zap.LogF(
 		"Flag error",
-		viper.BindPFlag("api.enabled", apiCmd.PersistentFlags().Lookup("enabled")),
+		V.BindPFlag("api.enabled", apiCmd.PersistentFlags().Lookup("enabled")),
 	)
 	zap.LogF(
 		"Flag error",
-		viper.BindPFlag("api.gateway", apiCmd.PersistentFlags().Lookup("rest-gateway")),
+		V.BindPFlag("api.gateway", apiCmd.PersistentFlags().Lookup("rest-gateway")),
 	)
 	zap.LogF(
 		"Flag error",
-		viper.BindPFlag("api.grpc", apiCmd.PersistentFlags().Lookup("grpc")),
+		V.BindPFlag("api.grpc", apiCmd.PersistentFlags().Lookup("grpc")),
 	)
 }

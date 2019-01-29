@@ -9,7 +9,6 @@ import (
 	"github.com/gofunct/common/pkg/logger/zap"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // gkeCmd represents the GKE command
@@ -17,7 +16,7 @@ var gkeCmd = &cobra.Command{
 	Use:   "GKE",
 	Short: "Setup Google Kubernetes Engine properties to deploy the service",
 	Run: func(cmd *cobra.Command, args []string) {
-		err := viper.WriteConfig()
+		err := V.WriteConfig()
 		if err != nil {
 			fmt.Println("Error of writing GKE configuration:", err)
 		}
@@ -34,18 +33,18 @@ func init() {
 	gkeCmd.PersistentFlags().String("cluster", "my-cluster-name", "A cluster name in GKE")
 	zap.LogF(
 		"Flag error",
-		viper.BindPFlag("gke.enabled", gkeCmd.PersistentFlags().Lookup("enabled")),
+		V.BindPFlag("gke.enabled", gkeCmd.PersistentFlags().Lookup("enabled")),
 	)
 	zap.LogF(
 		"Flag error",
-		viper.BindPFlag("gke.project", gkeCmd.PersistentFlags().Lookup("project")),
+		V.BindPFlag("gke.project", gkeCmd.PersistentFlags().Lookup("project")),
 	)
 	zap.LogF(
 		"Flag error",
-		viper.BindPFlag("gke.zone", gkeCmd.PersistentFlags().Lookup("zone")),
+		V.BindPFlag("gke.zone", gkeCmd.PersistentFlags().Lookup("zone")),
 	)
 	zap.LogF(
 		"Flag error",
-		viper.BindPFlag("gke.cluster", gkeCmd.PersistentFlags().Lookup("cluster")),
+		V.BindPFlag("gke.cluster", gkeCmd.PersistentFlags().Lookup("cluster")),
 	)
 }

@@ -47,7 +47,7 @@ var editCmd = &cobra.Command{
 		r.HandleFunc("/generate", generate)
 		addr := fmt.Sprintf(":%s", os.Getenv("PORT"))
 		if addr == ":" {
-			addr = ":8080"
+			addr = ":9000"
 		}
 
 		fmt.Printf("Listening on %s...\n", addr)
