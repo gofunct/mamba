@@ -71,6 +71,7 @@ func init() {
 	RootCmd.AddCommand(walk.RootCmd)
 	RootCmd.AddCommand(load.RootCmd)
 	RootCmd.AddCommand(ctl.RootCmd)
+	RootCmd.AddCommand(debugCmd)
 	zap.LogF(
 		"Flag error",
 		V.BindPFlag("directories.templates", RootCmd.PersistentFlags().Lookup("templates")),

@@ -82,15 +82,13 @@ type Config struct {
 }
 
 func init() {
-	defer Update()
-	defer Read()
 	Viper.SetConfigName(FileName)
 	Viper.AllowEmptyEnv(true)
-	Viper.SetConfigType("yaml")
+	Viper.SetConfigType("json")
 	Viper.AddConfigPath(homeDir)
 	Viper.AddConfigPath(".")
 	Viper.AutomaticEnv()
-	zap.LogE("Writing config", viper.SafeWriteConfig())
+	zap.LogE("Writing config", viper.WriteConfig())
 	{
 		Viper.SetDefault("project.name", "default")
 		Viper.SetDefault("project.description", "default")
@@ -146,7 +144,10 @@ func init() {
 	{
 		Viper.SetDefault("config.name", FileName)
 	}
-	zap.LogE("Reading config", Viper.SafeWriteConfig())
+	zap.LogE("updating config", Viper.WriteConfig())
+	zap.LogE("Reading config", Viper.ReadInConfig())
+	zap.LogF("unmarshaling config", Viper.Unmarshal(Configuration))
+	zap.Debug("Current config file-->", "config", Viper.ConfigFileUsed())
 }
 
 func GetConfig() *Config {
@@ -162,18 +163,4 @@ func Annotate(v *viper.Viper) map[string]string {
 		}
 	}
 	return an
-}
-
-func Read() {
-	zap.LogE("Reading config", Viper.ReadInConfig())
-	zap.Debug("Current config file-->", "config", Viper.ConfigFileUsed())
-	zap.LogE("Unmarshalling config", Viper.Unmarshal(Configuration))
-}
-
-func Update() {
-	zap.LogE("Writing config", viper.WriteConfig())
-	zap.Debug("Updated config file-->", "config", Viper.ConfigFileUsed())
-	zap.LogE("Reading config", Viper.ReadInConfig())
-	zap.Debug("Updated config file-->", "config", Viper.ConfigFileUsed())
-	zap.LogF("Unmarshalling config", Viper.Unmarshal(Configuration))
 }
