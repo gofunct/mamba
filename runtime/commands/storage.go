@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/gofunct/common/pkg/logger/zap"
 
-	"github.com/gofunct/common/pkg/config"
+	"github.com/gofunct/mamba/runtime/config"
 	"github.com/spf13/cobra"
 )
 

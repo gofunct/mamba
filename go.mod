@@ -11,7 +11,7 @@ require (
 	github.com/evanphx/json-patch v4.1.0+incompatible // indirect
 	github.com/fsouza/go-dockerclient v1.3.5
 	github.com/go-logfmt/logfmt v0.4.0 // indirect
-	github.com/gofunct/common v0.0.0-20190129000850-5d37b699683e
+	github.com/gofunct/common v0.0.0-20190129002835-dc0c14ef193d
 	github.com/golang/groupcache v0.0.0-20181024230925-c65c006176ff // indirect
 	github.com/golang/protobuf v1.2.0
 	github.com/google/btree v0.0.0-20180813153112-4030bb1f1f0c // indirect
