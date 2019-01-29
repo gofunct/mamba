@@ -167,11 +167,11 @@ func Annotate(v *viper.Viper) map[string]string {
 func Read() {
 	zap.LogE("Reading config", Viper.ReadInConfig())
 	zap.Debug("Current config file-->", "config", Viper.ConfigFileUsed())
-	zap.LogF("Unmarshalling config", Viper.Unmarshal(Configuration))
+	zap.LogE("Unmarshalling config", Viper.Unmarshal(Configuration))
 }
 
 func Update() {
-	zap.LogF("Writing config", viper.WriteConfig())
+	zap.LogE("Writing config", viper.WriteConfig())
 	zap.Debug("Updated config file-->", "config", Viper.ConfigFileUsed())
 	zap.LogE("Reading config", Viper.ReadInConfig())
 	zap.Debug("Updated config file-->", "config", Viper.ConfigFileUsed())
