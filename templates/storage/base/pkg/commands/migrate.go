@@ -35,9 +35,9 @@ func init() {
 	migrateCmd.PersistentFlags().String("dir", "migrations", "A database migrations directory")
 	migrateCmd.PersistentFlags().Bool("active", true, "A database migrations are active")
 	helper.LogF("Flag error",
-		viper.Project.BindPFlag("migrations.dir", migrateCmd.PersistentFlags().Lookup("dir")))
+		viper.BindPFlag("migrations.dir", migrateCmd.PersistentFlags().Lookup("dir")))
 	helper.LogF("Flag error",
-		viper.Project.BindPFlag("migrations.active", migrateCmd.PersistentFlags().Lookup("active")))
+		viper.BindPFlag("migrations.active", migrateCmd.PersistentFlags().Lookup("active")))
 	helper.LogF("Env error", viper.Project.BindEnv("migrations.dir"))
 	helper.LogF("Env error", viper.Project.BindEnv("migrations.active"))
 }

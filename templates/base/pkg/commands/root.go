@@ -43,9 +43,9 @@ func init() {
 	RootCmd.PersistentFlags().Int("log-level", int(config.DefaultLoggerLevel), "Logger level (0 - debug, 1 - info, ...)")
 	RootCmd.PersistentFlags().String("log-format", logger.TextFormatter.String(), "Logger format: txt, json")
 	helper.LogF("Flag error",
-		viper.Project.BindPFlag("logger.level", RootCmd.PersistentFlags().Lookup("log-level")))
+		viper.BindPFlag("logger.level", RootCmd.PersistentFlags().Lookup("log-level")))
 	helper.LogF("Flag error",
-		viper.Project.BindPFlag("logger.format", RootCmd.PersistentFlags().Lookup("log-format")))
+		viper.BindPFlag("logger.format", RootCmd.PersistentFlags().Lookup("log-format")))
 	helper.LogF("Env error", viper.Project.BindEnv("logger.level"))
 	helper.LogF("Env error", viper.Project.BindEnv("logger.format"))
 
@@ -62,25 +62,25 @@ func init() {
 	RootCmd.PersistentFlags().Int("idle-conn", 1, "Count of idle database connections")
 	RootCmd.PersistentFlags().StringP("fixtures-dir", "F", "fixtures", "A database fixtures directory")
 	helper.LogF("Flag error",
-		viper.Project.BindPFlag("database.driver", RootCmd.PersistentFlags().Lookup("database-driver")))
+		viper.BindPFlag("database.driver", RootCmd.PersistentFlags().Lookup("database-driver")))
 	helper.LogF("Flag error",
-		viper.Project.BindPFlag("database.host", RootCmd.PersistentFlags().Lookup("database-host")))
+		viper.BindPFlag("database.host", RootCmd.PersistentFlags().Lookup("database-host")))
 	helper.LogF("Flag error",
-		viper.Project.BindPFlag("database.port", RootCmd.PersistentFlags().Lookup("database-port")))
+		viper.BindPFlag("database.port", RootCmd.PersistentFlags().Lookup("database-port")))
 	helper.LogF("Flag error",
-		viper.Project.BindPFlag("database.name", RootCmd.PersistentFlags().Lookup("database-name")))
+		viper.BindPFlag("database.name", RootCmd.PersistentFlags().Lookup("database-name")))
 	helper.LogF("Flag error",
-		viper.Project.BindPFlag("database.username", RootCmd.PersistentFlags().Lookup("database-username")))
+		viper.BindPFlag("database.username", RootCmd.PersistentFlags().Lookup("database-username")))
 	helper.LogF("Flag error",
-		viper.Project.BindPFlag("database.password", RootCmd.PersistentFlags().Lookup("database-password")))
+		viper.BindPFlag("database.password", RootCmd.PersistentFlags().Lookup("database-password")))
 	helper.LogF("Flag error",
-		viper.Project.BindPFlag("database.properties", RootCmd.PersistentFlags().Lookup("database-props")))
+		viper.BindPFlag("database.properties", RootCmd.PersistentFlags().Lookup("database-props")))
 	helper.LogF("Flag error",
-		viper.Project.BindPFlag("database.connections.max", RootCmd.PersistentFlags().Lookup("max-conn")))
+		viper.BindPFlag("database.connections.max", RootCmd.PersistentFlags().Lookup("max-conn")))
 	helper.LogF("Flag error",
-		viper.Project.BindPFlag("database.connections.idle", RootCmd.PersistentFlags().Lookup("idle-conn")))
+		viper.BindPFlag("database.connections.idle", RootCmd.PersistentFlags().Lookup("idle-conn")))
 	helper.LogF("Flag error",
-		viper.Project.BindPFlag("database.fixtures.dir", RootCmd.PersistentFlags().Lookup("fixtures-dir")))
+		viper.BindPFlag("database.fixtures.dir", RootCmd.PersistentFlags().Lookup("fixtures-dir")))
 
 	helper.LogF("Env error",
 		viper.Project.BindEnv("database.driver", strings.ToUpper(config.ServiceName+".db.driver")))

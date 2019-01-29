@@ -39,12 +39,12 @@ func init() {
 	serveCmd.PersistentFlags().Bool("info-statistics", config.DefaultInfoStatistics, "Collect statistics information")
 	{{[- if .API.Enabled ]}}
 	helper.LogF("Flag error",
-		viper.Project.BindPFlag("server.port", serveCmd.PersistentFlags().Lookup("server-port")))
+		viper.BindPFlag("server.port", serveCmd.PersistentFlags().Lookup("server-port")))
 	{{[- end ]}}
 	helper.LogF("Flag error",
-		viper.Project.BindPFlag("info.port", serveCmd.PersistentFlags().Lookup("info-port")))
+		viper.BindPFlag("info.port", serveCmd.PersistentFlags().Lookup("info-port")))
 	helper.LogF("Flag error",
-		viper.Project.BindPFlag("info.statistics", serveCmd.PersistentFlags().Lookup("info-statistics")))
+		viper.BindPFlag("info.statistics", serveCmd.PersistentFlags().Lookup("info-statistics")))
 	{{[- if .API.Enabled ]}}
 	helper.LogF("Env error", viper.Project.BindEnv("server.port"))
 	{{[- end ]}}
