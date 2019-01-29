@@ -16,9 +16,9 @@ package commands
 
 import (
 	"github.com/gofunct/mamba/runtime/scripter/cli"
-	"os"
-
+	mux2 "github.com/gorilla/mux"
 	"github.com/spf13/cobra"
+	"net/http"
 )
 
 // scriptCmd represents the script command
@@ -26,8 +26,14 @@ var scriptCmd = &cobra.Command{
 	Use:   "script",
 	Short: "A brief description of your command",
 
-	Run: func(cmd *cobra.Command, args []string) {
-		os.Exit(cli.Run())
+	RunE: func(cmd *cobra.Command, args []string) error {
+		mux := mux2.NewRouter()
+		mux.HandleFunc("/"+cmd.Use, func(writer http.ResponseWriter, request *http.Request) {
+			cmd.SetOutput(writer)
+
+			cli.Run(cmd)
+		})
+		return http.ListenAndServe(":11000", mux)
 	},
 }
 
