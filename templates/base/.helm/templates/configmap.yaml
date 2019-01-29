@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "name" . }}-config
+  labels:
+    app: {{ template "fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    component: "{{ .Values.service.name }}"
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+data:
+  default.conf: |-
+    {
+      {{[- if .API.Enabled ]}}
+      "server": {
+      {{[- if .API.Gateway ]}}
+        "gateway": {
+          "port": {{ .Values.service.http.port }}
+        },
+      {{[- end ]}}
+        "port": {{ .Values.service.grpc.port }}
+      },
+      {{[- end ]}}
+      "info": {
+        "port": {{ .Values.service.info.port }},
+        "statistics": {{ .Values.service.info.statistics }}
+      },
+      {{[- if .Storage.Enabled ]}}
+      {{- if .Values.service.database.enabled }}
+      "database": {
+        "driver": "{{ .Values.service.database.driver }}",
+        "host": "{{ .Values.service.database.host }}",
+        "port": {{ .Values.service.database.port }},
+        "name": "{{ .Values.service.database.name }}",
+        "username": "{{ .Values.service.database.driver }}",
+        "password": "{{ .Values.service.database.driver }}",
+        {{- if .Values.service.database.properties }}
+        "properties": [
+         {{- range $i, $value := .Values.service.database.properties }}
+          {{- if gt $i 0 }},{{- end }}
+          "{{ $value }}"
+          {{- end }}
+        ],
+        {{- end }}
+        "connections": {
+          "max": {{ .Values.service.database.connections.max }},
+          "idle": {{ .Values.service.database.connections.idle }}
+        }
+      {{- end }}
+      },
+      "migrations": {
+        "dir": "migrations",
+        "active": true
+      },
+      {{[- end ]}}
+      "logger": {
+        "format": "{{ .Values.service.logger.format }}",
+        "level": {{ .Values.service.logger.level }},
+        "time": {{ printf "%t" .Values.service.logger.time }}
+      }
+    }
