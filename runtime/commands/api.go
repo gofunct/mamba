@@ -35,19 +35,19 @@ var apiCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(apiCmd)
 
-	apiCmd.PersistentFlags().Bool("on", false, "An API modules using")
-	apiCmd.PersistentFlags().Bool("rest-gateway", false, "A REST gateway module using")
-	apiCmd.PersistentFlags().Bool("grpc", false, "A gRPC module using")
+	apiCmd.Flags().Bool("enabled", false, "An API modules using")
+	apiCmd.Flags().Bool("rest-gateway", false, "A REST gateway module using")
+	apiCmd.Flags().Bool("grpc", false, "A gRPC module using")
 	zap.LogF(
 		"Flag error",
-		V.BindPFlag("api.enabled", apiCmd.PersistentFlags().Lookup("enabled")),
+		V.BindPFlag("api.enabled", apiCmd.Flags().Lookup("enabled")),
 	)
 	zap.LogF(
 		"Flag error",
-		V.BindPFlag("api.gateway", apiCmd.PersistentFlags().Lookup("rest-gateway")),
+		V.BindPFlag("api.gateway", apiCmd.Flags().Lookup("rest-gateway")),
 	)
 	zap.LogF(
 		"Flag error",
-		V.BindPFlag("api.grpc", apiCmd.PersistentFlags().Lookup("grpc")),
+		V.BindPFlag("api.grpc", apiCmd.Flags().Lookup("grpc")),
 	)
 }
