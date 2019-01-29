@@ -1,7 +1,7 @@
 // Package commands process flags/environment variables/config file
 // It contains global variables with configs and commands
 // nolint: gochecknoglobals, gochecknoinits, unparam
-package commands
+package app
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ import (
 // apiCmd represents the api command
 var apiCmd = &cobra.Command{
 	Use:   "api",
-	Short: "Select API modules which used in the service",
+	Short: "🐍  Select API modules which used in the service",
 	Run: func(cmd *cobra.Command, args []string) {
 		if V.GetBool("api.rest") || V.GetBool("api.grpc") {
 			V.Set("api.enabled", true)
@@ -33,8 +33,7 @@ var apiCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(apiCmd)
-
+	apiCmd.AddCommand(configCmd)
 	apiCmd.Flags().Bool("enabled", false, "An API modules using")
 	apiCmd.Flags().Bool("rest-gateway", false, "A REST gateway module using")
 	apiCmd.Flags().Bool("grpc", false, "A gRPC module using")

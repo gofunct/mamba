@@ -1,7 +1,7 @@
 // Package commands process flags/environment variables/config file
 // It contains global variables with configs and commands
 // nolint: gochecknoglobals, gochecknoinits, unparam
-package commands
+package app
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ import (
 // storageCmd represents the storage command
 var storageCmd = &cobra.Command{
 	Use:   "storage",
-	Short: "Setup your storage modules",
+	Short: "🐍  Setup your storage modules",
 	Run: func(cmd *cobra.Command, args []string) {
 		if V.GetBool("storage.postgres") || V.GetBool("storage.mysql") {
 			V.Set("storage.enabled", true)
@@ -49,8 +49,7 @@ var storageCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(storageCmd)
-
+	storageCmd.AddCommand(driverCmd)
 	storageCmd.PersistentFlags().Bool("enabled", false, "A Storage modules using")
 	storageCmd.PersistentFlags().Bool("postgres", false, "A postgres module using")
 	storageCmd.PersistentFlags().Bool("mysql", false, "A mysql module using")

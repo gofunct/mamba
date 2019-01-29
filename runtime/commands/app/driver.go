@@ -1,7 +1,7 @@
 // Package commands process flags/environment variables/config file
 // It contains global variables with configs and commands
 // nolint: gochecknoglobals, gochecknoinits, unparam
-package commands
+package app
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ var (
 // driverCmd represents the driver command
 var driverCmd = &cobra.Command{
 	Use:   "driver",
-	Short: "Setup database driver settings",
+	Short: "🐍 Setup database driver settings",
 	Run: func(cmd *cobra.Command, args []string) {
 		err := V.WriteConfig()
 		if err != nil {
@@ -30,8 +30,6 @@ var driverCmd = &cobra.Command{
 }
 
 func init() {
-	storageCmd.AddCommand(driverCmd)
-
 	if V.GetBool("storage.mysql") {
 		databasePort = config.DefaultMySQLPort
 		databaseDriver = config.StorageMySQL

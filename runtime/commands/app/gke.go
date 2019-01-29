@@ -1,7 +1,7 @@
 // Package commands process flags/environment variables/config file
 // It contains global variables with configs and commands
 // nolint: gochecknoglobals, gochecknoinits, unparam
-package commands
+package app
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ import (
 // gkeCmd represents the GKE command
 var gkeCmd = &cobra.Command{
 	Use:   "GKE",
-	Short: "Setup Google Kubernetes Engine properties to deploy the service",
+	Short: "🐍 Setup Google Kubernetes Engine properties to deploy the service",
 	Run: func(cmd *cobra.Command, args []string) {
 		err := V.WriteConfig()
 		if err != nil {
@@ -25,7 +25,6 @@ var gkeCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(gkeCmd)
 
 	gkeCmd.PersistentFlags().Bool("enabled", false, "A Google Kubernetes Engine enabled")
 	gkeCmd.PersistentFlags().String("project", "my-project-id", "A project ID in GCP")

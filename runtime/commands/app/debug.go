@@ -1,4 +1,4 @@
-package commands
+package app
 
 import (
 	"github.com/gofunct/common/pkg/encode"
@@ -17,7 +17,7 @@ import (
 // configCmd represents API settings command
 var debugCmd = &cobra.Command{
 	Use:   "debug",
-	Short: "Debug current config",
+	Short: "🐍  Debug current config",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		mux := mux2.NewRouter()
 		mux.HandleFunc("/debug/config", func(writer http.ResponseWriter, request *http.Request) {

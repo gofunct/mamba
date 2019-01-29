@@ -1,7 +1,7 @@
 // Package commands process flags/environment variables/config file
 // It contains global variables with configs and commands
 // nolint: gochecknoglobals, gochecknoinits, unparam
-package commands
+package app
 
 import (
 	"fmt"
@@ -18,11 +18,7 @@ import (
 // newCmd represents the new command
 var newCmd = &cobra.Command{
 	Use:   "new",
-	Short: "Generates new service from templates using default/config settings",
-	Long: `In this mode, you'll be not asked about everything.
-The configuration file will be used for all other data,
-such as the host, port, etc., if you have saved it before.
-Otherwise, the default settings will be used.`,
+	Short: "🐍 Generates new service from templates using default/config settings",
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg := new(config.Config)
 		if err := V.Unmarshal(&cfg); err != nil {
@@ -43,8 +39,6 @@ Otherwise, the default settings will be used.`,
 }
 
 func init() {
-	RootCmd.AddCommand(newCmd)
-
 	newCmd.PersistentFlags().String("name", "my-service", "A name of your new service")
 	newCmd.PersistentFlags().String("description", "My service", "A description of your new service")
 	RootCmd.PersistentFlags().String("github", "my-account", "A Github account name")

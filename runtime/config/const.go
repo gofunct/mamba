@@ -4,9 +4,9 @@ package config
 
 const (
 	FileName = ".mamba"
-
+	ConfigType = ".json"
 	// ServiceName defines short service name
-	ServiceName = "Common boilerplate generator"
+	ServiceName = "Mamba"
 	// DefaultPostgresPort defines default port for PostgreSQL
 	DefaultPostgresPort = 5432
 	// DefaultMySQLPort defines default port for MySQL
@@ -30,7 +30,7 @@ const (
 	// StorageMySQL declared storage driver type: mysql
 	StorageMySQL = "mysql"
 	// RELEASE returns the release version
-	RELEASE = "UNKNOWN"
+	RELEASE = "v0.1.1"
 	// DATE returns the release date
 	DATE = "UNKNOWN"
 )
