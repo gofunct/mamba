@@ -3,7 +3,7 @@
 package config
 
 const (
-	FileName = ".chronic"
+	FileName = ".mamba"
 
 	// ServiceName defines short service name
 	ServiceName = "Common boilerplate generator"
