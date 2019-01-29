@@ -4,9 +4,9 @@
 package commands
 
 import (
-	"{{[ .Project ]}}/pkg/config"
-	"{{[ .Project ]}}/pkg/helper"
-	"{{[ .Project ]}}/pkg/service"
+	"{{[ .Project.Project ]}}/pkg/config"
+	"{{[ .Project.Project ]}}/pkg/helper"
+	"{{[ .Project.Project ]}}/pkg/service"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -39,15 +39,15 @@ func init() {
 	serveCmd.PersistentFlags().Bool("info-statistics", config.DefaultInfoStatistics, "Collect statistics information")
 	{{[- if .API.Enabled ]}}
 	helper.LogF("Flag error",
-		viper.BindPFlag("server.port", serveCmd.PersistentFlags().Lookup("server-port")))
+		viper.Project.BindPFlag("server.port", serveCmd.PersistentFlags().Lookup("server-port")))
 	{{[- end ]}}
 	helper.LogF("Flag error",
-		viper.BindPFlag("info.port", serveCmd.PersistentFlags().Lookup("info-port")))
+		viper.Project.BindPFlag("info.port", serveCmd.PersistentFlags().Lookup("info-port")))
 	helper.LogF("Flag error",
-		viper.BindPFlag("info.statistics", serveCmd.PersistentFlags().Lookup("info-statistics")))
+		viper.Project.BindPFlag("info.statistics", serveCmd.PersistentFlags().Lookup("info-statistics")))
 	{{[- if .API.Enabled ]}}
-	helper.LogF("Env error", viper.BindEnv("server.port"))
+	helper.LogF("Env error", viper.Project.BindEnv("server.port"))
 	{{[- end ]}}
-	helper.LogF("Env error", viper.BindEnv("info.port"))
-	helper.LogF("Env error", viper.BindEnv("info.statistics"))
+	helper.LogF("Env error", viper.Project.BindEnv("info.port"))
+	helper.LogF("Env error", viper.Project.BindEnv("info.statistics"))
 }

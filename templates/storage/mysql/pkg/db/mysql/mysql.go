@@ -4,10 +4,10 @@ import (
 	"context"
 	"database/sql"
 
-	"{{[ .Project ]}}/pkg/db"
-	"{{[ .Project ]}}/pkg/db/migrations"
-	{{[- if .Contract ]}}
-	"{{[ .Project ]}}/pkg/db/provider"
+	"{{[ .Project.Project ]}}/pkg/db"
+	"{{[ .Project.Project ]}}/pkg/db/migrations"
+	{{[- if .Project.Contract ]}}
+	"{{[ .Project.Project ]}}/pkg/db/provider"
 	{{[- end ]}}
 
 	// MySQL driver
@@ -25,7 +25,7 @@ type MySQL struct {
 	pool *sql.DB
 	cfg  *db.Config
 	log  *zap.Logger
-	{{[- if .Contract ]}}
+	{{[- if .Project.Contract ]}}
 	// Contract providers
 	events provider.Events
 	{{[- end ]}}
@@ -49,7 +49,7 @@ func New(cfg *db.Config, log *zap.Logger, mig migrations.Migrator) (*MySQL, erro
 
 	log.Info("DB", zap.String("version", name))
 
-	{{[- if .Contract ]}}
+	{{[- if .Project.Contract ]}}
 
 	m.events = newEventsProvider(m.pool)
 	{{[- end ]}}
@@ -70,7 +70,7 @@ func (m MySQL) Shutdown(ctx context.Context) error {
 	return m.pool.Close()
 }
 
-{{[- if .Contract ]}}
+{{[- if .Project.Contract ]}}
 
 // EventsProvider returns data store provider for Events
 func (m MySQL) EventsProvider() provider.Events {

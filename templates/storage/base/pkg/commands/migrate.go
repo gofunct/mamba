@@ -4,10 +4,10 @@
 package commands
 
 import (
-	"{{[ .Project ]}}/pkg/config"
-	"{{[ .Project ]}}/pkg/db"
-	"{{[ .Project ]}}/pkg/db/migrations"
-	"{{[ .Project ]}}/pkg/helper"
+	"{{[ .Project.Project ]}}/pkg/config"
+	"{{[ .Project.Project ]}}/pkg/db"
+	"{{[ .Project.Project ]}}/pkg/db/migrations"
+	"{{[ .Project.Project ]}}/pkg/helper"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -35,11 +35,11 @@ func init() {
 	migrateCmd.PersistentFlags().String("dir", "migrations", "A database migrations directory")
 	migrateCmd.PersistentFlags().Bool("active", true, "A database migrations are active")
 	helper.LogF("Flag error",
-		viper.BindPFlag("migrations.dir", migrateCmd.PersistentFlags().Lookup("dir")))
+		viper.Project.BindPFlag("migrations.dir", migrateCmd.PersistentFlags().Lookup("dir")))
 	helper.LogF("Flag error",
-		viper.BindPFlag("migrations.active", migrateCmd.PersistentFlags().Lookup("active")))
-	helper.LogF("Env error", viper.BindEnv("migrations.dir"))
-	helper.LogF("Env error", viper.BindEnv("migrations.active"))
+		viper.Project.BindPFlag("migrations.active", migrateCmd.PersistentFlags().Lookup("active")))
+	helper.LogF("Env error", viper.Project.BindEnv("migrations.dir"))
+	helper.LogF("Env error", viper.Project.BindEnv("migrations.active"))
 }
 
 func doMigration(cmd *cobra.Command, action migrateAction) {

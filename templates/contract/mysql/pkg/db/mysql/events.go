@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 
-	"{{[ .Project ]}}/contracts/events"
-	"{{[ .Project ]}}/pkg/db/provider"
+	"{{[ .Project.Project ]}}/contracts/events"
+	"{{[ .Project.Project ]}}/pkg/db/provider"
 
 	"github.com/satori/go.uuid"
 )

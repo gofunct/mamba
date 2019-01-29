@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/golang/protobuf/ptypes/empty"
-	"{{[ .Project ]}}/contracts/events"
-	"{{[ .Project ]}}/contracts/request"
-	"{{[ .Project ]}}/pkg/db/provider"
+	"{{[ .Project.Project ]}}/contracts/events"
+	"{{[ .Project.Project ]}}/contracts/request"
+	"{{[ .Project.Project ]}}/pkg/db/provider"
 )
 
 type eventsServer struct {

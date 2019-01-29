@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"{{[ .Project ]}}/pkg/logger"
-	"{{[ .Project ]}}/pkg/version"
+	"{{[ .Project.Project ]}}/pkg/logger"
+	"{{[ .Project.Project ]}}/pkg/version"
 )
 
 var ErrReturnError = errors.New("test of return Error")

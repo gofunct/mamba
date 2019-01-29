@@ -1,6 +1,6 @@
 package main
 
-import "{{[ .Project ]}}/pkg/commands"
+import "{{[ .Project.Project ]}}/pkg/commands"
 
 func main() {
 	commands.Run()

@@ -5,25 +5,25 @@ import (
 	"fmt"
 	"net/http"
 
-	"{{[ .Project ]}}/pkg/config"
+	"{{[ .Project.Project ]}}/pkg/config"
 	{{[- if .Storage.Enabled ]}}
-	"{{[ .Project ]}}/pkg/db"
-	"{{[ .Project ]}}/pkg/db/migrations"
+	"{{[ .Project.Project ]}}/pkg/db"
+	"{{[ .Project.Project ]}}/pkg/db/migrations"
 	{{[- if .Storage.Postgres ]}}
-	"{{[ .Project ]}}/pkg/db/postgres"
+	"{{[ .Project.Project ]}}/pkg/db/postgres"
 	{{[- end ]}}
 	{{[- if .Storage.MySQL ]}}
-	"{{[ .Project ]}}/pkg/db/mysql"
+	"{{[ .Project.Project ]}}/pkg/db/mysql"
 	{{[- end ]}}
-	"{{[ .Project ]}}/pkg/db/stub"
+	"{{[ .Project.Project ]}}/pkg/db/stub"
 	{{[- end ]}}
-	"{{[ .Project ]}}/pkg/info"
-	"{{[ .Project ]}}/pkg/logger"
+	"{{[ .Project.Project ]}}/pkg/info"
+	"{{[ .Project.Project ]}}/pkg/logger"
 	{{[- if .API.Enabled ]}}
-	"{{[ .Project ]}}/pkg/server"
+	"{{[ .Project.Project ]}}/pkg/server"
 	{{[- end ]}}
-	"{{[ .Project ]}}/pkg/system"
-	"{{[ .Project ]}}/pkg/version"
+	"{{[ .Project.Project ]}}/pkg/system"
+	"{{[ .Project.Project ]}}/pkg/version"
 
 	"go.uber.org/zap"
 )
@@ -85,7 +85,7 @@ func Run(cfg *config.Config) error {
 	{{[- end ]}}
 	{{[- end ]}}
 
-	{{[- if .Contract ]}}
+	{{[- if .Project.Contract ]}}
 
 	// Register data store providers
 	srv.RegisterEventsProvider(database.EventsProvider())

@@ -1,4 +1,4 @@
-# {{[ .Name ]}}: A Helm charts for Kubernetes Application
+# {{ .Project.Name ]}}: A Helm charts for Kubernetes Application
 
 Run of deployment for the service that satisfied of Kubernetes requirements
 

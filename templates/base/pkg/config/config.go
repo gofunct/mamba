@@ -1,11 +1,11 @@
 package config
 
 import (
-	"{{[ .Project ]}}/pkg/db"
-	"{{[ .Project ]}}/pkg/db/migrations"
-	"{{[ .Project ]}}/pkg/info"
-	"{{[ .Project ]}}/pkg/logger"
-	"{{[ .Project ]}}/pkg/server"
+	"{{[ .Project.Project ]}}/pkg/db"
+	"{{[ .Project.Project ]}}/pkg/db/migrations"
+	"{{[ .Project.Project ]}}/pkg/info"
+	"{{[ .Project.Project ]}}/pkg/logger"
+	"{{[ .Project.Project ]}}/pkg/server"
 
 	"github.com/spf13/viper"
 )
@@ -13,7 +13,7 @@ import (
 // Default values: host, port, etc
 const (
 	// ServiceName - default service name
-	ServiceName = "{{[ .Name ]}}"
+	ServiceName = "{{ .Project.Name ]}}"
 
 	APIVersion = "v1alpha"
 

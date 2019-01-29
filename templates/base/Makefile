@@ -1,6 +1,6 @@
-PROJECT = {{[ .Project ]}}
-APP = {{[ .Name ]}}
-BIN = {{[ .Bin ]}}
+PROJECT = {{[ .Project.Project ]}}
+APP = {{ .Project.Name ]}}
+BIN = {{[ .Project.Bin ]}}
 SERVICE_NAME ?= $(shell echo "$(APP)" | tr - _)
 
 # Use the v0.0.0 tag for testing, it shouldn't clobber any release builds
@@ -21,48 +21,48 @@ KUBE_CONTEXT ?= gke_$(GKE_PROJECT_ID)_$(GKE_PROJECT_ZONE)_$(GKE_CLUSTER_NAME)
 REGISTRY ?= gcr.io/$(GKE_PROJECT_ID)
 {{[- else ]}}
 
-REGISTRY ?= {{[ .Github ]}}
+REGISTRY ?= {{[ .Project.Github ]}}
 {{[- end ]}}
 
 # Common configuration
 {{[- if .API.Enabled ]}}
-{{[ toENV .Name ]}}_SERVER_PORT ?= {{[ .API.Config.Port ]}}
-{{[ toENV .Name ]}}_EXTERNAL_PORT ?= {{[ .API.Config.Port ]}}
+{{[ toENV .Project.Name ]}}_SERVER_PORT ?= {{[ .API.Config.Port ]}}
+{{[ toENV .Project.Name ]}}_EXTERNAL_PORT ?= {{[ .API.Config.Port ]}}
 {{[- if .API.Gateway ]}}
-{{[ toENV .Name ]}}_SERVER_GATEWAY_PORT ?= {{[ .API.Config.Gateway.Port ]}}
-{{[ toENV .Name ]}}_GATEWAY_EXTERNAL_PORT ?= {{[ .API.Config.Gateway.Port ]}}
+{{[ toENV .Project.Name ]}}_SERVER_GATEWAY_PORT ?= {{[ .API.Config.Gateway.Port ]}}
+{{[ toENV .Project.Name ]}}_GATEWAY_EXTERNAL_PORT ?= {{[ .API.Config.Gateway.Port ]}}
 {{[- end ]}}
 {{[- end ]}}
-{{[ toENV .Name ]}}_INFO_PORT ?= 8080
-{{[ toENV .Name ]}}_INFO_EXTERNAL_PORT ?= 8080
-{{[ toENV .Name ]}}_LOGGER_LEVEL ?= 0
-{{[ toENV .Name ]}}_CONFIG_PATH ?= /etc/$(SERVICE_NAME)/default.conf
+{{[ toENV .Project.Name ]}}_INFO_PORT ?= 8080
+{{[ toENV .Project.Name ]}}_INFO_EXTERNAL_PORT ?= 8080
+{{[ toENV .Project.Name ]}}_LOGGER_LEVEL ?= 0
+{{[ toENV .Project.Name ]}}_CONFIG_PATH ?= /etc/$(SERVICE_NAME)/default.conf
 
 {{[- if .Storage.Enabled ]}}
 
 # Database configuration
-{{[ toENV .Name ]}}_DB_DRIVER ?= {{[ .Storage.Config.Driver ]}}
+{{[ toENV .Project.Name ]}}_DB_DRIVER ?= {{[ .Storage.Config.Driver ]}}
 {{[- if .Storage.Postgres ]}}
-{{[ toENV .Name ]}}_DB_DRIVER_VERSION ?= 10.5
+{{[ toENV .Project.Name ]}}_DB_DRIVER_VERSION ?= 10.5
 {{[- end ]}}
 {{[- if .Storage.MySQL ]}}
-{{[ toENV .Name ]}}_DB_DRIVER_VERSION ?= 8.0
+{{[ toENV .Project.Name ]}}_DB_DRIVER_VERSION ?= 8.0
 {{[- end ]}}
-{{[ toENV .Name ]}}_DB_NAME ?= {{[ .Storage.Config.Name ]}}
-{{[ toENV .Name ]}}_DB_USERNAME ?= {{[ .Storage.Config.Username ]}}
-{{[ toENV .Name ]}}_DB_PASSWORD ?= {{[ .Storage.Config.Password ]}}
-{{[ toENV .Name ]}}_DB_LOCATION ?= ~/docker/{{[ .Storage.Config.Driver ]}}
+{{[ toENV .Project.Name ]}}_DB_NAME ?= {{[ .Storage.Config.Name ]}}
+{{[ toENV .Project.Name ]}}_DB_USERNAME ?= {{[ .Storage.Config.Username ]}}
+{{[ toENV .Project.Name ]}}_DB_PASSWORD ?= {{[ .Storage.Config.Password ]}}
+{{[ toENV .Project.Name ]}}_DB_LOCATION ?= ~/docker/{{[ .Storage.Config.Driver ]}}
 {{[- if .Storage.Postgres ]}}
-{{[ toENV .Name ]}}_DB_PATH ?= /var/lib/postgresql/data
+{{[ toENV .Project.Name ]}}_DB_PATH ?= /var/lib/postgresql/data
 {{[- else ]}}
-{{[ toENV .Name ]}}_DB_PATH ?= /var/lib/{{[ .Storage.Config.Driver ]}}
+{{[ toENV .Project.Name ]}}_DB_PATH ?= /var/lib/{{[ .Storage.Config.Driver ]}}
 {{[- end ]}}
-{{[ toENV .Name ]}}_DB_HOST ?= {{[ .Storage.Config.Host ]}}
-{{[ toENV .Name ]}}_DB_PORT ?= {{[ .Storage.Config.Port ]}}
-{{[ toENV .Name ]}}_DB_FIXTURES_DIR ?= fixtures
+{{[ toENV .Project.Name ]}}_DB_HOST ?= {{[ .Storage.Config.Host ]}}
+{{[ toENV .Project.Name ]}}_DB_PORT ?= {{[ .Storage.Config.Port ]}}
+{{[ toENV .Project.Name ]}}_DB_FIXTURES_DIR ?= fixtures
 
-ifeq ("$({{[ toENV .Name ]}}_DB_DRIVER)","{{[ .Storage.Config.Driver ]}}")
-{{[ toENV .Name ]}}_DB_LINK ?= --link $({{[ toENV .Name ]}}_DB_HOST):$({{[ toENV .Name ]}}_DB_HOST)
+ifeq ("$({{[ toENV .Project.Name ]}}_DB_DRIVER)","{{[ .Storage.Config.Driver ]}}")
+{{[ toENV .Project.Name ]}}_DB_LINK ?= --link $({{[ toENV .Project.Name ]}}_DB_HOST):$({{[ toENV .Project.Name ]}}_DB_HOST)
 endif
 {{[- end ]}}
 
@@ -131,14 +131,14 @@ vendor: bootstrap
 	@echo "+ $@"
 	@dep ensure -vendor-only
 
-{{[- if .Contract ]}}
+{{[- if .Project.Contract ]}}
 
 contracts:
 	@echo "+ $@"
 	@$(MAKE) -C contracts generate
 {{[- end ]}}
 
-compile: {{[- if .Contract ]}} contracts {{[- end ]}} vendor test lint
+compile: {{[- if .Project.Contract ]}} contracts {{[- end ]}} vendor test lint
 	@echo "+ $@"
 	@CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build -a -installsuffix cgo \
 		-ldflags $(LDFLAGS) -o bin/$(GOOS)-$(GOARCH)/$(BIN) $(PROJECT)/cmd
@@ -164,55 +164,55 @@ push: build project
 
 {{[- if .Storage.Enabled ]}}
 
-HAS_DB_RUNNED := $(shell docker ps | grep $({{[ toENV .Name ]}}_DB_HOST))
-HAS_DB_EXITED := $(shell docker ps -a | grep $({{[ toENV .Name ]}}_DB_HOST))
+HAS_DB_RUNNED := $(shell docker ps | grep $({{[ toENV .Project.Name ]}}_DB_HOST))
+HAS_DB_EXITED := $(shell docker ps -a | grep $({{[ toENV .Project.Name ]}}_DB_HOST))
 
 db:
 	@echo "+ $@"
 ifndef HAS_DB_RUNNED
 ifndef HAS_DB_EXITED
-	@mkdir -p $({{[ toENV .Name ]}}_DB_LOCATION)
-	@docker run -d	--name $({{[ toENV .Name ]}}_DB_DRIVER) \
-	-p $({{[ toENV .Name ]}}_DB_PORT):$({{[ toENV .Name ]}}_DB_PORT) \
+	@mkdir -p $({{[ toENV .Project.Name ]}}_DB_LOCATION)
+	@docker run -d	--name $({{[ toENV .Project.Name ]}}_DB_DRIVER) \
+	-p $({{[ toENV .Project.Name ]}}_DB_PORT):$({{[ toENV .Project.Name ]}}_DB_PORT) \
 {{[- if .Storage.MySQL ]}}
 	-e "MYSQL_ROOT_PASSWORD={{[ randStr ]}}" \
-	-e "MYSQL_DATABASE=$({{[ toENV .Name ]}}_DB_NAME)" \
-	-e "MYSQL_USER=$({{[ toENV .Name ]}}_DB_USERNAME)" \
-	-e "MYSQL_PASSWORD=$({{[ toENV .Name ]}}_DB_PASSWORD)" \
+	-e "MYSQL_DATABASE=$({{[ toENV .Project.Name ]}}_DB_NAME)" \
+	-e "MYSQL_USER=$({{[ toENV .Project.Name ]}}_DB_USERNAME)" \
+	-e "MYSQL_PASSWORD=$({{[ toENV .Project.Name ]}}_DB_PASSWORD)" \
 {{[- end ]}}
 {{[- if .Storage.Postgres ]}}
-	-e "POSTGRES_DB=$({{[ toENV .Name ]}}_DB_NAME)" \
-	-e "POSTGRES_USER=$({{[ toENV .Name ]}}_DB_USERNAME)" \
-	-e "POSTGRES_PASSWORD=$({{[ toENV .Name ]}}_DB_PASSWORD)" \
+	-e "POSTGRES_DB=$({{[ toENV .Project.Name ]}}_DB_NAME)" \
+	-e "POSTGRES_USER=$({{[ toENV .Project.Name ]}}_DB_USERNAME)" \
+	-e "POSTGRES_PASSWORD=$({{[ toENV .Project.Name ]}}_DB_PASSWORD)" \
 {{[- end ]}}
-	-v $({{[ toENV .Name ]}}_DB_LOCATION):$({{[ toENV .Name ]}}_DB_PATH) \
-	$({{[ toENV .Name ]}}_DB_DRIVER):$({{[ toENV .Name ]}}_DB_DRIVER_VERSION)
+	-v $({{[ toENV .Project.Name ]}}_DB_LOCATION):$({{[ toENV .Project.Name ]}}_DB_PATH) \
+	$({{[ toENV .Project.Name ]}}_DB_DRIVER):$({{[ toENV .Project.Name ]}}_DB_DRIVER_VERSION)
 	@sleep {{[- if .Storage.Postgres ]}} 45 {{[ else ]}} 90 {{[- end ]}}
 else
-	@docker start $({{[ toENV .Name ]}}_DB_HOST)
+	@docker start $({{[ toENV .Project.Name ]}}_DB_HOST)
 endif
 endif
 
 migrate-up: build db
 	@echo "+ $@"
-	@docker run --rm $({{[ toENV .Name ]}}_DB_LINK) \
-		-e "{{[ toENV .Name ]}}_LOGGER_LEVEL=$({{[ toENV .Name ]}}_LOGGER_LEVEL)" \
-		-e "{{[ toENV .Name ]}}_CONFIG_PATH=$({{[ toENV .Name ]}}_CONFIG_PATH)" \
-		-e "{{[ toENV .Name ]}}_DB_DRIVER=$({{[ toENV .Name ]}}_DB_DRIVER)" \
-		-e "{{[ toENV .Name ]}}_DB_HOST=$({{[ toENV .Name ]}}_DB_HOST)" \
-		-e "{{[ toENV .Name ]}}_DB_PORT=$({{[ toENV .Name ]}}_DB_PORT)" \
-		-v $(shell pwd)/config/default.conf:$({{[ toENV .Name ]}}_CONFIG_PATH):ro \
+	@docker run --rm $({{[ toENV .Project.Name ]}}_DB_LINK) \
+		-e "{{[ toENV .Project.Name ]}}_LOGGER_LEVEL=$({{[ toENV .Project.Name ]}}_LOGGER_LEVEL)" \
+		-e "{{[ toENV .Project.Name ]}}_CONFIG_PATH=$({{[ toENV .Project.Name ]}}_CONFIG_PATH)" \
+		-e "{{[ toENV .Project.Name ]}}_DB_DRIVER=$({{[ toENV .Project.Name ]}}_DB_DRIVER)" \
+		-e "{{[ toENV .Project.Name ]}}_DB_HOST=$({{[ toENV .Project.Name ]}}_DB_HOST)" \
+		-e "{{[ toENV .Project.Name ]}}_DB_PORT=$({{[ toENV .Project.Name ]}}_DB_PORT)" \
+		-v $(shell pwd)/config/default.conf:$({{[ toENV .Project.Name ]}}_CONFIG_PATH):ro \
 		$(CONTAINER_IMAGE):$(RELEASE) /dcm migrate up
 
 migrate-down: build db
 	@echo "+ $@"
-	@docker run --rm $({{[ toENV .Name ]}}_DB_LINK) \
-		-e "{{[ toENV .Name ]}}_LOGGER_LEVEL=$({{[ toENV .Name ]}}_LOGGER_LEVEL)" \
-		-e "{{[ toENV .Name ]}}_CONFIG_PATH=$({{[ toENV .Name ]}}_CONFIG_PATH)" \
-		-e "{{[ toENV .Name ]}}_DB_DRIVER=$({{[ toENV .Name ]}}_DB_DRIVER)" \
-		-e "{{[ toENV .Name ]}}_DB_HOST=$({{[ toENV .Name ]}}_DB_HOST)" \
-		-e "{{[ toENV .Name ]}}_DB_PORT=$({{[ toENV .Name ]}}_DB_PORT)" \
-		-v $(shell pwd)/config/default.conf:$({{[ toENV .Name ]}}_CONFIG_PATH):ro \
+	@docker run --rm $({{[ toENV .Project.Name ]}}_DB_LINK) \
+		-e "{{[ toENV .Project.Name ]}}_LOGGER_LEVEL=$({{[ toENV .Project.Name ]}}_LOGGER_LEVEL)" \
+		-e "{{[ toENV .Project.Name ]}}_CONFIG_PATH=$({{[ toENV .Project.Name ]}}_CONFIG_PATH)" \
+		-e "{{[ toENV .Project.Name ]}}_DB_DRIVER=$({{[ toENV .Project.Name ]}}_DB_DRIVER)" \
+		-e "{{[ toENV .Project.Name ]}}_DB_HOST=$({{[ toENV .Project.Name ]}}_DB_HOST)" \
+		-e "{{[ toENV .Project.Name ]}}_DB_PORT=$({{[ toENV .Project.Name ]}}_DB_PORT)" \
+		-v $(shell pwd)/config/default.conf:$({{[ toENV .Project.Name ]}}_CONFIG_PATH):ro \
 		$(CONTAINER_IMAGE):$(RELEASE) /dcm migrate down
 {{[- end ]}}
 
@@ -220,31 +220,31 @@ run: clean build {{[- if .Storage.Enabled ]}} db {{[- end ]}}
 	@echo "+ $@"
 	@docker run --name $(CONTAINER_NAME) \
 {{[- if .Storage.Enabled ]}}
-		$({{[ toENV .Name ]}}_DB_LINK) \
+		$({{[ toENV .Project.Name ]}}_DB_LINK) \
 {{[- end ]}}
 {{[- if .API.Enabled ]}}
-		-p $({{[ toENV .Name ]}}_EXTERNAL_PORT):$({{[ toENV .Name ]}}_SERVER_PORT) \
+		-p $({{[ toENV .Project.Name ]}}_EXTERNAL_PORT):$({{[ toENV .Project.Name ]}}_SERVER_PORT) \
 {{[- if .API.Gateway ]}}
-		-p $({{[ toENV .Name ]}}_GATEWAY_EXTERNAL_PORT):$({{[ toENV .Name ]}}_SERVER_GATEWAY_PORT) \
+		-p $({{[ toENV .Project.Name ]}}_GATEWAY_EXTERNAL_PORT):$({{[ toENV .Project.Name ]}}_SERVER_GATEWAY_PORT) \
 {{[- end ]}}
 {{[- end ]}}
-		-p $({{[ toENV .Name ]}}_INFO_EXTERNAL_PORT):$({{[ toENV .Name ]}}_INFO_PORT) \
+		-p $({{[ toENV .Project.Name ]}}_INFO_EXTERNAL_PORT):$({{[ toENV .Project.Name ]}}_INFO_PORT) \
 {{[- if .API.Enabled ]}}
-		-e "{{[ toENV .Name ]}}_SERVER_PORT=$({{[ toENV .Name ]}}_SERVER_PORT)" \
+		-e "{{[ toENV .Project.Name ]}}_SERVER_PORT=$({{[ toENV .Project.Name ]}}_SERVER_PORT)" \
 {{[- if .API.Gateway ]}}
-		-e "{{[ toENV .Name ]}}_GATEWAY_PORT=$({{[ toENV .Name ]}}_SERVER_GATEWAY_PORT)" \
+		-e "{{[ toENV .Project.Name ]}}_GATEWAY_PORT=$({{[ toENV .Project.Name ]}}_SERVER_GATEWAY_PORT)" \
 {{[- end ]}}
 {{[- end ]}}
-		-e "{{[ toENV .Name ]}}_INFO_PORT=$({{[ toENV .Name ]}}_INFO_PORT)" \
-		-e "{{[ toENV .Name ]}}_LOGGER_LEVEL=$({{[ toENV .Name ]}}_LOGGER_LEVEL)" \
-		-e "{{[ toENV .Name ]}}_CONFIG_PATH=$({{[ toENV .Name ]}}_CONFIG_PATH)" \
+		-e "{{[ toENV .Project.Name ]}}_INFO_PORT=$({{[ toENV .Project.Name ]}}_INFO_PORT)" \
+		-e "{{[ toENV .Project.Name ]}}_LOGGER_LEVEL=$({{[ toENV .Project.Name ]}}_LOGGER_LEVEL)" \
+		-e "{{[ toENV .Project.Name ]}}_CONFIG_PATH=$({{[ toENV .Project.Name ]}}_CONFIG_PATH)" \
 {{[- if .Storage.Enabled ]}}
-		-e "{{[ toENV .Name ]}}_DB_DRIVER=$({{[ toENV .Name ]}}_DB_DRIVER)" \
-		-e "{{[ toENV .Name ]}}_DB_HOST=$({{[ toENV .Name ]}}_DB_HOST)" \
-		-e "{{[ toENV .Name ]}}_DB_PORT=$({{[ toENV .Name ]}}_DB_PORT)" \
-		-v $(shell pwd)/fixtures:/$({{[ toENV .Name ]}}_DB_FIXTURES_DIR):ro \
+		-e "{{[ toENV .Project.Name ]}}_DB_DRIVER=$({{[ toENV .Project.Name ]}}_DB_DRIVER)" \
+		-e "{{[ toENV .Project.Name ]}}_DB_HOST=$({{[ toENV .Project.Name ]}}_DB_HOST)" \
+		-e "{{[ toENV .Project.Name ]}}_DB_PORT=$({{[ toENV .Project.Name ]}}_DB_PORT)" \
+		-v $(shell pwd)/fixtures:/$({{[ toENV .Project.Name ]}}_DB_FIXTURES_DIR):ro \
 {{[- end ]}}
-		-v $(shell pwd)/config/default.conf:$({{[ toENV .Name ]}}_CONFIG_PATH):ro \
+		-v $(shell pwd)/config/default.conf:$({{[ toENV .Project.Name ]}}_CONFIG_PATH):ro \
 		-d $(CONTAINER_IMAGE):$(BUILD)
 	@sleep 1
 	@docker logs $(CONTAINER_NAME)
@@ -348,7 +348,7 @@ endif
 	cluster \
 {{[- end ]}}
 	vendor \
-{{[- if .Contract ]}}
+{{[- if .Project.Contract ]}}
 	contracts \
 {{[- end ]}}
 	compile \

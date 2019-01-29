@@ -3,7 +3,7 @@ package provider
 import (
 	"context"
 
-	"{{[ .Project ]}}/contracts/events"
+	"{{[ .Project.Project ]}}/contracts/events"
 )
 
 // Events defines data store Events provider methods

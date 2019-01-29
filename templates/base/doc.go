@@ -1,2 +1,1 @@
-// Package {{[ .Name ]}} provides documentation
-package {{[ .Name ]}}
+package {{ .Project.Name }}

@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"net/http"
 
-	{{[- if .Contract ]}}
+	{{[- if .Project.Contract ]}}
 
-	"{{[ .Project ]}}/contracts/events"
+	"{{[ .Project.Project ]}}/contracts/events"
 	{{[- end ]}}
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.uber.org/zap"
-	{{[- if .Contract ]}}
+	{{[- if .Project.Contract ]}}
 	"google.golang.org/grpc"
 	{{[- end ]}}
 )
@@ -49,7 +49,7 @@ func (gw *GatewayServer) Run(ctx context.Context) error {
 
 	// Register REST/gRPC gateway
 	gateway := runtime.NewServeMux()
-	{{[- if .Contract ]}}
+	{{[- if .Project.Contract ]}}
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 	if err := events.RegisterEventsHandlerFromEndpoint(
 		ctx, gateway, fmt.Sprintf("localhost:%d", gw.cfg.Port), opts,

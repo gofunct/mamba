@@ -3,14 +3,14 @@ package db
 import (
 	"context"
 
-	"{{[ .Project ]}}/pkg/db/provider"
+	"{{[ .Project.Project ]}}/pkg/db/provider"
 )
 
 // Store design database interface with providers
 type Store interface {
 	Check() error
 	Shutdown(ctx context.Context) error
-	{{[- if .Contract ]}}
+	{{[- if .Project.Contract ]}}
 	EventsProvider() provider.Events
 	{{[- end ]}}
 }

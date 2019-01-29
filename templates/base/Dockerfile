@@ -2,28 +2,28 @@ FROM scratch
 
 # Common configuration
 {{[- if .API.Enabled ]}}
-ENV {{[ toENV .Name ]}}_SERVER_PORT {{[ .API.Config.Port ]}}
+ENV {{[ toENV .Project.Name ]}}_SERVER_PORT {{[ .API.Config.Port ]}}
 {{[- if .API.Gateway ]}}
-ENV {{[ toENV .Name ]}}_SERVER_GATEWAY_PORT {{[ .API.Config.Gateway.Port ]}}
+ENV {{[ toENV .Project.Name ]}}_SERVER_GATEWAY_PORT {{[ .API.Config.Gateway.Port ]}}
 {{[- end ]}}
 {{[- end ]}}
-ENV {{[ toENV .Name ]}}_INFO_PORT 8080
-ENV {{[ toENV .Name ]}}_LOGGER_LEVEL 0
+ENV {{[ toENV .Project.Name ]}}_INFO_PORT 8080
+ENV {{[ toENV .Project.Name ]}}_LOGGER_LEVEL 0
 
 # Exposing ports
 {{[- if .API.Enabled ]}}
-EXPOSE ${{[ toENV .Name ]}}_SERVER_PORT
+EXPOSE ${{[ toENV .Project.Name ]}}_SERVER_PORT
 {{[- if .API.Gateway ]}}
-EXPOSE ${{[ toENV .Name ]}}_SERVER_GATEWAY_PORT
+EXPOSE ${{[ toENV .Project.Name ]}}_SERVER_GATEWAY_PORT
 {{[- end ]}}
 {{[- end ]}}
-EXPOSE ${{[ toENV .Name ]}}_INFO_PORT
+EXPOSE ${{[ toENV .Project.Name ]}}_INFO_PORT
 
 # Copy dependecies
 COPY certs /etc/ssl/certs/
 {{[- if .Storage.Enabled ]}}
 COPY migrations /migrations/
 {{[- end ]}}
-COPY bin/linux-amd64/{{[ .Bin ]}} /
+COPY bin/linux-amd64/{{[ .Project.Bin ]}} /
 
-CMD ["/{{[ .Bin ]}}", "serve"]
+CMD ["/{{[ .Project.Bin ]}}", "serve"]

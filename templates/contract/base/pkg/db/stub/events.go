@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"sync"
 
-	"{{[ .Project ]}}/contracts/events"
-	"{{[ .Project ]}}/pkg/db"
-	"{{[ .Project ]}}/pkg/db/provider"
+	"{{[ .Project.Project ]}}/contracts/events"
+	"{{[ .Project.Project ]}}/pkg/db"
+	"{{[ .Project.Project ]}}/pkg/db/provider"
 )
 
 type eventsProvider struct {

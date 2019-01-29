@@ -1,4 +1,4 @@
-## Default values for {{[ .Name ]}}.
+## Default values for {{ .Project.Name ]}}.
 ## This is a YAML-formatted file.
 ## Declare variables to be passed into your templates.
 
@@ -33,9 +33,9 @@ image:
   {{[- if .GKE.Enabled ]}}
   registry: gcr.io/{{[ .GKE.Project ]}}
   {{[- else ]}}
-  registry: {{[ .Github ]}}
+  registry: {{[ .Project.Github ]}}
   {{[- end ]}}
-  name: {{[ .Name ]}}
+  name: {{ .Project.Name ]}}
   tag: v0.0.0
 
   ## Docker Registry/Hub auth secret name, always use `registry-pull-secret` if registry inside if k8s
@@ -70,15 +70,15 @@ ingress:
   ##
   hostBased:
     hosts:
-    - {{[ .Name ]}}.example.net
+    - {{ .Project.Name ]}}.example.net
 
     ## Ingress TLS configuration
     ## Secrets must be manually created in the namespace
     ##
     tls:
-    - secretName: {{[ .Name ]}}.example.net-secret
+    - secretName: {{ .Project.Name ]}}.example.net-secret
       hosts:
-      - {{[ .Name ]}}.example.net
+      - {{ .Project.Name ]}}.example.net
 
   # ## Ingress path feature allow access to service through path
   # ## example: https://hostname/namespace/servicename
@@ -100,7 +100,7 @@ ingress:
 service:
   ## App container name
   ##
-  name: {{[ .Name ]}}
+  name: {{ .Project.Name ]}}
 
   ## Service Type
   ## For minikube, recommended value NodePort,

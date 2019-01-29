@@ -8,9 +8,9 @@ import (
 	"os"
 	"strings"
 
-	"{{[ .Project ]}}/pkg/config"
-	"{{[ .Project ]}}/pkg/helper"
-	"{{[ .Project ]}}/pkg/logger"
+	"{{[ .Project.Project ]}}/pkg/config"
+	"{{[ .Project.Project ]}}/pkg/helper"
+	"{{[ .Project.Project ]}}/pkg/logger"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -20,7 +20,7 @@ var cfgFile string
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
-	Use:   "{{[ .Name ]}}",
+	Use:   "{{ .Project.Name ]}}",
 	Short: "Service short description",
 	Long:  `Service long description`,
 }
@@ -43,11 +43,11 @@ func init() {
 	RootCmd.PersistentFlags().Int("log-level", int(config.DefaultLoggerLevel), "Logger level (0 - debug, 1 - info, ...)")
 	RootCmd.PersistentFlags().String("log-format", logger.TextFormatter.String(), "Logger format: txt, json")
 	helper.LogF("Flag error",
-		viper.BindPFlag("logger.level", RootCmd.PersistentFlags().Lookup("log-level")))
+		viper.Project.BindPFlag("logger.level", RootCmd.PersistentFlags().Lookup("log-level")))
 	helper.LogF("Flag error",
-		viper.BindPFlag("logger.format", RootCmd.PersistentFlags().Lookup("log-format")))
-	helper.LogF("Env error", viper.BindEnv("logger.level"))
-	helper.LogF("Env error", viper.BindEnv("logger.format"))
+		viper.Project.BindPFlag("logger.format", RootCmd.PersistentFlags().Lookup("log-format")))
+	helper.LogF("Env error", viper.Project.BindEnv("logger.level"))
+	helper.LogF("Env error", viper.Project.BindEnv("logger.format"))
 
 	{{[- if .Storage.Enabled ]}}
 
@@ -62,46 +62,46 @@ func init() {
 	RootCmd.PersistentFlags().Int("idle-conn", 1, "Count of idle database connections")
 	RootCmd.PersistentFlags().StringP("fixtures-dir", "F", "fixtures", "A database fixtures directory")
 	helper.LogF("Flag error",
-		viper.BindPFlag("database.driver", RootCmd.PersistentFlags().Lookup("database-driver")))
+		viper.Project.BindPFlag("database.driver", RootCmd.PersistentFlags().Lookup("database-driver")))
 	helper.LogF("Flag error",
-		viper.BindPFlag("database.host", RootCmd.PersistentFlags().Lookup("database-host")))
+		viper.Project.BindPFlag("database.host", RootCmd.PersistentFlags().Lookup("database-host")))
 	helper.LogF("Flag error",
-		viper.BindPFlag("database.port", RootCmd.PersistentFlags().Lookup("database-port")))
+		viper.Project.BindPFlag("database.port", RootCmd.PersistentFlags().Lookup("database-port")))
 	helper.LogF("Flag error",
-		viper.BindPFlag("database.name", RootCmd.PersistentFlags().Lookup("database-name")))
+		viper.Project.BindPFlag("database.name", RootCmd.PersistentFlags().Lookup("database-name")))
 	helper.LogF("Flag error",
-		viper.BindPFlag("database.username", RootCmd.PersistentFlags().Lookup("database-username")))
+		viper.Project.BindPFlag("database.username", RootCmd.PersistentFlags().Lookup("database-username")))
 	helper.LogF("Flag error",
-		viper.BindPFlag("database.password", RootCmd.PersistentFlags().Lookup("database-password")))
+		viper.Project.BindPFlag("database.password", RootCmd.PersistentFlags().Lookup("database-password")))
 	helper.LogF("Flag error",
-		viper.BindPFlag("database.properties", RootCmd.PersistentFlags().Lookup("database-props")))
+		viper.Project.BindPFlag("database.properties", RootCmd.PersistentFlags().Lookup("database-props")))
 	helper.LogF("Flag error",
-		viper.BindPFlag("database.connections.max", RootCmd.PersistentFlags().Lookup("max-conn")))
+		viper.Project.BindPFlag("database.connections.max", RootCmd.PersistentFlags().Lookup("max-conn")))
 	helper.LogF("Flag error",
-		viper.BindPFlag("database.connections.idle", RootCmd.PersistentFlags().Lookup("idle-conn")))
+		viper.Project.BindPFlag("database.connections.idle", RootCmd.PersistentFlags().Lookup("idle-conn")))
 	helper.LogF("Flag error",
-		viper.BindPFlag("database.fixtures.dir", RootCmd.PersistentFlags().Lookup("fixtures-dir")))
+		viper.Project.BindPFlag("database.fixtures.dir", RootCmd.PersistentFlags().Lookup("fixtures-dir")))
 
 	helper.LogF("Env error",
-		viper.BindEnv("database.driver", strings.ToUpper(config.ServiceName+".db.driver")))
+		viper.Project.BindEnv("database.driver", strings.ToUpper(config.ServiceName+".db.driver")))
 	helper.LogF("Env error",
-		viper.BindEnv("database.host", strings.ToUpper(config.ServiceName+".db.host")))
+		viper.Project.BindEnv("database.host", strings.ToUpper(config.ServiceName+".db.host")))
 	helper.LogF("Env error",
-		viper.BindEnv("database.port", strings.ToUpper(config.ServiceName+".db.port")))
+		viper.Project.BindEnv("database.port", strings.ToUpper(config.ServiceName+".db.port")))
 	helper.LogF("Env error",
-		viper.BindEnv("database.name", strings.ToUpper(config.ServiceName+".db.name")))
+		viper.Project.BindEnv("database.name", strings.ToUpper(config.ServiceName+".db.name")))
 	helper.LogF("Env error",
-		viper.BindEnv("database.username", strings.ToUpper(config.ServiceName+".db.username")))
+		viper.Project.BindEnv("database.username", strings.ToUpper(config.ServiceName+".db.username")))
 	helper.LogF("Env error",
-		viper.BindEnv("database.password", strings.ToUpper(config.ServiceName+".db.password")))
+		viper.Project.BindEnv("database.password", strings.ToUpper(config.ServiceName+".db.password")))
 	helper.LogF("Env error",
-		viper.BindEnv("database.properties", strings.ToUpper(config.ServiceName+".db.properties")))
+		viper.Project.BindEnv("database.properties", strings.ToUpper(config.ServiceName+".db.properties")))
 	helper.LogF("Env error",
-		viper.BindEnv("database.connections.max", strings.ToUpper(config.ServiceName+".db.connections.max")))
+		viper.Project.BindEnv("database.connections.max", strings.ToUpper(config.ServiceName+".db.connections.max")))
 	helper.LogF("Env error",
-		viper.BindEnv("database.connections.idle", strings.ToUpper(config.ServiceName+".db.connections.idle")))
+		viper.Project.BindEnv("database.connections.idle", strings.ToUpper(config.ServiceName+".db.connections.idle")))
 	helper.LogF("Env error",
-		viper.BindEnv("database.fixtures.dir", strings.ToUpper(config.ServiceName+".db.fixtures.dir")))
+		viper.Project.BindEnv("database.fixtures.dir", strings.ToUpper(config.ServiceName+".db.fixtures.dir")))
 	{{[- end ]}}
 }
 

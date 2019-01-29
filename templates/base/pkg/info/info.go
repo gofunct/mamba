@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"{{[ .Project ]}}/pkg/version"
+	"{{[ .Project.Project ]}}/pkg/version"
 
 	"go.uber.org/zap"
 )

@@ -1,7 +1,7 @@
 
-# {{[ .Name ]}}
+# {{ .Project.Name ]}}
 
-{{[ .Description ]}}
+{{[ .Project.Description ]}}
 
 ## Run the service
 
@@ -40,5 +40,3 @@ make run
 ## Versioned changes
 
 All changes in the project described in [changelog](docs/CHANGELOG.md)
-
-_Generated using ([Caldera boilerplate](https://github.com/takama/caldera))_
