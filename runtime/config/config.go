@@ -146,6 +146,7 @@ func init() {
 	{
 		Viper.SetDefault("config.name", FileName)
 	}
+	zap.LogE("Reading config", Viper.SafeWriteConfig())
 }
 
 func GetConfig() *Config {
