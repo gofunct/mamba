@@ -15,15 +15,22 @@
 package load
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/spf13/cobra"
+)
+
+var (
+	lConfig string
 )
 
 // deployCmd represents the deploy command
 var RootCmd = &cobra.Command{
 	Use: "load",
-	Short: "🐍 Download single, multiple, or all files from a remote repository",
 }
 
 func init() {
 	RootCmd.AddCommand(loadCmd)
+	RootCmd.PersistentFlags().StringVar(&lConfig, "config", filepath.Join(os.Getenv("PWD"), "config", "load.yaml"), "load config path")
 }

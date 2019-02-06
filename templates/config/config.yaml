@@ -1,0 +1,27 @@
+logo:
+repo:
+author:
+  name: Coleman Word
+  email: colemanword@gmail.com
+  for_hire: true
+license:
+version:
+download:
+image:
+usage:
+website:
+service:
+  port:
+  methods:
+runtime:
+  goos:
+  arch:
+path:
+  cmd:
+  bin:
+  config:
+  manifest:
+  dockerfile:
+  makefile:
+  schema:
+env:

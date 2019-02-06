@@ -1,0 +1,9 @@
+//go:generate go get github.com/gofunct/common
+//go:generate go fmt ./...
+//go:generate go vet ./...
+//go:generate go install ./...
+//go:generate git add .
+//go:generate git commit -m "successful go generate(no docker)🐍"
+//go:generate git push origin master
+
+package mamba

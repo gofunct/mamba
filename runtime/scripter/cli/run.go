@@ -1,17 +1,16 @@
 package cli
 
 import (
-	"github.com/spf13/cobra"
 	"os"
 	"strings"
 )
 
 // Run parses the gorram command line args and runs the gorram command.
-func Run(cmd *cobra.Command) int {
+func Run() int {
 	env := OSEnv{
 		Args:   make([]string, len(os.Args)),
-		Stderr: cmd.OutOrStdout(),
-		Stdout: cmd.OutOrStdout(),
+		Stderr: os.Stderr,
+		Stdout: os.Stdout,
 		Stdin:  os.Stdin,
 		Env:    getenv(os.Environ()),
 	}

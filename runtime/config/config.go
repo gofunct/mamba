@@ -21,86 +21,88 @@ var Configuration = &Config{}
 // Config contains service configuration
 type Config struct {
 	Project struct {
-		Name        string `json:"project.name"`
-		Description string `json:"project.description"`
-		Github      string `json:"project.github"`
-		Project     string `json:"project.project"`
-		Bin         string `json:"project.bin"`
-		GitInit     bool   `json:"project.gitinit"`
-		Contract    bool   `json:"project.contract"`
+		Name        string `mapstructure:"project.name"`
+		Description string `mapstructure:"project.description"`
+		Github      string `mapstructure:"project.github"`
+		Project     string `mapstructure:"project.project"`
+		Bin         string `mapstructure:"project.bin"`
+		GitInit     bool   `mapstructure:"project.gitinit"`
+		Contract    bool   `mapstructure:"project.contract"`
 	}
 	GKE struct {
-		Enabled bool   `json:"gke.enabled"`
-		Project string `json:"gke.project"`
-		Zone    string `json:"gke.zone"`
-		Cluster string `json:"gke.cluster"`
+		Enabled bool   `mapstructure:"gke.enabled"`
+		Project string `mapstructure:"gke.project"`
+		Zone    string `mapstructure:"gke.zone"`
+		Cluster string `mapstructure:"gke.cluster"`
 	}
 	Storage struct {
-		Enabled  bool `json:"storage.enabled"`
-		Postgres bool `json:"storage.posgres"`
-		MySQL    bool `json:"storage.mysql"`
+		Enabled  bool `mapstructure:"storage.enabled"`
+		Postgres bool `mapstructure:"storage.posgres"`
+		MySQL    bool `mapstructure:"storage.mysql"`
 		Config   struct {
-			Driver      string `json:"storage.comfig.driver"`
-			Host        string `json:"storage.comfig.driver"`
-			Port        int    `json:"storage.comfig.driver"`
-			Name        string `json:"storage.comfig.driver"`
-			Username    string `json:"storage.comfig.driver"`
-			Password    string `json:"storage.comfig.driver"`
+			Driver      string `mapstructure:"storage.comfig.driver"`
+			Host        string `mapstructure:"storage.comfig.driver"`
+			Port        int    `mapstructure:"storage.comfig.driver"`
+			Name        string `mapstructure:"storage.comfig.driver"`
+			Username    string `mapstructure:"storage.comfig.driver"`
+			Password    string `mapstructure:"storage.comfig.driver"`
 			Connections struct {
-				Max  int `json:"storage.comfig.connections.max"`
-				Idle int `json:"storage.comfig.connections.idle"`
+				Max  int `mapstructure:"storage.comfig.connections.max"`
+				Idle int `mapstructure:"storage.comfig.connections.idle"`
 			}
 		}
 	}
 	API struct {
-		Enabled bool `json:"api.enabled"`
-		GRPC    bool `json:"api.grpc"`
-		Gateway bool `json:"api.gateway"`
+		Enabled bool `mapstructure:"api.enabled"`
+		GRPC    bool `mapstructure:"api.grpc"`
+		Gateway bool `mapstructure:"api.gateway"`
 		Config  struct {
-			Port    int `json:"api.config.port"`
+			Port    int `mapstructure:"api.config.port"`
 			Gateway struct {
-				Port int `json:"api.config.port"`
+				Port int `mapstructure:"api.config.port"`
 			}
 		}
 	}
 	Directories struct {
-		Templates string `json:"directories.templates"`
-		Service   string `json:"directories.service"`
+		Templates string `mapstructure:"directories.templates"`
+		Service   string `mapstructure:"directories.service"`
 	}
 	Docker struct {
-		Endpoint  string `json:"docker.endpoint"`
-		Dockerhub string `json:"docker.dockerhub"`
+		Endpoint  string `mapstructure:"docker.endpoint"`
+		Dockerhub string `mapstructure:"docker.dockerhub"`
 		Container struct {
-			Image      string   `json:"docker.container.image"`
-			Container  string   `json:"docker.container"`
-			Args       []string `json:"docker.container.dependencies"`
-			Env        []string `json:"docker.container.env"`
-			Entrypoint []string `json:"docker.container.entrypoint"`
-			Modules    bool     `json:"docker.container.modules"`
+			Image      string   `mapstructure:"docker.container.image"`
+			Container  string   `mapstructure:"docker.container"`
+			Args       []string `mapstructure:"docker.container.dependencies"`
+			Env        []string `mapstructure:"docker.container.env"`
+			Entrypoint []string `mapstructure:"docker.container.entrypoint"`
+			Modules    bool     `mapstructure:"docker.container.modules"`
 		}
 	}
 }
 
 func init() {
+	defer Update()
+	defer Read()
 	Viper.SetConfigName(FileName)
 	Viper.AllowEmptyEnv(true)
-	Viper.SetConfigType("json")
+	Viper.SetConfigType("yaml")
 	Viper.AddConfigPath(homeDir)
 	Viper.AddConfigPath(".")
 	Viper.AutomaticEnv()
-	zap.LogE("Writing config", Viper.WriteConfig())
+	zap.LogE("Writing config", viper.SafeWriteConfig())
 	{
 		Viper.SetDefault("project.name", "default")
 		Viper.SetDefault("project.description", "default")
 		Viper.SetDefault("project.github", "default")
 		Viper.SetDefault("project.project", "default")
 		Viper.SetDefault("project.bin", "default")
-		Viper.SetDefault("project.gitinit", false)
-		Viper.SetDefault("project.contract", true)
+		Viper.SetDefault("project.gitinit", "default")
+		Viper.SetDefault("project.contract", "default")
 
 	}
 	{
-		Viper.SetDefault("gke.enabled", true)
+		Viper.SetDefault("gke.enabled", "default")
 		Viper.SetDefault("gke.project", "default")
 		Viper.SetDefault("gke.zone", "default")
 		Viper.SetDefault("gke.cluster", "default")
@@ -111,7 +113,7 @@ func init() {
 		Viper.SetDefault("storage.mysql", false)
 		Viper.SetDefault("storage.config.driver", "default")
 		Viper.SetDefault("storage.config.host", "default")
-		Viper.SetDefault("storage.config.port", DefaultPostgresPort)
+		Viper.SetDefault("storage.config.port", "default")
 		Viper.SetDefault("storage.config.name", "default")
 		Viper.SetDefault("storage.config.username", "default")
 		Viper.SetDefault("storage.config.password", "default")
@@ -144,13 +146,34 @@ func init() {
 	{
 		Viper.SetDefault("config.name", FileName)
 	}
-	zap.LogE("updating config", Viper.WriteConfig())
-	zap.LogE("Reading config", Viper.ReadInConfig())
-	zap.LogF("unmarshaling config", Viper.Unmarshal(Configuration))
-	zap.Debug("Current config file-->", "config", Viper.ConfigFileUsed())
+	zap.LogE("Reading config", Viper.SafeWriteConfig())
 }
 
 func GetConfig() *Config {
-	Viper.Unmarshal(Configuration)
 	return Configuration
+}
+
+func Annotate(v *viper.Viper) map[string]string {
+	settings := v.AllSettings()
+	an := make(map[string]string)
+	for k, v := range settings {
+		if t, ok := v.(string); ok == true {
+			an[k] = t
+		}
+	}
+	return an
+}
+
+func Read() {
+	zap.LogE("Reading config", Viper.ReadInConfig())
+	zap.Debug("Current config file-->", "config", Viper.ConfigFileUsed())
+	zap.LogE("Unmarshalling config", Viper.Unmarshal(Configuration))
+}
+
+func Update() {
+	zap.LogE("Writing config", viper.WriteConfig())
+	zap.Debug("Updated config file-->", "config", Viper.ConfigFileUsed())
+	zap.LogE("Reading config", Viper.ReadInConfig())
+	zap.Debug("Updated config file-->", "config", Viper.ConfigFileUsed())
+	zap.LogF("Unmarshalling config", Viper.Unmarshal(Configuration))
 }

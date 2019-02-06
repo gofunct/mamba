@@ -29,7 +29,6 @@ var (
 // deployCmd represents the deploy command
 var RootCmd = &cobra.Command{
 	Use: "contain",
-	Short: "🐍 A Docker development utility",
 }
 
 // pullCmd represents the pull command

@@ -14,7 +14,6 @@ var (
 
 func init() {
 	var err error
-	endpoint = "unix:///var/run/docker.sock"
 	client, err = docker.NewClient(endpoint)
 	if err != nil {
 		zap.LogF("failed to setup docker client", err)

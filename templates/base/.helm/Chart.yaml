@@ -1,6 +1,0 @@
-name: {{ .Project.Name ]}}
-description: A Helm charts for Kubernetes application
-version: v0.0.0
-sources:
-  - https://{{[ .Project.Project ]}}
-engine: gotpl
